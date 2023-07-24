@@ -35,17 +35,17 @@ func main() {
 		Exec("go", "build", "-v", "-o", "../static/client.wasm")
 
 	Task("watch-server").
-		Watch("server/*.go", "server/*/*.go", "net/*.go").
+		Watch("server/*.go", "server/*/*.go", "net/*.go", "game/*.go").
 		Signaler(SigQuit).
 		Run("build-server").
 		Run("run-server")
 	Task("watch-client").
-		Watch("client/*.go", "client/*/*.go", "net/*.go").
+		Watch("client/*.go", "client/*/*.go", "net/*.go", "game/*.go").
 		Signaler(SigQuit).
 		Run("build-client").
 		Run("run-client")
 	Task("watch-client-wasm").
-		Watch("client/*.go", "client/*/*.go", "net/*.go").
+		Watch("client/*.go", "client/*/*.go", "net/*.go", "game/*.go").
 		Signaler(SigQuit).
 		Run("build-client-wasm")
 
