@@ -3,18 +3,17 @@ package main
 import "github.com/kettek/morogue/client/ifs"
 
 type stateMachine struct {
-	states []ifs.State
 }
 
-func (sm *stateMachine) Top() ifs.State {
-	if len(sm.states) == 0 {
+func (a *app) Top() ifs.State {
+	if len(a.states) == 0 {
 		return nil
 	}
-	return sm.states[len(sm.states)-1]
+	return a.states[len(a.states)-1]
 }
 
-func (sm *stateMachine) Pop() (ifs.State, error) {
-	s := sm.Top()
+func (a *app) Pop() (ifs.State, error) {
+	s := a.Top()
 	if s == nil {
 		return nil, nil
 	}
@@ -22,8 +21,8 @@ func (sm *stateMachine) Pop() (ifs.State, error) {
 	if err != nil {
 		return nil, err
 	}
-	sm.states = sm.states[:len(sm.states)-1]
-	s = sm.Top()
+	a.states = a.states[:len(a.states)-1]
+	s = a.Top()
 	if s == nil {
 		return nil, nil
 	}
@@ -31,15 +30,15 @@ func (sm *stateMachine) Pop() (ifs.State, error) {
 	return s, err
 }
 
-func (sm *stateMachine) Push(s ifs.State) error {
-	t := sm.Top()
+func (a *app) Push(s ifs.State) error {
+	t := a.Top()
 	if t != nil {
 		err := t.Leave()
 		if err != nil {
 			return err
 		}
 	}
-	sm.states = append(sm.states, s)
-	err := s.Begin()
+	a.states = append(a.states, s)
+	err := s.Begin(a.runContext)
 	return err
 }

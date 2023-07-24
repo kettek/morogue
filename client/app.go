@@ -13,7 +13,7 @@ import (
 )
 
 type app struct {
-	stateMachine
+	states       []ifs.State
 	connectState states.Connect
 	drawContext  ifs.DrawContext
 	runContext   ifs.RunContext
@@ -39,7 +39,7 @@ func newApp() *app {
 	a.runContext.Txt = ifs.NewTextRenderer(renderer)
 	a.drawContext.Txt = ifs.NewTextRenderer(renderer)
 
-	a.connectState.Begin()
+	a.connectState.Begin(a.runContext)
 
 	return a
 }
@@ -49,7 +49,7 @@ func (a *app) Update() error {
 		return err
 	}
 
-	if t := a.stateMachine.Top(); t != nil {
+	if t := a.Top(); t != nil {
 		t.Update(a.runContext)
 	}
 
@@ -58,7 +58,7 @@ func (a *app) Update() error {
 
 func (a *app) Draw(screen *ebiten.Image) {
 	a.drawContext.Screen = screen
-	if t := a.stateMachine.Top(); t != nil {
+	if t := a.Top(); t != nil {
 		t.Draw(a.drawContext)
 	}
 

@@ -21,7 +21,7 @@ type Connect struct {
 	result         string
 }
 
-func (state *Connect) Begin() error {
+func (state *Connect) Begin(ctx ifs.RunContext) error {
 	state.mode = modeConnecting
 	state.connectionChan = state.connection.Connect()
 	return nil

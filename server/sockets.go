@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -10,19 +9,21 @@ import (
 	"nhooyr.io/websocket"
 )
 
-// protoServer is the WebSocket echo server implementation.
-// It ensures the client speaks the echo subprotocol and
-// only allows one message every 100ms with a 10 message burst.
-type protoServer struct {
+type socketServer struct {
 	// logf controls where logs are sent.
 	logf func(f string, v ...interface{})
 	//
 	serveMux http.ServeMux
+	//
+	newClientChan chan client
+	checkChan     chan struct{}
 }
 
-func newProtoServer() *protoServer {
-	p := &protoServer{
-		logf: log.Printf,
+func newSocketServer(newClientChan chan client, checkChan chan struct{}) *socketServer {
+	p := &socketServer{
+		logf:          log.Printf,
+		newClientChan: newClientChan,
+		checkChan:     checkChan,
 	}
 
 	p.serveMux.Handle("/", http.FileServer(http.Dir("./static")))
@@ -31,11 +32,11 @@ func newProtoServer() *protoServer {
 	return p
 }
 
-func (s *protoServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *socketServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.serveMux.ServeHTTP(w, r)
 }
 
-func (s *protoServer) handleSockit(w http.ResponseWriter, r *http.Request) {
+func (s *socketServer) handleSockit(w http.ResponseWriter, r *http.Request) {
 	c, err := websocket.Accept(w, r, &websocket.AcceptOptions{
 		Subprotocols: []string{"morogue"},
 	})
@@ -50,7 +51,14 @@ func (s *protoServer) handleSockit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cl := net.NewConnection(c)
+	conn := net.NewConnection(c)
+	client := client{
+		conn:       conn,
+		msgChan:    make(chan net.Message, 10),
+		closedChan: make(chan error, 2),
+	}
+
+	s.newClientChan <- client
 
 	for {
 		var w net.Wrapper
@@ -60,21 +68,20 @@ func (s *protoServer) handleSockit(w http.ResponseWriter, r *http.Request) {
 			err = json.Unmarshal(b, &w)
 			if err != nil {
 				s.logf("failed to unmarshal with %v: %v", r.RemoteAddr, err)
-				return
-			}
-			if m := w.Message(); m != nil {
-				// TODO: Send m to client instance for handling.
-				fmt.Println("client msg", m, m.Type())
-				cl.Write(&net.PingMessage{})
+			} else if m := w.Message(); m != nil {
+				client.msgChan <- m
+				s.checkChan <- struct{}{}
+				conn.Write(&net.PingMessage{})
 			}
 		}
 
 		if websocket.CloseStatus(err) == websocket.StatusNormalClosure {
+			client.closedChan <- err
 			return
 		}
 		if err != nil {
-			s.logf("failed to read with %v: %v", r.RemoteAddr, err)
-			// TODO: Handle err reason, if it exists.
+			client.closedChan <- err
+			s.checkChan <- struct{}{}
 			return
 		}
 	}

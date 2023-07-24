@@ -28,7 +28,15 @@ func run() error {
 	}
 	log.Printf("listening on http://%v", l.Addr())
 
-	ps := newProtoServer()
+	accounts, err := newAccounts("accounts")
+	if err != nil {
+		return err
+	}
+
+	u := newUniverse(accounts)
+	u.Run()
+
+	ps := newSocketServer(u.clientChan, u.checkChan)
 
 	s := &http.Server{
 		Handler:      ps,
