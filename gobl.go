@@ -35,7 +35,7 @@ func main() {
 		Exec("go", "build", "-v", "-o", "../static/client.wasm")
 
 	Task("watch-server").
-		Watch("server/*.go", "server/*/*.go").
+		Watch("server/*.go", "server/*/*.go", "net/*.go").
 		Signaler(SigQuit).
 		Run("build-server").
 		Run("run-server")
