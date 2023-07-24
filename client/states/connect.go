@@ -9,6 +9,7 @@ import (
 const (
 	modeConnecting = "connecting"
 	modeFailed     = "failed"
+	modeLost       = "lost"
 	modeSuccess    = "success"
 )
 
@@ -16,7 +17,6 @@ type Connect struct {
 	connection     net.Connection
 	connectionChan chan error
 	loopChan       chan error
-	messageChan    chan net.Message
 	mode           string
 	result         string
 }
@@ -55,7 +55,11 @@ func (state *Connect) Update(ctx ifs.RunContext) error {
 		// Push the login state onto the stack.
 		ctx.Sm.Push(NewLogin(state.connection, messageChan))
 	case err := <-state.loopChan:
-		state.mode = modeFailed
+		if state.mode == modeSuccess {
+			state.mode = modeLost
+		} else {
+			state.mode = modeFailed
+		}
 		state.result = err.Error()
 	default:
 		//
