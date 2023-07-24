@@ -8,6 +8,7 @@ import (
 )
 
 type Account struct {
+	username   string
 	ID         int
 	Characters []game.Character
 	Password   string

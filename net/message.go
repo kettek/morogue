@@ -23,6 +23,10 @@ func (w *Wrapper) Message() Message {
 		var m RegisterMessage
 		json.Unmarshal(w.Data, &m)
 		return m
+	case (LogoutMessage{}).Type():
+		var m LogoutMessage
+		json.Unmarshal(w.Data, &m)
+		return m
 	}
 	return nil
 }
@@ -58,4 +62,13 @@ type RegisterMessage struct {
 
 func (m RegisterMessage) Type() string {
 	return "register"
+}
+
+type LogoutMessage struct {
+	Result     string `json:"r,omitempty"`
+	ResultCode int    `json:"c,omitempty"`
+}
+
+func (m LogoutMessage) Type() string {
+	return "logout"
 }

@@ -1,17 +1,19 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/kettek/morogue/net"
 )
 
 type universe struct {
-	accounts   Accounts
-	clients    []client
-	clientChan chan client
-	checkChan  chan struct{}
-	worlds     []world
+	accounts         Accounts
+	loggedInAccounts []string
+	clients          []*client
+	clientChan       chan client
+	checkChan        chan struct{}
+	worlds           []world
 }
 
 func newUniverse(accounts Accounts) universe {
@@ -39,7 +41,7 @@ func (u *universe) Run() chan struct{} {
 				// TODO: Cleanup worlds.
 				return
 			case client := <-u.clientChan:
-				u.clients = append(u.clients, client)
+				u.clients = append(u.clients, &client)
 			case <-u.checkChan:
 				u.checkClients()
 			}
@@ -59,13 +61,12 @@ func (u *universe) checkClients() {
 		}
 	}
 	for j := i; j < len(u.clients); j++ {
-		u.clients[j] = client{}
+		u.clients[j] = nil
 	}
 	u.clients = u.clients[:i]
 }
 
-func (u *universe) updateClient(cl client) error {
-	fmt.Println("updateClient")
+func (u *universe) updateClient(cl *client) error {
 	for {
 		select {
 		case msg := <-cl.msgChan:
@@ -88,12 +89,19 @@ func (u *universe) updateClient(cl client) error {
 								Result:     ErrBadPassword.Error(),
 								ResultCode: 403,
 							})
+						} else if u.isAccountLoggedIn(m.User) {
+							cl.conn.Write(net.LoginMessage{
+								Result:     ErrUserLoggedIn.Error(),
+								ResultCode: 403,
+							})
 						} else {
 							cl.conn.Write(net.LoginMessage{
 								ResultCode: 200,
 							})
+							account.username = m.User
 							cl.account = account
 							cl.state = clientStateLoggedIn
+							u.loggedInAccounts = append(u.loggedInAccounts, m.User)
 						}
 					}
 				}
@@ -120,13 +128,22 @@ func (u *universe) updateClient(cl client) error {
 							cl.conn.Write(net.RegisterMessage{
 								ResultCode: 200,
 							})
+							account.username = m.User
 							cl.account = account
 							cl.state = clientStateLoggedIn
+							u.loggedInAccounts = append(u.loggedInAccounts, m.User)
 						}
 					}
 				}
+			case net.LogoutMessage:
+				u.removeAccountLoggedIn(cl.account.username)
+				cl.account = Account{}
+				cl.state = clientStateWaiting
 			}
 		case err := <-cl.closedChan:
+			if cl.account.username != "" {
+				u.removeAccountLoggedIn(cl.account.username)
+			}
 			fmt.Println("client yeeted", err)
 			return err
 		default:
@@ -134,3 +151,26 @@ func (u *universe) updateClient(cl client) error {
 		}
 	}
 }
+
+func (u *universe) isAccountLoggedIn(username string) bool {
+	for _, user := range u.loggedInAccounts {
+		if user == username {
+			return true
+		}
+	}
+	return false
+}
+
+func (u *universe) removeAccountLoggedIn(username string) {
+	fmt.Println("removing", username, u.loggedInAccounts)
+	for i, user := range u.loggedInAccounts {
+		if user == username {
+			u.loggedInAccounts = append(u.loggedInAccounts[:i], u.loggedInAccounts[i+1:]...)
+			return
+		}
+	}
+}
+
+var (
+	ErrUserLoggedIn = errors.New("user is logged in")
+)

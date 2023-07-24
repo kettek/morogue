@@ -239,7 +239,7 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 	)
 
 	state.resultText = widget.NewText(
-		widget.TextOpts.Text("Login. You will be prompted to register if username does not exist.", face, color.White),
+		widget.TextOpts.Text("login. you will be prompted to register if username does not exist.", face, color.White),
 		widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
 		widget.TextOpts.WidgetOpts(
 			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
@@ -319,6 +319,10 @@ func (state *Login) showRegister() {
 }
 
 func (state *Login) Return(interface{}) error {
+	state.resultText.Label = "...and so you return."
+	state.ui.Container.RemoveChildren()
+	state.showLogin()
+
 	return nil
 }
 
@@ -336,8 +340,9 @@ func (state *Login) Update(ctx ifs.RunContext) error {
 		switch m := msg.(type) {
 		case net.LoginMessage:
 			if m.ResultCode == 200 {
-				fmt.Println("Success, let's log in!!!")
 				state.resultText.Label = "logged in!"
+				ctx.Sm.Push(NewCreate(state.connection, state.messageChan))
+				return nil
 			} else if m.ResultCode == 404 {
 				state.showRegister()
 				state.resultText.Label = "Confirm your password to register."
@@ -346,8 +351,9 @@ func (state *Login) Update(ctx ifs.RunContext) error {
 			}
 		case net.RegisterMessage:
 			if m.ResultCode == 200 {
-				fmt.Println("Success, let's log in!!!")
 				state.resultText.Label = "logged in!"
+				ctx.Sm.Push(NewCreate(state.connection, state.messageChan))
+				return nil
 			} else {
 				state.showLogin()
 				state.resultText.Label = m.Result
