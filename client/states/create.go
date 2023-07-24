@@ -19,6 +19,8 @@ import (
 	"github.com/kettek/morogue/client/ifs"
 	"github.com/kettek/morogue/game"
 	"github.com/kettek/morogue/net"
+	"github.com/nfnt/resize"
+	"golang.org/x/exp/slices"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 )
@@ -31,9 +33,15 @@ type Create struct {
 	logoutButton *widget.Button
 	resultText   *widget.Text
 	//
-	archetypesList *widget.List
+	archetypesContainer *widget.Container
 	//
 	archetypes []archetype
+	//
+	face font.Face
+	//
+	tooltips map[string]*widget.Container
+	//
+	sortBy string
 }
 
 type archetype struct {
@@ -54,6 +62,7 @@ func NewCreate(connection net.Connection, msgCh chan net.Message) *Create {
 					widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(20)))),
 			),
 		},
+		tooltips: make(map[string]*widget.Container),
 	}
 	return state
 }
@@ -68,6 +77,20 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 		DPI:     72,
 		Hinting: font.HintingNone,
 	})
+	state.face = face
+
+	state.archetypesContainer = widget.NewContainer(
+		widget.ContainerOpts.WidgetOpts(
+			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+				Position: widget.RowLayoutPositionCenter,
+			}),
+		),
+		widget.ContainerOpts.Layout(widget.NewRowLayout(
+			widget.RowLayoutOpts.Direction(widget.DirectionVertical),
+			widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(10)),
+			widget.RowLayoutOpts.Spacing(1),
+		)),
+	)
 
 	state.logoutButton = widget.NewButton(
 		// set general widget options
@@ -113,6 +136,7 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 	)
 
 	state.ui.Container.AddChild(state.resultText)
+	state.ui.Container.AddChild(state.archetypesContainer)
 	state.ui.Container.AddChild(state.logoutButton)
 
 	return nil
@@ -184,52 +208,221 @@ func (state *Create) acquireArchetypes(archetypes []game.Archetype) {
 			continue
 		}
 
+		// Resize the image to 2x until ebitenui has scaling built-in.
+		img = resize.Resize(uint(img.Bounds().Dx()*2), uint(img.Bounds().Dy()*2), img, resize.NearestNeighbor)
+
 		ebiImg := ebiten.NewImageFromImage(img)
 
 		arche.Image = ebiImg
-		fmt.Println("assigned imagie")
 	}
 }
 
 func (state *Create) refreshArchetypes() {
-	// FIXME: Archetypes need to be displayed as selectable rows with the following columns: Image | Title | Swole | Zooms | Brains | Funk
+	state.archetypesContainer.RemoveChildren()
+
+	// Heading
+	{
+		row := widget.NewContainer(
+			widget.ContainerOpts.Layout(widget.NewRowLayout(
+				widget.RowLayoutOpts.Direction(widget.DirectionHorizontal),
+			)),
+		)
+
+		el := widget.NewText(
+			widget.TextOpts.Text("", state.face, color.White),
+			widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
+			widget.TextOpts.WidgetOpts(
+				widget.WidgetOpts.MinSize(50, 20),
+				widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+					Position: widget.RowLayoutPositionCenter,
+				}),
+			),
+		)
+		row.AddChild(el)
+
+		parts := []string{"Archetype", "Swole", "Zooms", "Brains", "Funk"}
+		for _, p := range parts {
+			func(p string) {
+				var c color.NRGBA
+				var tooltip string
+				switch p {
+				case "Archetype":
+					c = color.NRGBA{255, 255, 255, 255}
+				case "Swole":
+					c = game.ColorSwoleVibrant
+					tooltip = game.AttributeSwoleDescription
+				case "Zooms":
+					c = game.ColorZoomsVibrant
+					tooltip = game.AttributeZoomsDescription
+				case "Brains":
+					c = game.ColorBrainsVibrant
+					tooltip = game.AttributeBrainsDescription
+				case "Funk":
+					c = game.ColorFunkVibrant
+					tooltip = game.AttributeFunkDescription
+				}
+
+				tool := widget.NewTextToolTip(tooltip, state.face, color.White, eimage.NewNineSliceColor(color.NRGBA{R: 50, G: 50, B: 50, A: 255}))
+				tool.Position = widget.TOOLTIP_POS_CURSOR_STICKY
+				tool.Delay = time.Duration(time.Millisecond * 200)
+
+				el := widget.NewText(
+					widget.TextOpts.Text(p, state.face, c),
+					widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
+					widget.TextOpts.WidgetOpts(
+						widget.WidgetOpts.MinSize(100, 20),
+						widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+							Position: widget.RowLayoutPositionCenter,
+						}),
+						widget.WidgetOpts.ToolTip(tool),
+						widget.WidgetOpts.MouseButtonPressedHandler(func(args *widget.WidgetMouseButtonPressedEventArgs) {
+							state.sortBy = p
+							state.refreshArchetypes()
+						}),
+					),
+				)
+				row.AddChild(el)
+			}(p)
+		}
+
+		state.archetypesContainer.AddChild(row)
+	}
+
 	buttonImage := &widget.ButtonImage{
 		Idle:    eimage.NewNineSliceColor(color.RGBA{R: 170, G: 170, B: 180, A: 255}),
 		Hover:   eimage.NewNineSliceColor(color.RGBA{R: 130, G: 130, B: 150, A: 255}),
 		Pressed: eimage.NewNineSliceColor(color.RGBA{R: 100, G: 100, B: 120, A: 255}),
 	}
 
+	var rowButtons []widget.RadioGroupElement
+
+	slices.SortFunc(state.archetypes, func(a, b archetype) bool {
+		if state.sortBy == "Archetype" {
+			return a.Archetype.Title > b.Archetype.Title
+		} else if state.sortBy == "Swole" {
+			return a.Archetype.Swole > b.Archetype.Swole
+		} else if state.sortBy == "Zooms" {
+			return a.Archetype.Zooms > b.Archetype.Zooms
+		} else if state.sortBy == "Brains" {
+			return a.Archetype.Brains > b.Archetype.Brains
+		} else if state.sortBy == "Funk" {
+			return a.Archetype.Funk > b.Archetype.Funk
+		}
+		return false
+	})
+
 	for _, arch := range state.archetypes {
-		buttonStackedLayout := widget.NewContainer(
-			widget.ContainerOpts.Layout(widget.NewStackedLayout()),
-			// instruct the container's anchor layout to center the button both horizontally and vertically;
-			// since our button is a 2-widget object, we add the anchor info to the wrapping container
-			// instead of the button
-			widget.ContainerOpts.WidgetOpts(widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
-				HorizontalPosition: widget.AnchorLayoutPositionCenter,
-				VerticalPosition:   widget.AnchorLayoutPositionCenter,
-			})),
-		)
-		// construct a pressable button
-		button := widget.NewButton(
-			// specify the images to use
-			widget.ButtonOpts.Image(buttonImage),
+		func(arch archetype) {
+			rowContainer := widget.NewContainer(
+				widget.ContainerOpts.Layout(widget.NewStackedLayout()),
+				widget.ContainerOpts.WidgetOpts(
+					widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+						StretchHorizontal: true,
+						StretchVertical:   true,
+					}),
+				),
+			)
+			rowContainerButton := widget.NewButton(
+				widget.ButtonOpts.Image(buttonImage),
 
-			// add a handler that reacts to clicking the button
-			widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
-				println("button clicked")
-			}),
-		)
-		buttonStackedLayout.AddChild(button)
-		// Put an image on top of the button, it will be centered.
-		// If your image doesn't fit the button and there is no Y stretching support,
-		// you may see a transparent rectangle inside the button.
-		// To fix that, either use a separate button image (that can fit the image)
-		// or add an appropriate stretching.
-		buttonStackedLayout.AddChild(widget.NewGraphic(widget.GraphicOpts.Image(arch.Image)))
+				// add a handler that reacts to clicking the button
+				widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
+					println("button clicked", arch.Archetype.Title)
+				}),
+			)
+			rowButtons = append(rowButtons, rowContainerButton)
+			rowContainer.AddChild(rowContainerButton)
 
-		state.ui.Container.AddChild(buttonStackedLayout)
+			row := widget.NewContainer(
+				widget.ContainerOpts.Layout(widget.NewRowLayout(
+					widget.RowLayoutOpts.Direction(widget.DirectionHorizontal),
+				)),
+			)
+
+			rowContainer.AddChild(row)
+
+			graphicContainer := widget.NewContainer(
+				widget.ContainerOpts.Layout(widget.NewStackedLayout()),
+				widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{0, 0, 0, 255})),
+				widget.ContainerOpts.WidgetOpts(
+					widget.WidgetOpts.MinSize(50, 20),
+					widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+						Stretch: true,
+					}),
+				),
+			)
+
+			graphic := widget.NewGraphic(
+				widget.GraphicOpts.Image(arch.Image),
+				widget.GraphicOpts.WidgetOpts(
+					widget.WidgetOpts.LayoutData(
+						widget.RowLayoutPositionCenter,
+					),
+				),
+			)
+			graphicContainer.AddChild(graphic)
+
+			makeWidget := func(name string, clr color.NRGBA, tooltip string) *widget.Container {
+				tool := widget.NewTextToolTip(tooltip, state.face, color.White, eimage.NewNineSliceColor(color.NRGBA{R: 50, G: 50, B: 50, A: 255}))
+				tool.Position = widget.TOOLTIP_POS_CURSOR_STICKY
+				tool.Delay = time.Duration(time.Millisecond * 200)
+
+				box := widget.NewContainer(
+					widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(clr)),
+					widget.ContainerOpts.Layout(widget.NewStackedLayout()),
+					widget.ContainerOpts.WidgetOpts(
+						widget.WidgetOpts.MinSize(100, 20),
+						widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+							Stretch: true,
+						}),
+						widget.WidgetOpts.ToolTip(tool),
+					))
+				content := widget.NewText(
+					widget.TextOpts.Text(name, state.face, color.White),
+					widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
+					widget.TextOpts.WidgetOpts(
+						widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+							Position: widget.RowLayoutPositionCenter,
+						}),
+					),
+				)
+				box.AddChild(content)
+				return box
+			}
+
+			name := widget.NewText(
+				widget.TextOpts.Text(arch.Archetype.Title, state.face, color.White),
+				widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
+				widget.TextOpts.WidgetOpts(
+					widget.WidgetOpts.MinSize(100, 20),
+					widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+						Position: widget.RowLayoutPositionCenter,
+					}),
+				),
+			)
+
+			swole := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Swole)), game.ColorSwole, game.AttributeSwoleDescription)
+
+			zooms := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Zooms)), game.ColorZooms, game.AttributeZoomsDescription)
+
+			brains := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Brains)), game.ColorBrains, game.AttributeBrainsDescription)
+
+			funk := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Funk)), game.ColorFunk, game.AttributeFunkDescription)
+
+			row.AddChild(graphicContainer)
+			row.AddChild(name)
+			row.AddChild(swole)
+			row.AddChild(zooms)
+			row.AddChild(brains)
+			row.AddChild(funk)
+
+			state.archetypesContainer.AddChild(rowContainer)
+		}(arch)
 	}
+
+	widget.NewRadioGroup(
+		widget.RadioGroupOpts.Elements(rowButtons...),
+	)
 
 }
 
