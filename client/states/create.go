@@ -1,13 +1,23 @@
 package states
 
 import (
+	"bytes"
+	"context"
 	"fmt"
+	"image"
 	"image/color"
+	_ "image/png"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"time"
 
 	"github.com/ebitenui/ebitenui"
-	"github.com/ebitenui/ebitenui/image"
+	eimage "github.com/ebitenui/ebitenui/image"
 	"github.com/ebitenui/ebitenui/widget"
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kettek/morogue/client/ifs"
+	"github.com/kettek/morogue/game"
 	"github.com/kettek/morogue/net"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
@@ -20,6 +30,15 @@ type Create struct {
 	//
 	logoutButton *widget.Button
 	resultText   *widget.Text
+	//
+	archetypesList *widget.List
+	//
+	archetypes []archetype
+}
+
+type archetype struct {
+	Archetype game.Archetype
+	Image     *ebiten.Image
 }
 
 func NewCreate(connection net.Connection, msgCh chan net.Message) *Create {
@@ -28,7 +47,7 @@ func NewCreate(connection net.Connection, msgCh chan net.Message) *Create {
 		messageChan: msgCh,
 		ui: &ebitenui.UI{
 			Container: widget.NewContainer(
-				widget.ContainerOpts.BackgroundImage(image.NewNineSliceColor(color.NRGBA{0x22, 0x13, 0x1a, 0xff})),
+				widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{0x22, 0x13, 0x1a, 0xff})),
 				widget.ContainerOpts.Layout(widget.NewRowLayout(
 					widget.RowLayoutOpts.Direction(widget.DirectionVertical),
 					widget.RowLayoutOpts.Spacing(20),
@@ -111,12 +130,116 @@ func (state *Create) End() (interface{}, error) {
 	return nil, nil
 }
 
+func (state *Create) haveArchetype(archetype game.Archetype) bool {
+	for _, arch := range state.archetypes {
+		if arch.Archetype.Title == archetype.Title {
+			return true
+		}
+	}
+	return false
+}
+
+func (state *Create) acquireArchetypes(archetypes []game.Archetype) {
+	for _, arch := range archetypes {
+		if state.haveArchetype(arch) {
+			continue
+		}
+
+		var arche archetype
+		arche.Archetype = arch
+
+		defer func() {
+			state.archetypes = append(state.archetypes, arche)
+		}()
+
+		ctx, cancel := context.WithTimeout(context.TODO(), time.Second*5)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost:8080/archetypes/"+arch.Image, nil)
+		if err != nil {
+			log.Println(err)
+			// TODO: Show error image?
+			continue
+		}
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			log.Println(err)
+			// TODO: Show error image?
+			continue
+		}
+
+		if res.StatusCode != 200 {
+			// TODO: Show error image?
+			continue
+		}
+
+		resBody, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			// TODO: Show error image?
+			continue
+		}
+
+		img, _, err := image.Decode(bytes.NewReader(resBody))
+		if err != nil {
+			// TODO: Show error image?
+			continue
+		}
+
+		ebiImg := ebiten.NewImageFromImage(img)
+
+		arche.Image = ebiImg
+		fmt.Println("assigned imagie")
+	}
+}
+
+func (state *Create) refreshArchetypes() {
+	// FIXME: Archetypes need to be displayed as selectable rows with the following columns: Image | Title | Swole | Zooms | Brains | Funk
+	buttonImage := &widget.ButtonImage{
+		Idle:    eimage.NewNineSliceColor(color.RGBA{R: 170, G: 170, B: 180, A: 255}),
+		Hover:   eimage.NewNineSliceColor(color.RGBA{R: 130, G: 130, B: 150, A: 255}),
+		Pressed: eimage.NewNineSliceColor(color.RGBA{R: 100, G: 100, B: 120, A: 255}),
+	}
+
+	for _, arch := range state.archetypes {
+		buttonStackedLayout := widget.NewContainer(
+			widget.ContainerOpts.Layout(widget.NewStackedLayout()),
+			// instruct the container's anchor layout to center the button both horizontally and vertically;
+			// since our button is a 2-widget object, we add the anchor info to the wrapping container
+			// instead of the button
+			widget.ContainerOpts.WidgetOpts(widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+				HorizontalPosition: widget.AnchorLayoutPositionCenter,
+				VerticalPosition:   widget.AnchorLayoutPositionCenter,
+			})),
+		)
+		// construct a pressable button
+		button := widget.NewButton(
+			// specify the images to use
+			widget.ButtonOpts.Image(buttonImage),
+
+			// add a handler that reacts to clicking the button
+			widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
+				println("button clicked")
+			}),
+		)
+		buttonStackedLayout.AddChild(button)
+		// Put an image on top of the button, it will be centered.
+		// If your image doesn't fit the button and there is no Y stretching support,
+		// you may see a transparent rectangle inside the button.
+		// To fix that, either use a separate button image (that can fit the image)
+		// or add an appropriate stretching.
+		buttonStackedLayout.AddChild(widget.NewGraphic(widget.GraphicOpts.Image(arch.Image)))
+
+		state.ui.Container.AddChild(buttonStackedLayout)
+	}
+
+}
+
 func (state *Create) Update(ctx ifs.RunContext) error {
 	select {
 	case msg := <-state.messageChan:
 		switch m := msg.(type) {
 		case net.ArchetypesMessage:
-			fmt.Println("Populate archetypes", m)
+			state.acquireArchetypes(m.Archetypes)
+			state.refreshArchetypes()
 		}
 	default:
 	}
