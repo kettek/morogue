@@ -50,6 +50,8 @@ func (s *protoServer) handleSockit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	cl := net.NewConnection(c)
+
 	for {
 		var w net.Wrapper
 
@@ -62,7 +64,8 @@ func (s *protoServer) handleSockit(w http.ResponseWriter, r *http.Request) {
 			}
 			if m := w.Message(); m != nil {
 				// TODO: Send m to client instance for handling.
-				fmt.Println("client msg", m)
+				fmt.Println("client msg", m, m.Type())
+				cl.Write(&net.PingMessage{})
 			}
 		}
 

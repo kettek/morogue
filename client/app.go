@@ -14,12 +14,14 @@ import (
 
 type app struct {
 	stateMachine
-	drawContext ifs.DrawContext
-	runContext  ifs.RunContext
+	connectState states.Connect
+	drawContext  ifs.DrawContext
+	runContext   ifs.RunContext
 }
 
 func newApp() *app {
 	a := &app{}
+	a.runContext.Sm = a
 
 	ebiten.SetWindowSize(1280, 720)
 
@@ -37,14 +39,16 @@ func newApp() *app {
 	a.runContext.Txt = ifs.NewTextRenderer(renderer)
 	a.drawContext.Txt = ifs.NewTextRenderer(renderer)
 
-	if err := a.Push(&states.Connect{}); err != nil {
-		panic(err)
-	}
+	a.connectState.Begin()
 
 	return a
 }
 
 func (a *app) Update() error {
+	if err := a.connectState.Update(a.runContext); err != nil {
+		return err
+	}
+
 	if t := a.stateMachine.Top(); t != nil {
 		t.Update(a.runContext)
 	}
@@ -57,6 +61,8 @@ func (a *app) Draw(screen *ebiten.Image) {
 	if t := a.stateMachine.Top(); t != nil {
 		t.Draw(a.drawContext)
 	}
+
+	a.connectState.Draw(a.drawContext)
 
 	{
 		b := screen.Bounds()

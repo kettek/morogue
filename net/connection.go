@@ -14,6 +14,10 @@ type Connection struct {
 	c *websocket.Conn
 }
 
+func NewConnection(c *websocket.Conn) *Connection {
+	return &Connection{c}
+}
+
 func (conn *Connection) Connect() chan error {
 	ch := make(chan error)
 
@@ -52,12 +56,14 @@ func (conn *Connection) Loop() (chan Message, chan error) {
 	ech := make(chan error)
 	go func() {
 		for {
-			var m Message
-			if err := wsjson.Read(context.TODO(), conn.c, m); err != nil {
+			var w Wrapper
+			if err := wsjson.Read(context.TODO(), conn.c, &w); err != nil {
 				ech <- err
 				return
 			} else {
-				mch <- m
+				if m := w.Message(); m != nil {
+					mch <- m
+				}
 			}
 		}
 	}()

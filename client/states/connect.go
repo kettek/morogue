@@ -1,11 +1,9 @@
 package states
 
 import (
-	"fmt"
-	"image/color"
-
 	"github.com/kettek/morogue/client/ifs"
 	"github.com/kettek/morogue/net"
+	"github.com/tinne26/etxt"
 )
 
 const (
@@ -50,8 +48,12 @@ func (state *Connect) Update(ctx ifs.RunContext) error {
 			return nil
 		}
 		state.mode = modeSuccess
-		state.messageChan, state.loopChan = state.connection.Loop()
-		state.connection.Write(&net.PingMessage{})
+
+		messageChan, loopChan := state.connection.Loop()
+		state.loopChan = loopChan
+
+		// Push the login state onto the stack.
+		ctx.Sm.Push(NewLogin(state.connection, messageChan))
 	case err := <-state.loopChan:
 		state.mode = modeFailed
 		state.result = err.Error()
@@ -59,24 +61,16 @@ func (state *Connect) Update(ctx ifs.RunContext) error {
 		//
 	}
 
-	if state.mode == modeSuccess {
-		select {
-		case msg := <-state.messageChan:
-			fmt.Println("got eem", msg)
-		default:
-		}
-	}
-
 	return nil
 }
 
 func (state *Connect) Draw(ctx ifs.DrawContext) {
-	// background color
-	ctx.Screen.Fill(color.NRGBA{0, 0, 0, 255})
-
 	// get screen center position and text content
 	bounds := ctx.Screen.Bounds() // assumes origin (0, 0)
-	x, y := bounds.Dx()/2, bounds.Dy()/2
+	x, y := 2, bounds.Dy()-4
+
+	al := ctx.Txt.Renderer.GetAlign()
+	ctx.Txt.Renderer.SetAlign(etxt.TopBaseline | etxt.Left)
 
 	// draw the text
 	ctx.Txt.Draw(ctx.Screen, state.mode, x, y)
@@ -92,4 +86,5 @@ func (state *Connect) Draw(ctx ifs.DrawContext) {
 		}
 		i++
 	}
+	ctx.Txt.Renderer.SetAlign(al)
 }
