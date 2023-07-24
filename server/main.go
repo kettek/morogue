@@ -71,6 +71,9 @@ func run() error {
 
 	ps := newSocketServer(u.clientChan, u.checkChan)
 
+	// Allow access to archetypes via archetypes subdir.
+	ps.serveMux.Handle("/archetypes/", http.StripPrefix("/archetypes/", http.FileServer(http.Dir("./archetypes"))))
+
 	s := &http.Server{
 		Handler:      ps,
 		ReadTimeout:  time.Second * 10,
