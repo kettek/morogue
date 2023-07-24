@@ -2,13 +2,18 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
+	"strings"
 	"time"
+
+	"github.com/kettek/morogue/game"
 )
 
 func main() {
@@ -28,12 +33,40 @@ func run() error {
 	}
 	log.Printf("listening on http://%v", l.Addr())
 
+	// Load archetypes.
+	var archetypes []game.Archetype
+	{
+		entries, err := os.ReadDir("archetypes")
+		if err != nil {
+			return err
+		}
+		for _, entry := range entries {
+			if entry.IsDir() {
+				continue
+			}
+			if strings.HasSuffix(entry.Name(), ".json") {
+				bytes, err := os.ReadFile(filepath.Join("archetypes", entry.Name()))
+				if err != nil {
+					log.Println(err)
+					continue
+				}
+				var a game.Archetype
+				err = json.Unmarshal(bytes, &a)
+				if err != nil {
+					log.Println(err)
+					continue
+				}
+				archetypes = append(archetypes, a)
+			}
+		}
+	}
+
 	accounts, err := newAccounts("accounts")
 	if err != nil {
 		return err
 	}
 
-	u := newUniverse(accounts)
+	u := newUniverse(accounts, archetypes)
 	u.Run()
 
 	ps := newSocketServer(u.clientChan, u.checkChan)

@@ -40,8 +40,6 @@ func NewCreate(connection net.Connection, msgCh chan net.Message) *Create {
 }
 
 func (state *Create) Begin(ctx ifs.RunContext) error {
-	state.connection.Write(&net.PingMessage{})
-
 	// load images for button states: idle, hover, and pressed
 	buttonImages, _ := buttonImages()
 
@@ -116,7 +114,10 @@ func (state *Create) End() (interface{}, error) {
 func (state *Create) Update(ctx ifs.RunContext) error {
 	select {
 	case msg := <-state.messageChan:
-		fmt.Println("handle", msg)
+		switch m := msg.(type) {
+		case net.ArchetypesMessage:
+			fmt.Println("Populate archetypes", m)
+		}
 	default:
 	}
 

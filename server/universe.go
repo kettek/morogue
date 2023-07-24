@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/kettek/morogue/game"
 	"github.com/kettek/morogue/net"
 )
 
@@ -14,13 +15,16 @@ type universe struct {
 	clientChan       chan client
 	checkChan        chan struct{}
 	worlds           []world
+	//
+	archetypes []game.Archetype
 }
 
-func newUniverse(accounts Accounts) universe {
+func newUniverse(accounts Accounts, archetypes []game.Archetype) universe {
 	return universe{
 		accounts:   accounts,
 		clientChan: make(chan client, 10),
 		checkChan:  make(chan struct{}, 10),
+		archetypes: archetypes,
 	}
 }
 
@@ -66,6 +70,16 @@ func (u *universe) checkClients() {
 	u.clients = u.clients[:i]
 }
 
+func (u *universe) loginClient(cl *client) {
+	cl.state = clientStateLoggedIn
+	u.loggedInAccounts = append(u.loggedInAccounts, cl.account.username)
+	// Send the available archetypes.
+	fmt.Println("sending", u.archetypes)
+	cl.conn.Write(net.ArchetypesMessage{
+		Archetypes: u.archetypes,
+	})
+}
+
 func (u *universe) updateClient(cl *client) error {
 	for {
 		select {
@@ -100,8 +114,7 @@ func (u *universe) updateClient(cl *client) error {
 							})
 							account.username = m.User
 							cl.account = account
-							cl.state = clientStateLoggedIn
-							u.loggedInAccounts = append(u.loggedInAccounts, m.User)
+							u.loginClient(cl)
 						}
 					}
 				}
@@ -130,8 +143,7 @@ func (u *universe) updateClient(cl *client) error {
 							})
 							account.username = m.User
 							cl.account = account
-							cl.state = clientStateLoggedIn
-							u.loggedInAccounts = append(u.loggedInAccounts, m.User)
+							u.loginClient(cl)
 						}
 					}
 				}

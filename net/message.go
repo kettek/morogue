@@ -2,6 +2,8 @@ package net
 
 import (
 	"encoding/json"
+
+	"github.com/kettek/morogue/game"
 )
 
 type Wrapper struct {
@@ -25,6 +27,10 @@ func (w *Wrapper) Message() Message {
 		return m
 	case (LogoutMessage{}).Type():
 		var m LogoutMessage
+		json.Unmarshal(w.Data, &m)
+		return m
+	case (ArchetypesMessage{}).Type():
+		var m ArchetypesMessage
 		json.Unmarshal(w.Data, &m)
 		return m
 	}
@@ -71,4 +77,12 @@ type LogoutMessage struct {
 
 func (m LogoutMessage) Type() string {
 	return "logout"
+}
+
+type ArchetypesMessage struct {
+	Archetypes []game.Archetype `json:"a,omitempty"`
+}
+
+func (m ArchetypesMessage) Type() string {
+	return "archetypes"
 }
