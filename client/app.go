@@ -1,13 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"image/color"
 	"math"
 
 	"github.com/carlmjohnson/versioninfo"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/kettek/morogue/client/ifs"
 	"github.com/kettek/morogue/client/states"
 	"github.com/tinne26/etxt"
@@ -59,7 +57,17 @@ func (a *app) Draw(screen *ebiten.Image) {
 	if t := a.stateMachine.Top(); t != nil {
 		t.Draw(a.drawContext)
 	}
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("%s %s", versioninfo.Short(), versioninfo.Revision))
+
+	{
+		b := screen.Bounds()
+		fs := a.drawContext.Txt.GetSize()
+		al := a.drawContext.Txt.GetAlign()
+		a.drawContext.Txt.Renderer.SetAlign(etxt.TopBaseline | etxt.Right)
+		a.drawContext.Txt.Renderer.SetSize(16)
+		a.drawContext.Txt.Renderer.Draw(screen, versioninfo.Short(), b.Dx(), b.Dy()-4)
+		a.drawContext.Txt.Renderer.SetSize(fs)
+		a.drawContext.Txt.Renderer.SetAlign(al)
+	}
 }
 
 func (a *app) Layout(winWidth, winHeight int) (int, int) {
