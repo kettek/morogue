@@ -11,6 +11,7 @@ import (
 type Accounts interface {
 	GetAccount(username string) (account Account, err error)
 	NewAccount(username string, password string) error
+	SaveAccount(account Account) error
 }
 
 type accounts struct {
@@ -80,6 +81,21 @@ func (a *accounts) NewAccount(username string, password string) error {
 		return b.Put([]byte(username), buf)
 	})
 
+	return err
+}
+
+// SaveAccount saves the given Account. This must be an account acquired from GetAccount.
+func (a *accounts) SaveAccount(account Account) error {
+	err := a.db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("accounts"))
+
+		buf, err := json.Marshal(&account)
+		if err != nil {
+			return err
+		}
+
+		return b.Put([]byte(account.username), buf)
+	})
 	return err
 }
 

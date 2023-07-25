@@ -180,22 +180,31 @@ func (u *universe) updateClient(cl *client) error {
 					})
 				} else {
 					if !u.hasArchetype(m.Archetype) {
-						cl.conn.Write(net.RegisterMessage{
+						cl.conn.Write(net.CreateCharacterMessage{
 							ResultCode: 400,
 							Result:     "no such archetype",
 						})
 					} else if err := u.checkName(m.Name); err != nil {
-						cl.conn.Write(net.RegisterMessage{
+						cl.conn.Write(net.CreateCharacterMessage{
 							ResultCode: 400,
 							Result:     err.Error(),
 						})
 					} else if cl.account.HasCharacter(m.Name) {
-						cl.conn.Write(net.RegisterMessage{
+						cl.conn.Write(net.CreateCharacterMessage{
 							ResultCode: 400,
 							Result:     "character with given name already exists",
 						})
+					} else if err := cl.account.CreateCharacter(m.Name, m.Archetype); err != nil {
+						cl.conn.Write(net.CreateCharacterMessage{
+							ResultCode: 400,
+							Result:     err.Error(),
+						})
 					} else {
-						fmt.Println("Handle character creation", m)
+						u.accounts.SaveAccount(cl.account)
+						// Re-send the player's characters.
+						cl.conn.Write(net.CharactersMessage{
+							Characters: cl.account.Characters,
+						})
 					}
 				}
 			}

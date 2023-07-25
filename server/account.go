@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/kettek/morogue/game"
+	"github.com/kettek/morogue/id"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -28,6 +29,20 @@ func (a *Account) HasCharacter(name string) bool {
 	return false
 }
 
+func (a *Account) CreateCharacter(name string, archetype id.UUID) error {
+	if a.HasCharacter(name) {
+		return ErrCharacterExists
+	}
+
+	a.Characters = append(a.Characters, game.Character{
+		Name:      name,
+		Archetype: archetype,
+	})
+
+	return nil
+}
+
 var (
-	ErrBadPassword = errors.New("bad password")
+	ErrBadPassword     = errors.New("bad password")
+	ErrCharacterExists = errors.New("character exists")
 )
