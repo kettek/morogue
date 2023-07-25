@@ -367,9 +367,115 @@ func (state *Create) loadImage(src string, scale float64) (*ebiten.Image, error)
 
 func (state *Create) populateCharacters(characters []game.Character) {
 	state.charactersContainer.RemoveChildren()
-	for _, ch := range characters {
-		fmt.Println("TODO: Make row for", ch)
+
+	buttonImage := &widget.ButtonImage{
+		Idle:    eimage.NewNineSliceColor(color.RGBA{R: 40, G: 40, B: 40, A: 255}),
+		Hover:   eimage.NewNineSliceColor(color.RGBA{R: 50, G: 50, B: 50, A: 255}),
+		Pressed: eimage.NewNineSliceColor(color.RGBA{R: 80, G: 80, B: 80, A: 255}),
 	}
+
+	var rowButtons []widget.RadioGroupElement
+	for _, ch := range characters {
+		func(ch game.Character) {
+			rowContainer := widget.NewContainer(
+				widget.ContainerOpts.Layout(widget.NewStackedLayout()),
+				widget.ContainerOpts.WidgetOpts(
+					widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+						StretchHorizontal: true,
+						StretchVertical:   true,
+					}),
+				),
+			)
+			rowContainerButton := widget.NewButton(
+				widget.ButtonOpts.Image(buttonImage),
+				// add a handler that reacts to clicking the button
+				widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
+					fmt.Println("use char", ch)
+					// TODO
+				}),
+				widget.ButtonOpts.WidgetOpts(
+					widget.WidgetOpts.CursorHovered("interactive"),
+				),
+			)
+			rowButtons = append(rowButtons, rowContainerButton)
+			rowContainer.AddChild(rowContainerButton)
+
+			row := widget.NewContainer(
+				widget.ContainerOpts.Layout(widget.NewRowLayout(
+					widget.RowLayoutOpts.Direction(widget.DirectionHorizontal),
+				)),
+			)
+
+			rowContainer.AddChild(row)
+
+			graphicContainer := widget.NewContainer(
+				widget.ContainerOpts.Layout(widget.NewStackedLayout()),
+				widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{0, 0, 0, 255})),
+				widget.ContainerOpts.WidgetOpts(
+					widget.WidgetOpts.MinSize(50, 20),
+					widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+						Stretch: true,
+					}),
+				),
+			)
+
+			var image *ebiten.Image
+			for _, arch := range state.archetypes {
+				if arch.Archetype.UUID == ch.Archetype {
+					image = arch.Image
+					break
+				}
+			}
+
+			graphic := widget.NewGraphic(
+				widget.GraphicOpts.Image(image),
+				widget.GraphicOpts.WidgetOpts(
+					widget.WidgetOpts.LayoutData(
+						widget.RowLayoutPositionCenter,
+					),
+				),
+			)
+			graphicContainer.AddChild(graphic)
+
+			name := widget.NewText(
+				widget.TextOpts.Text(ch.Name, state.face, color.White),
+				widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
+				widget.TextOpts.WidgetOpts(
+					widget.WidgetOpts.MinSize(100, 20),
+					widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+						Position: widget.RowLayoutPositionCenter,
+					}),
+				),
+			)
+
+			delete := widget.NewButton(
+				widget.ButtonOpts.Image(buttonImage),
+				widget.ButtonOpts.WidgetOpts(
+					widget.WidgetOpts.CursorHovered("interactive"),
+					widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+						Stretch: true,
+					}),
+				),
+				widget.ButtonOpts.Text("delete", state.face, &widget.ButtonTextColor{
+					Idle: color.NRGBA{0xff, 0x0, 0x0, 0xff},
+				}),
+				widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
+					state.connection.Write(net.DeleteCharacterMessage{
+						Name: ch.Name,
+					})
+				}),
+			)
+
+			row.AddChild(graphicContainer)
+			row.AddChild(name)
+			row.AddChild(delete)
+
+			state.charactersContainer.AddChild(rowContainer)
+		}(ch)
+	}
+	widget.NewRadioGroup(
+		widget.RadioGroupOpts.Elements(rowButtons...),
+	)
 }
 
 func (state *Create) acquireArchetypes(archetypes []game.Archetype) {
@@ -676,6 +782,10 @@ func (state *Create) Update(ctx ifs.RunContext) error {
 			state.populateCharacters(m.Characters)
 		case net.CreateCharacterMessage:
 			state.resultText.Label = m.Result
+		case net.DeleteCharacterMessage:
+			if m.Result != "" {
+				state.resultText.Label = m.Result
+			}
 		}
 	default:
 	}
