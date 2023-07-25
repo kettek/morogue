@@ -164,6 +164,40 @@ func (state *Create) haveArchetype(archetype game.Archetype) bool {
 	return false
 }
 
+func (state *Create) loadImage(src string, scale float64) (*ebiten.Image, error) {
+	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*5)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost:8080/"+src, nil)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	if res.StatusCode != 200 {
+		return nil, err
+	}
+
+	resBody, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	img, _, err := image.Decode(bytes.NewReader(resBody))
+	if err != nil {
+		return nil, err
+	}
+
+	// Resize the image to 2x until ebitenui has scaling built-in.
+	img = resize.Resize(uint(float64(img.Bounds().Dx())*scale), uint(float64(img.Bounds().Dy())*scale), img, resize.NearestNeighbor)
+
+	return ebiten.NewImageFromImage(img), nil
+}
+
 func (state *Create) acquireArchetypes(archetypes []game.Archetype) {
 	for _, arch := range archetypes {
 		if state.haveArchetype(arch) {
@@ -177,44 +211,13 @@ func (state *Create) acquireArchetypes(archetypes []game.Archetype) {
 			state.archetypes = append(state.archetypes, arche)
 		}()
 
-		ctx, cancel := context.WithTimeout(context.TODO(), time.Second*5)
-		defer cancel()
-		req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost:8080/archetypes/"+arch.Image, nil)
+		img, err := state.loadImage("archetypes/"+arch.Image, 2.0)
 		if err != nil {
-			log.Println(err)
-			// TODO: Show error image?
-			continue
-		}
-		res, err := http.DefaultClient.Do(req)
-		if err != nil {
-			log.Println(err)
-			// TODO: Show error image?
+			// TODO: Show error image
 			continue
 		}
 
-		if res.StatusCode != 200 {
-			// TODO: Show error image?
-			continue
-		}
-
-		resBody, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			// TODO: Show error image?
-			continue
-		}
-
-		img, _, err := image.Decode(bytes.NewReader(resBody))
-		if err != nil {
-			// TODO: Show error image?
-			continue
-		}
-
-		// Resize the image to 2x until ebitenui has scaling built-in.
-		img = resize.Resize(uint(img.Bounds().Dx()*2), uint(img.Bounds().Dy()*2), img, resize.NearestNeighbor)
-
-		ebiImg := ebiten.NewImageFromImage(img)
-
-		arche.Image = ebiImg
+		arche.Image = img
 	}
 }
 
