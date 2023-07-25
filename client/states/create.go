@@ -332,7 +332,7 @@ func (state *Create) refreshArchetypes() {
 							Stretch: true,
 						}),
 						widget.WidgetOpts.ToolTip(tool),
-						widget.WidgetOpts.CursorHovered("interactive"),
+						widget.WidgetOpts.CursorHovered("interactive-tooltip"),
 						widget.WidgetOpts.MouseButtonPressedHandler(func(args *widget.WidgetMouseButtonPressedEventArgs) {
 							state.sortBy = p
 							state.refreshArchetypes()
@@ -445,11 +445,7 @@ func (state *Create) refreshArchetypes() {
 			)
 			graphicContainer.AddChild(graphic)
 
-			makeWidget := func(name string, clr color.NRGBA, width int, tooltip string) *widget.Container {
-				tool := widget.NewTextToolTip(tooltip, state.face, color.White, eimage.NewNineSliceColor(color.NRGBA{R: 50, G: 50, B: 50, A: 255}))
-				tool.Position = widget.TOOLTIP_POS_CURSOR_STICKY
-				tool.Delay = time.Duration(time.Millisecond * 200)
-
+			makeWidget := func(name string, clr color.NRGBA, width int) *widget.Container {
 				box := widget.NewContainer(
 					widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(clr)),
 					widget.ContainerOpts.Layout(widget.NewStackedLayout()),
@@ -458,7 +454,6 @@ func (state *Create) refreshArchetypes() {
 						widget.WidgetOpts.LayoutData(widget.RowLayoutData{
 							Stretch: true,
 						}),
-						widget.WidgetOpts.ToolTip(tool),
 					))
 				content := widget.NewText(
 					widget.TextOpts.Text(name, state.face, color.White),
@@ -484,19 +479,19 @@ func (state *Create) refreshArchetypes() {
 				),
 			)
 
-			swole := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Swole)), game.ColorSwole, 100, game.AttributeSwoleDescription)
+			swole := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Swole)), game.ColorSwole, 100)
 
-			zooms := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Zooms)), game.ColorZooms, 100, game.AttributeZoomsDescription)
+			zooms := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Zooms)), game.ColorZooms, 100)
 
-			brains := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Brains)), game.ColorBrains, 100, game.AttributeBrainsDescription)
+			brains := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Brains)), game.ColorBrains, 100)
 
-			funk := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Funk)), game.ColorFunk, 100, game.AttributeFunkDescription)
+			funk := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Funk)), game.ColorFunk, 100)
 
 			var d string
 			for _, t := range arch.Archetype.Traits {
 				d += t + "\n"
 			}
-			desc := makeWidget(d, color.NRGBA{32, 32, 32, 0}, 200, "Traits of the archetype")
+			desc := makeWidget(d, color.NRGBA{32, 32, 32, 0}, 200)
 
 			row.AddChild(graphicContainer)
 			row.AddChild(name)

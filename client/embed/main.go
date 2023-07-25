@@ -15,6 +15,7 @@ var Assets embed.FS
 
 var CursorDefault *ebiten.Image
 var CursorPointer *ebiten.Image
+var CursorPointerTooltip *ebiten.Image
 var CursorText *ebiten.Image
 
 func Setup() {
@@ -26,10 +27,12 @@ func Setup() {
 	i, _, _ := ebitenutil.NewImageFromReader(f)
 	CursorDefault = ebiten.NewImageFromImage(i.SubImage(image.Rect(0, 0, 16, 16)))
 	CursorPointer = ebiten.NewImageFromImage(i.SubImage(image.Rect(16, 0, 32, 16)))
+	CursorPointerTooltip = ebiten.NewImageFromImage(i.SubImage(image.Rect(16, 16, 32, 32)))
 	CursorText = ebiten.NewImageFromImage(i.SubImage(image.Rect(32, 0, 48, 16)))
 
 	//
 	einput.SetCursorImage(einput.CURSOR_DEFAULT, CursorDefault)
 	einput.SetCursorImage("interactive", CursorPointer)
+	einput.SetCursorImage("interactive-tooltip", CursorPointerTooltip)
 	einput.SetCursorImage("text", CursorText)
 }
