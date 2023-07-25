@@ -37,6 +37,7 @@ type Create struct {
 	charactersSection   *widget.Container
 	charactersContainer *widget.Container
 	charactersControls  *widget.Container
+	deleteWindow        *widget.Window
 	//
 	archetypesSection      *widget.Container
 	archetypesContainer    *widget.Container
@@ -53,6 +54,7 @@ type Create struct {
 	//
 	sortBy            string
 	selectedArchetype id.UUID
+	characterToDelete string
 	//
 	traitsImage    *ebiten.Image
 	swoleImage     *ebiten.Image
@@ -144,6 +146,67 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 			widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(10)),
 			widget.RowLayoutOpts.Spacing(1),
 		)),
+	)
+
+	deleteContents := widget.NewContainer(
+		widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{100, 100, 100, 255})),
+		widget.ContainerOpts.WidgetOpts(
+			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+				Position: widget.RowLayoutPositionCenter,
+			}),
+		),
+		widget.ContainerOpts.Layout(widget.NewRowLayout(
+			widget.RowLayoutOpts.Direction(widget.DirectionVertical),
+			widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(10)),
+			widget.RowLayoutOpts.Spacing(1),
+		)),
+	)
+
+	deleteText := widget.NewText(
+		widget.TextOpts.Text("Confirm deletion", face, color.White),
+		widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
+		widget.TextOpts.WidgetOpts(
+			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+				Position: widget.RowLayoutPositionCenter,
+			}),
+		),
+	)
+	buttonImage := &widget.ButtonImage{
+		Idle:    eimage.NewNineSliceColor(color.RGBA{R: 40, G: 40, B: 40, A: 255}),
+		Hover:   eimage.NewNineSliceColor(color.RGBA{R: 50, G: 50, B: 50, A: 255}),
+		Pressed: eimage.NewNineSliceColor(color.RGBA{R: 80, G: 80, B: 80, A: 255}),
+	}
+	deleteButton := widget.NewButton(
+		widget.ButtonOpts.Image(buttonImage),
+		widget.ButtonOpts.WidgetOpts(
+			widget.WidgetOpts.CursorHovered("delete"),
+			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+				Stretch: true,
+			}),
+		),
+		widget.ButtonOpts.Text("delete", state.face, &widget.ButtonTextColor{
+			Idle: color.NRGBA{0xff, 0x0, 0x0, 0xff},
+		}),
+		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
+			state.connection.Write(net.DeleteCharacterMessage{
+				Name: state.characterToDelete,
+			})
+			state.deleteWindow.Close()
+		}),
+	)
+
+	deleteContents.AddChild(deleteText)
+	deleteContents.AddChild(deleteButton)
+
+	state.deleteWindow = widget.NewWindow(
+		widget.WindowOpts.Contents(deleteContents),
+		widget.WindowOpts.Modal(),
+		widget.WindowOpts.CloseMode(widget.CLICK_OUT),
+		//Set the minimum size the window can be
+		widget.WindowOpts.MinSize(400, 200),
+		//Set the maximum size a window can be
+		widget.WindowOpts.MaxSize(400, 200),
+		//Set the callback that triggers when a move is complete
 	)
 
 	{
@@ -419,16 +482,16 @@ func (state *Create) populateCharacters(characters []game.Character) {
 				),
 			)
 
-			var image *ebiten.Image
+			var img *ebiten.Image
 			for _, arch := range state.archetypes {
 				if arch.Archetype.UUID == ch.Archetype {
-					image = arch.Image
+					img = arch.Image
 					break
 				}
 			}
 
 			graphic := widget.NewGraphic(
-				widget.GraphicOpts.Image(image),
+				widget.GraphicOpts.Image(img),
 				widget.GraphicOpts.WidgetOpts(
 					widget.WidgetOpts.LayoutData(
 						widget.RowLayoutPositionCenter,
@@ -460,9 +523,12 @@ func (state *Create) populateCharacters(characters []game.Character) {
 					Idle: color.NRGBA{0xff, 0x0, 0x0, 0xff},
 				}),
 				widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
-					state.connection.Write(net.DeleteCharacterMessage{
-						Name: ch.Name,
-					})
+					x, y := state.deleteWindow.Contents.PreferredSize()
+					r := image.Rect(0, 0, x, y)
+					r = r.Add(image.Point{100, 50})
+					state.deleteWindow.SetLocation(r)
+					state.ui.AddWindow(state.deleteWindow)
+					state.characterToDelete = ch.Name
 				}),
 			)
 
