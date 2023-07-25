@@ -206,6 +206,11 @@ func (u *universe) updateClient(cl *client) error {
 						})
 					} else {
 						u.accounts.SaveAccount(cl.account)
+						// Let 'em know it went ok
+						cl.conn.Write(net.CreateCharacterMessage{
+							ResultCode: 200,
+							Result:     fmt.Sprintf("%s takes form", m.Name),
+						})
 						// Re-send the player's characters.
 						cl.conn.Write(net.CharactersMessage{
 							Characters: cl.account.Characters,
@@ -231,6 +236,11 @@ func (u *universe) updateClient(cl *client) error {
 						})
 					} else {
 						u.accounts.SaveAccount(cl.account)
+						// Let 'em know it went ok
+						cl.conn.Write(net.DeleteCharacterMessage{
+							ResultCode: 200,
+							Result:     fmt.Sprintf("%s is no more", m.Name),
+						})
 						// Re-send the player's characters.
 						cl.conn.Write(net.CharactersMessage{
 							Characters: cl.account.Characters,

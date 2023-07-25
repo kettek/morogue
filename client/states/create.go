@@ -975,7 +975,14 @@ func (state *Create) Update(ctx ifs.RunContext) error {
 			state.populateCharacters(m.Characters)
 			state.syncUI()
 		case net.CreateCharacterMessage:
-			state.resultText.Label = m.Result
+			if m.ResultCode == 200 {
+				// Set selected character on success and clear name field.
+				state.selectedCharacter = state.archetypesCreateName.InputText
+				state.archetypesCreateName.InputText = ""
+			}
+			if m.Result != "" {
+				state.resultText.Label = m.Result
+			}
 		case net.DeleteCharacterMessage:
 			if m.Result != "" {
 				state.resultText.Label = m.Result
