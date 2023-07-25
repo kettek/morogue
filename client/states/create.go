@@ -41,7 +41,8 @@ type Create struct {
 	//
 	tooltips map[string]*widget.Container
 	//
-	sortBy string
+	sortBy            string
+	selectedArchetype string
 }
 
 type archetype struct {
@@ -240,11 +241,12 @@ func (state *Create) refreshArchetypes() {
 		)
 		row.AddChild(el)
 
-		parts := []string{"Archetype", "Swole", "Zooms", "Brains", "Funk"}
+		parts := []string{"Archetype", "Swole", "Zooms", "Brains", "Funk", "Traits"}
 		for _, p := range parts {
 			func(p string) {
 				var c color.NRGBA
 				var tooltip string
+				width := 100
 				switch p {
 				case "Archetype":
 					c = color.NRGBA{255, 255, 255, 255}
@@ -260,6 +262,9 @@ func (state *Create) refreshArchetypes() {
 				case "Funk":
 					c = game.ColorFunkVibrant
 					tooltip = game.AttributeFunkDescription
+				case "Traits":
+					c = color.NRGBA{200, 200, 200, 255}
+					width = 100
 				}
 
 				tool := widget.NewTextToolTip(tooltip, state.face, color.White, eimage.NewNineSliceColor(color.NRGBA{R: 50, G: 50, B: 50, A: 255}))
@@ -270,7 +275,7 @@ func (state *Create) refreshArchetypes() {
 					widget.TextOpts.Text(p, state.face, c),
 					widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
 					widget.TextOpts.WidgetOpts(
-						widget.WidgetOpts.MinSize(100, 20),
+						widget.WidgetOpts.MinSize(width, 20),
 						widget.WidgetOpts.LayoutData(widget.RowLayoutData{
 							Position: widget.RowLayoutPositionCenter,
 						}),
@@ -327,7 +332,7 @@ func (state *Create) refreshArchetypes() {
 
 				// add a handler that reacts to clicking the button
 				widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
-					println("button clicked", arch.Archetype.Title)
+					state.selectedArchetype = arch.Archetype.Title
 				}),
 			)
 			rowButtons = append(rowButtons, rowContainerButton)
@@ -409,12 +414,19 @@ func (state *Create) refreshArchetypes() {
 
 			funk := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Funk)), game.ColorFunk, game.AttributeFunkDescription)
 
+			var d string
+			for _, t := range arch.Archetype.Traits {
+				d += t + "\n"
+			}
+			desc := makeWidget(d, color.NRGBA{32, 32, 32, 255}, "Traits of the archetype")
+
 			row.AddChild(graphicContainer)
 			row.AddChild(name)
 			row.AddChild(swole)
 			row.AddChild(zooms)
 			row.AddChild(brains)
 			row.AddChild(funk)
+			row.AddChild(desc)
 
 			state.archetypesContainer.AddChild(rowContainer)
 		}(arch)

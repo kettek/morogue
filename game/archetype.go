@@ -8,4 +8,5 @@ type Archetype struct {
 	Zooms  AttributeLevel // Dex, basically
 	Brains AttributeLevel // Thinkin' and spell-related
 	Funk   AttributeLevel // Charm and god-related
+	Traits []string       // Traits
 }
