@@ -1,7 +1,11 @@
 package game
 
+import "github.com/kettek/morogue/id"
+
 type Archetype struct {
 	Title string
+	UUID  id.UUID
+
 	Image string // Image for the archetype. Should be requested via HTTP to the resources backend.
 	//
 	Swole  AttributeLevel // Raw Strength + Health
