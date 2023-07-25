@@ -33,6 +33,8 @@ type Create struct {
 	logoutButton *widget.Button
 	resultText   *widget.Text
 	//
+	charactersContainer *widget.Container
+	//
 	archetypesContainer *widget.Container
 	//
 	archetypes []archetype
@@ -50,6 +52,10 @@ type Create struct {
 	brainsImage    *ebiten.Image
 	funkImage      *ebiten.Image
 	archetypeImage *ebiten.Image
+}
+
+type character struct {
+	Character game.Character
 }
 
 type archetype struct {
@@ -119,6 +125,19 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 	})
 	state.face = face
 
+	state.charactersContainer = widget.NewContainer(
+		widget.ContainerOpts.WidgetOpts(
+			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+				Position: widget.RowLayoutPositionCenter,
+			}),
+		),
+		widget.ContainerOpts.Layout(widget.NewRowLayout(
+			widget.RowLayoutOpts.Direction(widget.DirectionVertical),
+			widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(10)),
+			widget.RowLayoutOpts.Spacing(1),
+		)),
+	)
+
 	state.archetypesContainer = widget.NewContainer(
 		widget.ContainerOpts.WidgetOpts(
 			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
@@ -177,6 +196,7 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 	)
 
 	state.ui.Container.AddChild(state.resultText)
+	state.ui.Container.AddChild(state.charactersContainer)
 	state.ui.Container.AddChild(state.archetypesContainer)
 	state.ui.Container.AddChild(state.logoutButton)
 
@@ -236,6 +256,13 @@ func (state *Create) loadImage(src string, scale float64) (*ebiten.Image, error)
 	img = resize.Resize(uint(float64(img.Bounds().Dx())*scale), uint(float64(img.Bounds().Dy())*scale), img, resize.NearestNeighbor)
 
 	return ebiten.NewImageFromImage(img), nil
+}
+
+func (state *Create) populateCharacters(characters []game.Character) {
+	state.charactersContainer.RemoveChildren()
+	for _, ch := range characters {
+		fmt.Println("TODO: Make row for", ch)
+	}
 }
 
 func (state *Create) acquireArchetypes(archetypes []game.Archetype) {
@@ -518,6 +545,8 @@ func (state *Create) Update(ctx ifs.RunContext) error {
 		case net.ArchetypesMessage:
 			state.acquireArchetypes(m.Archetypes)
 			state.refreshArchetypes()
+		case net.CharactersMessage:
+			state.populateCharacters(m.Characters)
 		}
 	default:
 	}
