@@ -74,9 +74,12 @@ func (u *universe) loginClient(cl *client) {
 	cl.state = clientStateLoggedIn
 	u.loggedInAccounts = append(u.loggedInAccounts, cl.account.username)
 	// Send the available archetypes.
-	fmt.Println("sending", u.archetypes)
 	cl.conn.Write(net.ArchetypesMessage{
 		Archetypes: u.archetypes,
+	})
+	// Send the player's characters.
+	cl.conn.Write(net.CharactersMessage{
+		Characters: cl.account.Characters,
 	})
 }
 

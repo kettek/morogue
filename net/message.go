@@ -33,6 +33,10 @@ func (w *Wrapper) Message() Message {
 		var m ArchetypesMessage
 		json.Unmarshal(w.Data, &m)
 		return m
+	case (CharactersMessage{}).Type():
+		var m CharactersMessage
+		json.Unmarshal(w.Data, &m)
+		return m
 	}
 	return nil
 }
@@ -85,4 +89,12 @@ type ArchetypesMessage struct {
 
 func (m ArchetypesMessage) Type() string {
 	return "archetypes"
+}
+
+type CharactersMessage struct {
+	Characters []game.Character `json:"c,omitempty"`
+}
+
+func (m CharactersMessage) Type() string {
+	return "characters"
 }
