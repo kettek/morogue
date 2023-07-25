@@ -74,6 +74,8 @@ func run() error {
 	// Allow access to archetypes via archetypes subdir.
 	ps.serveMux.Handle("/archetypes/", http.StripPrefix("/archetypes/", http.FileServer(http.Dir("./archetypes"))))
 
+	ps.serveMux.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("./images"))))
+
 	s := &http.Server{
 		Handler:      ps,
 		ReadTimeout:  time.Second * 10,

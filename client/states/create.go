@@ -43,6 +43,13 @@ type Create struct {
 	//
 	sortBy            string
 	selectedArchetype string
+	//
+	traitsImage    *ebiten.Image
+	swoleImage     *ebiten.Image
+	zoomsImage     *ebiten.Image
+	brainsImage    *ebiten.Image
+	funkImage      *ebiten.Image
+	archetypeImage *ebiten.Image
 }
 
 type archetype struct {
@@ -69,6 +76,38 @@ func NewCreate(connection net.Connection, msgCh chan net.Message) *Create {
 }
 
 func (state *Create) Begin(ctx ifs.RunContext) error {
+	// Load attributes images.
+	if img, err := state.loadImage("images/swole.png", 2); err != nil {
+		return err
+	} else {
+		state.swoleImage = img
+	}
+	if img, err := state.loadImage("images/zooms.png", 2); err != nil {
+		return err
+	} else {
+		state.zoomsImage = img
+	}
+	if img, err := state.loadImage("images/brains.png", 2); err != nil {
+		return err
+	} else {
+		state.brainsImage = img
+	}
+	if img, err := state.loadImage("images/funk.png", 2); err != nil {
+		return err
+	} else {
+		state.funkImage = img
+	}
+	if img, err := state.loadImage("images/traits.png", 2); err != nil {
+		return err
+	} else {
+		state.traitsImage = img
+	}
+	if img, err := state.loadImage("images/archetype.png", 2); err != nil {
+		return err
+	} else {
+		state.archetypeImage = img
+	}
+
 	// load images for button states: idle, hover, and pressed
 	buttonImages, _ := buttonImages()
 
@@ -249,38 +288,47 @@ func (state *Create) refreshArchetypes() {
 			func(p string) {
 				var c color.NRGBA
 				var tooltip string
+				var img *ebiten.Image
 				width := 100
 				switch p {
 				case "Archetype":
 					c = color.NRGBA{255, 255, 255, 255}
+					tooltip = "Archetype is a collection of attributes and traits"
+					img = state.archetypeImage
 				case "Swole":
 					c = game.ColorSwoleVibrant
 					tooltip = game.AttributeSwoleDescription
+					img = state.swoleImage
 				case "Zooms":
 					c = game.ColorZoomsVibrant
 					tooltip = game.AttributeZoomsDescription
+					img = state.zoomsImage
 				case "Brains":
 					c = game.ColorBrainsVibrant
 					tooltip = game.AttributeBrainsDescription
+					img = state.brainsImage
 				case "Funk":
 					c = game.ColorFunkVibrant
 					tooltip = game.AttributeFunkDescription
+					img = state.funkImage
 				case "Traits":
 					c = color.NRGBA{200, 200, 200, 255}
-					width = 100
+					img = state.traitsImage
+					tooltip = "Traits are unique modifiers to an archetype"
+					width = 200
 				}
 
 				tool := widget.NewTextToolTip(tooltip, state.face, color.White, eimage.NewNineSliceColor(color.NRGBA{R: 50, G: 50, B: 50, A: 255}))
 				tool.Position = widget.TOOLTIP_POS_CURSOR_STICKY
 				tool.Delay = time.Duration(time.Millisecond * 200)
 
-				el := widget.NewText(
-					widget.TextOpts.Text(p, state.face, c),
-					widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
-					widget.TextOpts.WidgetOpts(
-						widget.WidgetOpts.MinSize(width, 20),
+				container := widget.NewContainer(
+					widget.ContainerOpts.Layout(widget.NewStackedLayout()),
+					widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{0, 0, 0, 255})),
+					widget.ContainerOpts.WidgetOpts(
+						widget.WidgetOpts.MinSize(width, 40),
 						widget.WidgetOpts.LayoutData(widget.RowLayoutData{
-							Position: widget.RowLayoutPositionCenter,
+							Stretch: true,
 						}),
 						widget.WidgetOpts.ToolTip(tool),
 						widget.WidgetOpts.MouseButtonPressedHandler(func(args *widget.WidgetMouseButtonPressedEventArgs) {
@@ -289,7 +337,30 @@ func (state *Create) refreshArchetypes() {
 						}),
 					),
 				)
-				row.AddChild(el)
+
+				if img != nil {
+					graphic := widget.NewGraphic(
+						widget.GraphicOpts.Image(img),
+						widget.GraphicOpts.WidgetOpts(
+							widget.WidgetOpts.LayoutData(
+								widget.RowLayoutPositionCenter,
+							),
+						),
+					)
+					container.AddChild(graphic)
+				} else {
+					el := widget.NewText(
+						widget.TextOpts.Text(p, state.face, c),
+						widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
+						widget.TextOpts.WidgetOpts(
+							widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+								Position: widget.RowLayoutPositionCenter,
+							}),
+						),
+					)
+					container.AddChild(el)
+				}
+				row.AddChild(container)
 			}(p)
 		}
 
@@ -297,9 +368,9 @@ func (state *Create) refreshArchetypes() {
 	}
 
 	buttonImage := &widget.ButtonImage{
-		Idle:    eimage.NewNineSliceColor(color.RGBA{R: 170, G: 170, B: 180, A: 255}),
-		Hover:   eimage.NewNineSliceColor(color.RGBA{R: 130, G: 130, B: 150, A: 255}),
-		Pressed: eimage.NewNineSliceColor(color.RGBA{R: 100, G: 100, B: 120, A: 255}),
+		Idle:    eimage.NewNineSliceColor(color.RGBA{R: 40, G: 40, B: 40, A: 255}),
+		Hover:   eimage.NewNineSliceColor(color.RGBA{R: 50, G: 50, B: 50, A: 255}),
+		Pressed: eimage.NewNineSliceColor(color.RGBA{R: 80, G: 80, B: 80, A: 255}),
 	}
 
 	var rowButtons []widget.RadioGroupElement
@@ -370,7 +441,7 @@ func (state *Create) refreshArchetypes() {
 			)
 			graphicContainer.AddChild(graphic)
 
-			makeWidget := func(name string, clr color.NRGBA, tooltip string) *widget.Container {
+			makeWidget := func(name string, clr color.NRGBA, width int, tooltip string) *widget.Container {
 				tool := widget.NewTextToolTip(tooltip, state.face, color.White, eimage.NewNineSliceColor(color.NRGBA{R: 50, G: 50, B: 50, A: 255}))
 				tool.Position = widget.TOOLTIP_POS_CURSOR_STICKY
 				tool.Delay = time.Duration(time.Millisecond * 200)
@@ -379,7 +450,7 @@ func (state *Create) refreshArchetypes() {
 					widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(clr)),
 					widget.ContainerOpts.Layout(widget.NewStackedLayout()),
 					widget.ContainerOpts.WidgetOpts(
-						widget.WidgetOpts.MinSize(100, 20),
+						widget.WidgetOpts.MinSize(width, 20),
 						widget.WidgetOpts.LayoutData(widget.RowLayoutData{
 							Stretch: true,
 						}),
@@ -409,19 +480,19 @@ func (state *Create) refreshArchetypes() {
 				),
 			)
 
-			swole := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Swole)), game.ColorSwole, game.AttributeSwoleDescription)
+			swole := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Swole)), game.ColorSwole, 100, game.AttributeSwoleDescription)
 
-			zooms := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Zooms)), game.ColorZooms, game.AttributeZoomsDescription)
+			zooms := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Zooms)), game.ColorZooms, 100, game.AttributeZoomsDescription)
 
-			brains := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Brains)), game.ColorBrains, game.AttributeBrainsDescription)
+			brains := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Brains)), game.ColorBrains, 100, game.AttributeBrainsDescription)
 
-			funk := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Funk)), game.ColorFunk, game.AttributeFunkDescription)
+			funk := makeWidget(fmt.Sprintf("%d", int(arch.Archetype.Funk)), game.ColorFunk, 100, game.AttributeFunkDescription)
 
 			var d string
 			for _, t := range arch.Archetype.Traits {
 				d += t + "\n"
 			}
-			desc := makeWidget(d, color.NRGBA{32, 32, 32, 255}, "Traits of the archetype")
+			desc := makeWidget(d, color.NRGBA{32, 32, 32, 0}, 200, "Traits of the archetype")
 
 			row.AddChild(graphicContainer)
 			row.AddChild(name)
