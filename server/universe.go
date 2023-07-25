@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/kettek/morogue/game"
+	"github.com/kettek/morogue/id"
 	"github.com/kettek/morogue/net"
 )
 
@@ -68,6 +69,23 @@ func (u *universe) checkClients() {
 		u.clients[j] = nil
 	}
 	u.clients = u.clients[:i]
+}
+
+func (u *universe) hasArchetype(uuid id.UUID) bool {
+	for _, a := range u.archetypes {
+		if a.UUID == uuid {
+			return true
+		}
+	}
+	return false
+}
+
+func (u *universe) checkName(name string) error {
+	if name == "" {
+		return errors.New("name cannot be empty")
+	}
+	// TODO: Probably handle pottymouth names, if even possible.
+	return nil
 }
 
 func (u *universe) loginClient(cl *client) {
@@ -154,6 +172,32 @@ func (u *universe) updateClient(cl *client) error {
 				u.removeAccountLoggedIn(cl.account.username)
 				cl.account = Account{}
 				cl.state = clientStateWaiting
+			case net.CreateCharacterMessage:
+				if cl.state != clientStateLoggedIn {
+					cl.conn.Write(net.RegisterMessage{
+						ResultCode: 400,
+						Result:     "not logged in",
+					})
+				} else {
+					if !u.hasArchetype(m.Archetype) {
+						cl.conn.Write(net.RegisterMessage{
+							ResultCode: 400,
+							Result:     "no such archetype",
+						})
+					} else if err := u.checkName(m.Name); err != nil {
+						cl.conn.Write(net.RegisterMessage{
+							ResultCode: 400,
+							Result:     err.Error(),
+						})
+					} else if cl.account.HasCharacter(m.Name) {
+						cl.conn.Write(net.RegisterMessage{
+							ResultCode: 400,
+							Result:     "character with given name already exists",
+						})
+					} else {
+						fmt.Println("Handle character creation", m)
+					}
+				}
 			}
 		case err := <-cl.closedChan:
 			if cl.account.username != "" {

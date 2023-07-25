@@ -19,6 +19,15 @@ func (a *Account) PasswordMatches(password string) bool {
 	return err == nil
 }
 
+func (a *Account) HasCharacter(name string) bool {
+	for _, c := range a.Characters {
+		if c.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
 var (
 	ErrBadPassword = errors.New("bad password")
 )
