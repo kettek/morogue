@@ -451,7 +451,7 @@ func (state *Create) populateCharacters(characters []game.Character) {
 			delete := widget.NewButton(
 				widget.ButtonOpts.Image(buttonImage),
 				widget.ButtonOpts.WidgetOpts(
-					widget.WidgetOpts.CursorHovered("interactive"),
+					widget.WidgetOpts.CursorHovered("delete"),
 					widget.WidgetOpts.LayoutData(widget.RowLayoutData{
 						Stretch: true,
 					}),
