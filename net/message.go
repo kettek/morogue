@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/kettek/morogue/game"
+	"github.com/kettek/morogue/id"
 )
 
 type Wrapper struct {
@@ -35,6 +36,10 @@ func (w *Wrapper) Message() Message {
 		return m
 	case (CharactersMessage{}).Type():
 		var m CharactersMessage
+		json.Unmarshal(w.Data, &m)
+		return m
+	case (CreateCharacterMessage{}).Type():
+		var m CreateCharacterMessage
 		json.Unmarshal(w.Data, &m)
 		return m
 	}
@@ -97,4 +102,13 @@ type CharactersMessage struct {
 
 func (m CharactersMessage) Type() string {
 	return "characters"
+}
+
+type CreateCharacterMessage struct {
+	Name      string
+	Archetype id.UUID
+}
+
+func (m CreateCharacterMessage) Type() string {
+	return "create-character"
 }
