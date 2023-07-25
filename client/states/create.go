@@ -674,6 +674,8 @@ func (state *Create) Update(ctx ifs.RunContext) error {
 			state.refreshArchetypes()
 		case net.CharactersMessage:
 			state.populateCharacters(m.Characters)
+		case net.CreateCharacterMessage:
+			state.resultText.Label = m.Result
 		}
 	default:
 	}
