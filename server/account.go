@@ -43,6 +43,8 @@ func (a *Account) CreateCharacter(name string, archetype id.UUID) error {
 }
 
 var (
+	ErrNotLoggedIn     = errors.New("not logged in")
 	ErrBadPassword     = errors.New("bad password")
 	ErrCharacterExists = errors.New("character exists")
+	ErrNoSuchArchetype = errors.New("no such archetype")
 )
