@@ -18,6 +18,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kettek/morogue/client/ifs"
 	"github.com/kettek/morogue/game"
+	"github.com/kettek/morogue/id"
 	"github.com/kettek/morogue/net"
 	"github.com/nfnt/resize"
 	"golang.org/x/exp/slices"
@@ -33,9 +34,16 @@ type Create struct {
 	logoutButton *widget.Button
 	resultText   *widget.Text
 	//
+	charactersSection   *widget.Container
 	charactersContainer *widget.Container
+	charactersControls  *widget.Container
 	//
-	archetypesContainer *widget.Container
+	archetypesSection      *widget.Container
+	archetypesContainer    *widget.Container
+	archetypesControls     *widget.Container
+	archetypesCreateImage  *widget.Graphic
+	archetypesCreateName   *widget.TextInput
+	archetypesCreateButton *widget.Button
 	//
 	archetypes []archetype
 	//
@@ -44,7 +52,7 @@ type Create struct {
 	tooltips map[string]*widget.Container
 	//
 	sortBy            string
-	selectedArchetype string
+	selectedArchetype id.UUID
 	//
 	traitsImage    *ebiten.Image
 	swoleImage     *ebiten.Image
@@ -138,18 +146,117 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 		)),
 	)
 
-	state.archetypesContainer = widget.NewContainer(
-		widget.ContainerOpts.WidgetOpts(
-			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
-				Position: widget.RowLayoutPositionCenter,
+	{
+		state.archetypesSection = widget.NewContainer(
+			widget.ContainerOpts.WidgetOpts(
+				widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+					Position: widget.RowLayoutPositionCenter,
+				}),
+			),
+			widget.ContainerOpts.Layout(widget.NewRowLayout(
+				widget.RowLayoutOpts.Direction(widget.DirectionVertical),
+			)),
+		)
+
+		state.archetypesContainer = widget.NewContainer(
+			widget.ContainerOpts.WidgetOpts(
+				widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+					Position: widget.RowLayoutPositionCenter,
+				}),
+			),
+			widget.ContainerOpts.Layout(widget.NewRowLayout(
+				widget.RowLayoutOpts.Direction(widget.DirectionVertical),
+				widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(10)),
+				widget.RowLayoutOpts.Spacing(1),
+			)),
+		)
+		state.archetypesSection.AddChild(state.archetypesContainer)
+
+		state.archetypesControls = widget.NewContainer(
+			widget.ContainerOpts.WidgetOpts(
+				widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+					Position: widget.RowLayoutPositionCenter,
+				}),
+			),
+			widget.ContainerOpts.Layout(widget.NewRowLayout(
+				widget.RowLayoutOpts.Direction(widget.DirectionHorizontal),
+				widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(10)),
+				widget.RowLayoutOpts.Spacing(10),
+			)),
+		)
+
+		state.archetypesCreateImage = widget.NewGraphic(
+			widget.GraphicOpts.Image(nil),
+			widget.GraphicOpts.WidgetOpts(
+				widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+					Position: widget.RowLayoutPositionCenter,
+					Stretch:  true,
+				}),
+			),
+		)
+		state.archetypesControls.AddChild(state.archetypesCreateImage)
+
+		state.archetypesCreateName = widget.NewTextInput(
+			widget.TextInputOpts.WidgetOpts(
+				widget.WidgetOpts.MinSize(200, 20),
+				widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+					Position: widget.RowLayoutPositionCenter,
+					Stretch:  true,
+				}),
+				widget.WidgetOpts.CursorHovered("text"),
+			),
+			widget.TextInputOpts.Image(&widget.TextInputImage{
+				Idle:     eimage.NewNineSliceColor(color.NRGBA{R: 100, G: 100, B: 100, A: 255}),
+				Disabled: eimage.NewNineSliceColor(color.NRGBA{R: 100, G: 100, B: 100, A: 255}),
 			}),
-		),
-		widget.ContainerOpts.Layout(widget.NewRowLayout(
-			widget.RowLayoutOpts.Direction(widget.DirectionVertical),
-			widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(10)),
-			widget.RowLayoutOpts.Spacing(1),
-		)),
-	)
+			widget.TextInputOpts.Face(face),
+			widget.TextInputOpts.Color(&widget.TextInputColor{
+				Idle:          color.NRGBA{254, 255, 255, 255},
+				Disabled:      color.NRGBA{R: 200, G: 200, B: 200, A: 255},
+				Caret:         color.NRGBA{254, 255, 255, 255},
+				DisabledCaret: color.NRGBA{R: 200, G: 200, B: 200, A: 255},
+			}),
+			widget.TextInputOpts.Padding(widget.NewInsetsSimple(5)),
+			widget.TextInputOpts.CaretOpts(
+				widget.CaretOpts.Size(face, 2),
+			),
+			widget.TextInputOpts.Placeholder("character name"),
+			widget.TextInputOpts.SubmitHandler(func(args *widget.TextInputChangedEventArgs) {
+				state.doCreate()
+			}),
+			//This is called whenver there is a change to the text
+			widget.TextInputOpts.ChangedHandler(func(args *widget.TextInputChangedEventArgs) {
+				// TODO: Store it.
+			}),
+		)
+		state.archetypesControls.AddChild(state.archetypesCreateName)
+
+		state.archetypesCreateButton = widget.NewButton(
+			widget.ButtonOpts.WidgetOpts(
+				widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+					HorizontalPosition: widget.AnchorLayoutPositionCenter,
+					VerticalPosition:   widget.AnchorLayoutPositionCenter,
+				}),
+				widget.WidgetOpts.CursorHovered("interactive"),
+			),
+			widget.ButtonOpts.Image(buttonImages),
+			widget.ButtonOpts.Text("create", face, &widget.ButtonTextColor{
+				Idle: color.NRGBA{0xdf, 0xf4, 0xff, 0xff},
+			}),
+			widget.ButtonOpts.TextPadding(widget.Insets{
+				Left:   30,
+				Right:  30,
+				Top:    5,
+				Bottom: 5,
+			}),
+			widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
+				state.doCreate()
+			}),
+		)
+		state.archetypesControls.AddChild(state.archetypesCreateButton)
+
+		state.archetypesSection.AddChild(state.archetypesControls)
+	}
 
 	state.logoutButton = widget.NewButton(
 		// set general widget options
@@ -197,7 +304,7 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 
 	state.ui.Container.AddChild(state.resultText)
 	state.ui.Container.AddChild(state.charactersContainer)
-	state.ui.Container.AddChild(state.archetypesContainer)
+	state.ui.Container.AddChild(state.archetypesSection)
 	state.ui.Container.AddChild(state.logoutButton)
 
 	return nil
@@ -217,7 +324,7 @@ func (state *Create) End() (interface{}, error) {
 
 func (state *Create) haveArchetype(archetype game.Archetype) bool {
 	for _, arch := range state.archetypes {
-		if arch.Archetype.Title == archetype.Title {
+		if arch.Archetype.UUID == archetype.UUID {
 			return true
 		}
 	}
@@ -434,7 +541,8 @@ func (state *Create) refreshArchetypes() {
 				widget.ButtonOpts.Image(buttonImage),
 				// add a handler that reacts to clicking the button
 				widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
-					state.selectedArchetype = arch.Archetype.Title
+					state.selectedArchetype = arch.Archetype.UUID
+					state.archetypesCreateImage.Image = arch.Image
 				}),
 				widget.ButtonOpts.WidgetOpts(
 					widget.WidgetOpts.CursorHovered("interactive"),
@@ -536,6 +644,25 @@ func (state *Create) refreshArchetypes() {
 		widget.RadioGroupOpts.Elements(rowButtons...),
 	)
 
+}
+
+func (state *Create) doCreate() {
+	name := state.archetypesCreateName.InputText
+	id := state.selectedArchetype
+
+	if name == "" {
+		state.resultText.Label = "name must not be empty"
+		return
+	}
+	if id.IsNil() {
+		state.resultText.Label = "archetype must be selected"
+		return
+	}
+
+	state.connection.Write(net.CreateCharacterMessage{
+		Name:      name,
+		Archetype: id,
+	})
 }
 
 func (state *Create) Update(ctx ifs.RunContext) error {
