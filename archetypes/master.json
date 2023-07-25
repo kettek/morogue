@@ -4,5 +4,6 @@
   "swole": 2,
   "zooms": 4,
   "brains": 1,
-  "funk": 2
+  "funk": 2,
+  "traits": ["unarmed x2 damage"]
 }

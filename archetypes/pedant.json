@@ -4,5 +4,6 @@
   "swole": 0,
   "zooms": 2,
   "brains": 6,
-  "funk": 0
+  "funk": 0,
+  "traits": ["no helmets"]
 }
