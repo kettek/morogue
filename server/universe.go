@@ -274,6 +274,19 @@ func (u *universe) updateClient(cl *client) error {
 						})
 					}
 				}
+			case net.UnjoinCharacterMessage:
+				if cl.state != clientStateSelectedCharacter {
+					cl.conn.Write(net.UnjoinCharacterMessage{
+						ResultCode: 400,
+						Result:     ErrNotJoined.Error(),
+					})
+				} else {
+					cl.character = ""
+					cl.state = clientStateLoggedIn
+					cl.conn.Write(net.UnjoinCharacterMessage{
+						ResultCode: 200,
+					})
+				}
 			}
 		case err := <-cl.closedChan:
 			if cl.account.username != "" {
@@ -307,6 +320,7 @@ func (u *universe) removeAccountLoggedIn(username string) {
 }
 
 var (
+	ErrNotJoined     = errors.New("character not joined")
 	ErrAlreadyJoined = errors.New("character is already joined")
 	ErrUserLoggedIn  = errors.New("user is logged in")
 )

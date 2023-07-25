@@ -910,7 +910,7 @@ func (state *Create) Update(ctx ifs.RunContext) error {
 			}
 		case net.JoinCharacterMessage:
 			if m.ResultCode == 200 {
-				fmt.Println("TODO: Switch to join world state!")
+				ctx.Sm.Push(NewWorlds(state.connection, state.messageChan))
 			} else {
 				state.resultText.Label = m.Result
 			}
