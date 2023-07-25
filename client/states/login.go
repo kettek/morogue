@@ -9,8 +9,6 @@ import (
 	"github.com/ebitenui/ebitenui/widget"
 	"github.com/kettek/morogue/client/ifs"
 	"github.com/kettek/morogue/net"
-	"golang.org/x/image/font"
-	"golang.org/x/image/font/opentype"
 )
 
 type Login struct {
@@ -45,63 +43,22 @@ func NewLogin(connection net.Connection, msgCh chan net.Message) *Login {
 func (state *Login) Begin(ctx ifs.RunContext) error {
 	state.connection.Write(&net.PingMessage{})
 
-	// load images for button states: idle, hover, and pressed
-	buttonImages, _ := buttonImages()
-
-	// load button text font
-	face, _ := opentype.NewFace(ctx.Txt.Renderer.GetFont(), &opentype.FaceOptions{
-		Size:    16,
-		DPI:     72,
-		Hinting: font.HintingNone,
-	})
-
 	state.usernameInput = widget.NewTextInput(
 		widget.TextInputOpts.WidgetOpts(
-			//Set the layout information to center the textbox in the parent
 			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
 				Position: widget.RowLayoutPositionCenter,
 				Stretch:  true,
 			}),
 			widget.WidgetOpts.CursorHovered("text"),
 		),
-
-		//Set the Idle and Disabled background image for the text input
-		//If the NineSlice image has a minimum size, the widget will use that or
-		// widget.WidgetOpts.MinSize; whichever is greater
-		widget.TextInputOpts.Image(&widget.TextInputImage{
-			Idle:     image.NewNineSliceColor(color.NRGBA{R: 100, G: 100, B: 100, A: 255}),
-			Disabled: image.NewNineSliceColor(color.NRGBA{R: 100, G: 100, B: 100, A: 255}),
-		}),
-
-		//Set the font face and size for the widget
-		widget.TextInputOpts.Face(face),
-
-		//Set the colors for the text and caret
-		widget.TextInputOpts.Color(&widget.TextInputColor{
-			Idle:          color.NRGBA{254, 255, 255, 255},
-			Disabled:      color.NRGBA{R: 200, G: 200, B: 200, A: 255},
-			Caret:         color.NRGBA{254, 255, 255, 255},
-			DisabledCaret: color.NRGBA{R: 200, G: 200, B: 200, A: 255},
-		}),
-
-		//Set how much padding there is between the edge of the input and the text
-		widget.TextInputOpts.Padding(widget.NewInsetsSimple(5)),
-
-		//Set the font and width of the caret
+		widget.TextInputOpts.Image(ctx.UI.TextInputImage),
+		widget.TextInputOpts.Face(ctx.UI.BodyCopyFace),
+		widget.TextInputOpts.Color(ctx.UI.TextInputColor),
+		widget.TextInputOpts.Padding(ctx.UI.TextInputPadding),
 		widget.TextInputOpts.CaretOpts(
-			widget.CaretOpts.Size(face, 2),
+			widget.CaretOpts.Size(ctx.UI.BodyCopyFace, 2),
 		),
-
-		//This text is displayed if the input is empty
 		widget.TextInputOpts.Placeholder("username"),
-
-		//This is called when the user hits the "Enter" key.
-		//There are other options that can configure this behavior
-		widget.TextInputOpts.SubmitHandler(func(args *widget.TextInputChangedEventArgs) {
-			fmt.Println("Text Submitted: ", args.InputText)
-		}),
-
-		//This is called whenver there is a change to the text
 		widget.TextInputOpts.ChangedHandler(func(args *widget.TextInputChangedEventArgs) {
 			state.checkInputs()
 		}),
@@ -115,28 +72,15 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 			}),
 			widget.WidgetOpts.CursorHovered("text"),
 		),
-		widget.TextInputOpts.Image(&widget.TextInputImage{
-			Idle:     image.NewNineSliceColor(color.NRGBA{R: 100, G: 100, B: 100, A: 255}),
-			Disabled: image.NewNineSliceColor(color.NRGBA{R: 100, G: 100, B: 100, A: 255}),
-		}),
-		widget.TextInputOpts.Face(face),
-		widget.TextInputOpts.Color(&widget.TextInputColor{
-			Idle:          color.NRGBA{254, 255, 255, 255},
-			Disabled:      color.NRGBA{R: 200, G: 200, B: 200, A: 255},
-			Caret:         color.NRGBA{254, 255, 255, 255},
-			DisabledCaret: color.NRGBA{R: 200, G: 200, B: 200, A: 255},
-		}),
-		widget.TextInputOpts.Padding(widget.NewInsetsSimple(5)),
+		widget.TextInputOpts.Image(ctx.UI.TextInputImage),
+		widget.TextInputOpts.Face(ctx.UI.BodyCopyFace),
+		widget.TextInputOpts.Color(ctx.UI.TextInputColor),
+		widget.TextInputOpts.Padding(ctx.UI.TextInputPadding),
 		widget.TextInputOpts.CaretOpts(
-			widget.CaretOpts.Size(face, 2),
+			widget.CaretOpts.Size(ctx.UI.BodyCopyFace, 2),
 		),
-		//This parameter indicates that the inputted text should be hidden
 		widget.TextInputOpts.Secure(true),
-
 		widget.TextInputOpts.Placeholder("password"),
-		widget.TextInputOpts.SubmitHandler(func(args *widget.TextInputChangedEventArgs) {
-			fmt.Println("Text Submitted: ", args.InputText)
-		}),
 		widget.TextInputOpts.ChangedHandler(func(args *widget.TextInputChangedEventArgs) {
 			state.checkInputs()
 		}),
@@ -150,101 +94,54 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 			}),
 			widget.WidgetOpts.CursorHovered("text"),
 		),
-		widget.TextInputOpts.Image(&widget.TextInputImage{
-			Idle:     image.NewNineSliceColor(color.NRGBA{R: 100, G: 100, B: 100, A: 255}),
-			Disabled: image.NewNineSliceColor(color.NRGBA{R: 100, G: 100, B: 100, A: 255}),
-		}),
-		widget.TextInputOpts.Face(face),
-		widget.TextInputOpts.Color(&widget.TextInputColor{
-			Idle:          color.NRGBA{254, 255, 255, 255},
-			Disabled:      color.NRGBA{R: 200, G: 200, B: 200, A: 255},
-			Caret:         color.NRGBA{254, 255, 255, 255},
-			DisabledCaret: color.NRGBA{R: 200, G: 200, B: 200, A: 255},
-		}),
-		widget.TextInputOpts.Padding(widget.NewInsetsSimple(5)),
+		widget.TextInputOpts.Image(ctx.UI.TextInputImage),
+		widget.TextInputOpts.Face(ctx.UI.BodyCopyFace),
+		widget.TextInputOpts.Color(ctx.UI.TextInputColor),
+		widget.TextInputOpts.Padding(ctx.UI.TextInputPadding),
 		widget.TextInputOpts.CaretOpts(
-			widget.CaretOpts.Size(face, 2),
+			widget.CaretOpts.Size(ctx.UI.BodyCopyFace, 2),
 		),
-		//This parameter indicates that the inputted text should be hidden
 		widget.TextInputOpts.Secure(true),
-
 		widget.TextInputOpts.Placeholder("confirm"),
-		widget.TextInputOpts.SubmitHandler(func(args *widget.TextInputChangedEventArgs) {
-			fmt.Println("Text Submitted: ", args.InputText)
-		}),
 		widget.TextInputOpts.ChangedHandler(func(args *widget.TextInputChangedEventArgs) {
 			state.checkInputs()
 		}),
 	)
 
 	state.loginButton = widget.NewButton(
-		// set general widget options
 		widget.ButtonOpts.WidgetOpts(
-			// instruct the container's anchor layout to center the button both horizontally and vertically
 			widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
 				HorizontalPosition: widget.AnchorLayoutPositionCenter,
 				VerticalPosition:   widget.AnchorLayoutPositionCenter,
 			}),
 			widget.WidgetOpts.CursorHovered("interactive"),
 		),
-
-		// specify the images to use
-		widget.ButtonOpts.Image(buttonImages),
-
-		// specify the button's text, the font face, and the color
-		widget.ButtonOpts.Text("login", face, &widget.ButtonTextColor{
-			Idle: color.NRGBA{0xdf, 0xf4, 0xff, 0xff},
-		}),
-
-		// specify that the button's text needs some padding for correct display
-		widget.ButtonOpts.TextPadding(widget.Insets{
-			Left:   30,
-			Right:  30,
-			Top:    5,
-			Bottom: 5,
-		}),
-
-		// add a handler that reacts to clicking the button
+		widget.ButtonOpts.Image(ctx.UI.ButtonImage),
+		widget.ButtonOpts.Text("login", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
+		widget.ButtonOpts.TextPadding(ctx.UI.ButtonPadding),
 		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 			state.doLogin()
 		}),
 	)
 
 	state.registerButton = widget.NewButton(
-		// set general widget options
 		widget.ButtonOpts.WidgetOpts(
-			// instruct the container's anchor layout to center the button both horizontally and vertically
 			widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
 				HorizontalPosition: widget.AnchorLayoutPositionCenter,
 				VerticalPosition:   widget.AnchorLayoutPositionCenter,
 			}),
 			widget.WidgetOpts.CursorHovered("interactive"),
 		),
-
-		// specify the images to use
-		widget.ButtonOpts.Image(buttonImages),
-
-		// specify the button's text, the font face, and the color
-		widget.ButtonOpts.Text("register", face, &widget.ButtonTextColor{
-			Idle: color.NRGBA{0xdf, 0xf4, 0xff, 0xff},
-		}),
-
-		// specify that the button's text needs some padding for correct display
-		widget.ButtonOpts.TextPadding(widget.Insets{
-			Left:   30,
-			Right:  30,
-			Top:    5,
-			Bottom: 5,
-		}),
-
-		// add a handler that reacts to clicking the button
+		widget.ButtonOpts.Image(ctx.UI.ButtonImage),
+		widget.ButtonOpts.Text("register", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
+		widget.ButtonOpts.TextPadding(ctx.UI.ButtonPadding),
 		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 			state.doRegister()
 		}),
 	)
 
 	state.resultText = widget.NewText(
-		widget.TextOpts.Text("login. you will be prompted to register if username does not exist.", face, color.White),
+		widget.TextOpts.Text("login. you will be prompted to register if username does not exist.", ctx.UI.BodyCopyFace, color.White),
 		widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
 		widget.TextOpts.WidgetOpts(
 			widget.WidgetOpts.LayoutData(widget.RowLayoutData{

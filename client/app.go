@@ -26,6 +26,8 @@ func newApp() *app {
 
 	ebiten.SetWindowSize(1280, 720)
 
+	embed.Setup()
+
 	// copied and pasted from tinne example -- thx tinne! :)
 	// create text renderer, set the font and cache
 	renderer := etxt.NewRenderer()
@@ -38,9 +40,11 @@ func newApp() *app {
 	renderer.SetSize(32)
 
 	a.runContext.Txt = ifs.NewTextRenderer(renderer)
-	a.drawContext.Txt = ifs.NewTextRenderer(renderer)
+	a.drawContext.Txt = a.runContext.Txt
 
-	embed.Setup()
+	a.drawContext.UI = &ifs.DrawContextUI{}
+	a.runContext.UI = a.drawContext.UI
+	a.drawContext.UI.Init(a.drawContext.Txt)
 
 	a.connectState.Begin(a.runContext)
 

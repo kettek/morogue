@@ -22,8 +22,6 @@ import (
 	"github.com/kettek/morogue/net"
 	"github.com/nfnt/resize"
 	"golang.org/x/exp/slices"
-	"golang.org/x/image/font"
-	"golang.org/x/image/font/opentype"
 )
 
 type Create struct {
@@ -52,8 +50,6 @@ type Create struct {
 	characters []game.Character
 	archetypes []archetype
 	//
-	face font.Face
-	//
 	tooltips map[string]*widget.Container
 	//
 	sortBy            string
@@ -66,10 +62,6 @@ type Create struct {
 	brainsImage    *ebiten.Image
 	funkImage      *ebiten.Image
 	archetypeImage *ebiten.Image
-}
-
-type character struct {
-	Character game.Character
 }
 
 type archetype struct {
@@ -128,17 +120,6 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 		state.archetypeImage = img
 	}
 
-	// load images for button states: idle, hover, and pressed
-	buttonImages, _ := buttonImages()
-
-	// load button text font
-	face, _ := opentype.NewFace(ctx.Txt.Renderer.GetFont(), &opentype.FaceOptions{
-		Size:    16,
-		DPI:     72,
-		Hinting: font.HintingNone,
-	})
-	state.face = face
-
 	state.charactersSection = widget.NewContainer(
 		widget.ContainerOpts.WidgetOpts(
 			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
@@ -186,16 +167,9 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 			}),
 			widget.WidgetOpts.CursorHovered("interactive"),
 		),
-		widget.ButtonOpts.Image(buttonImages),
-		widget.ButtonOpts.Text("join", face, &widget.ButtonTextColor{
-			Idle: color.NRGBA{0xdf, 0xf4, 0xff, 0xff},
-		}),
-		widget.ButtonOpts.TextPadding(widget.Insets{
-			Left:   30,
-			Right:  30,
-			Top:    5,
-			Bottom: 5,
-		}),
+		widget.ButtonOpts.Image(ctx.UI.ButtonImage),
+		widget.ButtonOpts.Text("join", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
+		widget.ButtonOpts.TextPadding(ctx.UI.ButtonPadding),
 		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 			state.doJoin()
 		}),
@@ -217,7 +191,7 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 	)
 
 	deleteText := widget.NewText(
-		widget.TextOpts.Text("Confirm deletion", face, color.White),
+		widget.TextOpts.Text("Confirm deletion", ctx.UI.BodyCopyFace, color.White),
 		widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
 		widget.TextOpts.WidgetOpts(
 			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
@@ -225,22 +199,15 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 			}),
 		),
 	)
-	buttonImage := &widget.ButtonImage{
-		Idle:    eimage.NewNineSliceColor(color.RGBA{R: 40, G: 40, B: 40, A: 255}),
-		Hover:   eimage.NewNineSliceColor(color.RGBA{R: 50, G: 50, B: 50, A: 255}),
-		Pressed: eimage.NewNineSliceColor(color.RGBA{R: 80, G: 80, B: 80, A: 255}),
-	}
 	deleteButton := widget.NewButton(
-		widget.ButtonOpts.Image(buttonImage),
+		widget.ButtonOpts.Image(ctx.UI.ButtonImage),
 		widget.ButtonOpts.WidgetOpts(
 			widget.WidgetOpts.CursorHovered("delete"),
 			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
 				Stretch: true,
 			}),
 		),
-		widget.ButtonOpts.Text("delete", state.face, &widget.ButtonTextColor{
-			Idle: color.NRGBA{0xff, 0x0, 0x0, 0xff},
-		}),
+		widget.ButtonOpts.Text("delete", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
 		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 			state.connection.Write(net.DeleteCharacterMessage{
 				Name: state.selectedCharacter,
@@ -322,20 +289,12 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 				}),
 				widget.WidgetOpts.CursorHovered("text"),
 			),
-			widget.TextInputOpts.Image(&widget.TextInputImage{
-				Idle:     eimage.NewNineSliceColor(color.NRGBA{R: 100, G: 100, B: 100, A: 255}),
-				Disabled: eimage.NewNineSliceColor(color.NRGBA{R: 100, G: 100, B: 100, A: 255}),
-			}),
-			widget.TextInputOpts.Face(face),
-			widget.TextInputOpts.Color(&widget.TextInputColor{
-				Idle:          color.NRGBA{254, 255, 255, 255},
-				Disabled:      color.NRGBA{R: 200, G: 200, B: 200, A: 255},
-				Caret:         color.NRGBA{254, 255, 255, 255},
-				DisabledCaret: color.NRGBA{R: 200, G: 200, B: 200, A: 255},
-			}),
-			widget.TextInputOpts.Padding(widget.NewInsetsSimple(5)),
+			widget.TextInputOpts.Image(ctx.UI.TextInputImage),
+			widget.TextInputOpts.Face(ctx.UI.BodyCopyFace),
+			widget.TextInputOpts.Color(ctx.UI.TextInputColor),
+			widget.TextInputOpts.Padding(ctx.UI.TextInputPadding),
 			widget.TextInputOpts.CaretOpts(
-				widget.CaretOpts.Size(face, 2),
+				widget.CaretOpts.Size(ctx.UI.BodyCopyFace, 2),
 			),
 			widget.TextInputOpts.Placeholder("character name"),
 			widget.TextInputOpts.SubmitHandler(func(args *widget.TextInputChangedEventArgs) {
@@ -356,16 +315,9 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 				}),
 				widget.WidgetOpts.CursorHovered("interactive"),
 			),
-			widget.ButtonOpts.Image(buttonImages),
-			widget.ButtonOpts.Text("create", face, &widget.ButtonTextColor{
-				Idle: color.NRGBA{0xdf, 0xf4, 0xff, 0xff},
-			}),
-			widget.ButtonOpts.TextPadding(widget.Insets{
-				Left:   30,
-				Right:  30,
-				Top:    5,
-				Bottom: 5,
-			}),
+			widget.ButtonOpts.Image(ctx.UI.ButtonImage),
+			widget.ButtonOpts.Text("create", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
+			widget.ButtonOpts.TextPadding(ctx.UI.ButtonPadding),
 			widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 				state.doCreate()
 			}),
@@ -376,33 +328,16 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 	}
 
 	state.logoutButton = widget.NewButton(
-		// set general widget options
 		widget.ButtonOpts.WidgetOpts(
-			// instruct the container's anchor layout to center the button both horizontally and vertically
 			widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
 				HorizontalPosition: widget.AnchorLayoutPositionCenter,
 				VerticalPosition:   widget.AnchorLayoutPositionCenter,
 			}),
 			widget.WidgetOpts.CursorHovered("interactive"),
 		),
-
-		// specify the images to use
-		widget.ButtonOpts.Image(buttonImages),
-
-		// specify the button's text, the font face, and the color
-		widget.ButtonOpts.Text("logout", face, &widget.ButtonTextColor{
-			Idle: color.NRGBA{0xdf, 0xf4, 0xff, 0xff},
-		}),
-
-		// specify that the button's text needs some padding for correct display
-		widget.ButtonOpts.TextPadding(widget.Insets{
-			Left:   30,
-			Right:  30,
-			Top:    5,
-			Bottom: 5,
-		}),
-
-		// add a handler that reacts to clicking the button
+		widget.ButtonOpts.Image(ctx.UI.ButtonImage),
+		widget.ButtonOpts.Text("logout", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
+		widget.ButtonOpts.TextPadding(ctx.UI.ButtonPadding),
 		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 			state.connection.Write(net.LogoutMessage{})
 			ctx.Sm.Pop()
@@ -410,7 +345,7 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 	)
 
 	state.resultText = widget.NewText(
-		widget.TextOpts.Text("Create a new hero or select a previous one.", face, color.White),
+		widget.TextOpts.Text("Create a new hero or select a previous one.", ctx.UI.BodyCopyFace, color.White),
 		widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
 		widget.TextOpts.WidgetOpts(
 			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
@@ -482,15 +417,9 @@ func (state *Create) loadImage(src string, scale float64) (*ebiten.Image, error)
 	return ebiten.NewImageFromImage(img), nil
 }
 
-func (state *Create) populateCharacters(characters []game.Character) {
+func (state *Create) populateCharacters(ctx ifs.RunContext, characters []game.Character) {
 	state.characters = characters
 	state.charactersContainer.RemoveChildren()
-
-	buttonImage := &widget.ButtonImage{
-		Idle:    eimage.NewNineSliceColor(color.RGBA{R: 40, G: 40, B: 40, A: 255}),
-		Hover:   eimage.NewNineSliceColor(color.RGBA{R: 50, G: 50, B: 50, A: 255}),
-		Pressed: eimage.NewNineSliceColor(color.RGBA{R: 80, G: 80, B: 80, A: 255}),
-	}
 
 	var rowButtons []widget.RadioGroupElement
 	for _, ch := range characters {
@@ -505,7 +434,7 @@ func (state *Create) populateCharacters(characters []game.Character) {
 				),
 			)
 			rowContainerButton := widget.NewButton(
-				widget.ButtonOpts.Image(buttonImage),
+				widget.ButtonOpts.Image(ctx.UI.ButtonImage),
 				widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 					state.selectedCharacter = ch.Name
 				}),
@@ -555,7 +484,7 @@ func (state *Create) populateCharacters(characters []game.Character) {
 			graphicContainer.AddChild(graphic)
 
 			name := widget.NewText(
-				widget.TextOpts.Text(ch.Name, state.face, color.White),
+				widget.TextOpts.Text(ch.Name, ctx.UI.HeadlineFace, color.White),
 				widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
 				widget.TextOpts.WidgetOpts(
 					widget.WidgetOpts.MinSize(100, 20),
@@ -566,16 +495,14 @@ func (state *Create) populateCharacters(characters []game.Character) {
 			)
 
 			delete := widget.NewButton(
-				widget.ButtonOpts.Image(buttonImage),
+				widget.ButtonOpts.Image(ctx.UI.ButtonImage),
 				widget.ButtonOpts.WidgetOpts(
 					widget.WidgetOpts.CursorHovered("delete"),
 					widget.WidgetOpts.LayoutData(widget.RowLayoutData{
 						Stretch: true,
 					}),
 				),
-				widget.ButtonOpts.Text("delete", state.face, &widget.ButtonTextColor{
-					Idle: color.NRGBA{0xff, 0x0, 0x0, 0xff},
-				}),
+				widget.ButtonOpts.Text("delete", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
 				widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 					x, y := state.deleteWindow.Contents.PreferredSize()
 					r := image.Rect(0, 0, x, y)
@@ -621,7 +548,7 @@ func (state *Create) acquireArchetypes(archetypes []game.Archetype) {
 	}
 }
 
-func (state *Create) refreshArchetypes() {
+func (state *Create) refreshArchetypes(ctx ifs.RunContext) {
 	state.archetypesContainer.RemoveChildren()
 
 	// Heading
@@ -633,7 +560,7 @@ func (state *Create) refreshArchetypes() {
 		)
 
 		el := widget.NewText(
-			widget.TextOpts.Text("", state.face, color.White),
+			widget.TextOpts.Text("", ctx.UI.HeadlineFace, color.White),
 			widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
 			widget.TextOpts.WidgetOpts(
 				widget.WidgetOpts.MinSize(50, 20),
@@ -679,7 +606,7 @@ func (state *Create) refreshArchetypes() {
 					width = 200
 				}
 
-				tool := widget.NewTextToolTip(tooltip, state.face, color.White, eimage.NewNineSliceColor(color.NRGBA{R: 50, G: 50, B: 50, A: 255}))
+				tool := widget.NewTextToolTip(tooltip, ctx.UI.BodyCopyFace, color.White, eimage.NewNineSliceColor(color.NRGBA{R: 50, G: 50, B: 50, A: 255}))
 				tool.Position = widget.TOOLTIP_POS_CURSOR_STICKY
 				tool.Delay = time.Duration(time.Millisecond * 200)
 
@@ -695,7 +622,7 @@ func (state *Create) refreshArchetypes() {
 						widget.WidgetOpts.CursorHovered("interactive-tooltip"),
 						widget.WidgetOpts.MouseButtonPressedHandler(func(args *widget.WidgetMouseButtonPressedEventArgs) {
 							state.sortBy = p
-							state.refreshArchetypes()
+							state.refreshArchetypes(ctx)
 							state.syncUI()
 						}),
 					),
@@ -713,7 +640,7 @@ func (state *Create) refreshArchetypes() {
 					container.AddChild(graphic)
 				} else {
 					el := widget.NewText(
-						widget.TextOpts.Text(p, state.face, c),
+						widget.TextOpts.Text(p, ctx.UI.HeadlineFace, c),
 						widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
 						widget.TextOpts.WidgetOpts(
 							widget.WidgetOpts.LayoutData(widget.RowLayoutData{
@@ -728,12 +655,6 @@ func (state *Create) refreshArchetypes() {
 		}
 
 		state.archetypesContainer.AddChild(row)
-	}
-
-	buttonImage := &widget.ButtonImage{
-		Idle:    eimage.NewNineSliceColor(color.RGBA{R: 40, G: 40, B: 40, A: 255}),
-		Hover:   eimage.NewNineSliceColor(color.RGBA{R: 50, G: 50, B: 50, A: 255}),
-		Pressed: eimage.NewNineSliceColor(color.RGBA{R: 80, G: 80, B: 80, A: 255}),
 	}
 
 	var rowButtons []widget.RadioGroupElement
@@ -765,7 +686,7 @@ func (state *Create) refreshArchetypes() {
 				),
 			)
 			rowContainerButton := widget.NewButton(
-				widget.ButtonOpts.Image(buttonImage),
+				widget.ButtonOpts.Image(ctx.UI.ButtonImage),
 				// add a handler that reacts to clicking the button
 				widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 					state.selectedArchetype = arch.Archetype.UUID
@@ -819,7 +740,7 @@ func (state *Create) refreshArchetypes() {
 						}),
 					))
 				content := widget.NewText(
-					widget.TextOpts.Text(name, state.face, color.White),
+					widget.TextOpts.Text(name, ctx.UI.HeadlineFace, color.White),
 					widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
 					widget.TextOpts.WidgetOpts(
 						widget.WidgetOpts.LayoutData(widget.RowLayoutData{
@@ -832,7 +753,7 @@ func (state *Create) refreshArchetypes() {
 			}
 
 			name := widget.NewText(
-				widget.TextOpts.Text(arch.Archetype.Title, state.face, color.White),
+				widget.TextOpts.Text(arch.Archetype.Title, ctx.UI.HeadlineFace, color.White),
 				widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
 				widget.TextOpts.WidgetOpts(
 					widget.WidgetOpts.MinSize(100, 20),
@@ -969,10 +890,10 @@ func (state *Create) Update(ctx ifs.RunContext) error {
 		switch m := msg.(type) {
 		case net.ArchetypesMessage:
 			state.acquireArchetypes(m.Archetypes)
-			state.refreshArchetypes()
+			state.refreshArchetypes(ctx)
 			state.syncUI()
 		case net.CharactersMessage:
-			state.populateCharacters(m.Characters)
+			state.populateCharacters(ctx, m.Characters)
 			state.syncUI()
 		case net.CreateCharacterMessage:
 			if m.ResultCode == 200 {
