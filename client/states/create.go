@@ -34,18 +34,22 @@ type Create struct {
 	logoutButton *widget.Button
 	resultText   *widget.Text
 	//
-	charactersSection   *widget.Container
-	charactersContainer *widget.Container
-	charactersControls  *widget.Container
-	deleteWindow        *widget.Window
+	charactersSection    *widget.Container
+	charactersContainer  *widget.Container
+	charactersRadioGroup *widget.RadioGroup
+	charactersControls   *widget.Container
+	charactersJoinButton *widget.Button
+	deleteWindow         *widget.Window
 	//
 	archetypesSection      *widget.Container
 	archetypesContainer    *widget.Container
+	archetypesRadioGroup   *widget.RadioGroup
 	archetypesControls     *widget.Container
 	archetypesCreateImage  *widget.Graphic
 	archetypesCreateName   *widget.TextInput
 	archetypesCreateButton *widget.Button
 	//
+	characters []game.Character
 	archetypes []archetype
 	//
 	face font.Face
@@ -54,7 +58,7 @@ type Create struct {
 	//
 	sortBy            string
 	selectedArchetype id.UUID
-	characterToDelete string
+	selectedCharacter string
 	//
 	traitsImage    *ebiten.Image
 	swoleImage     *ebiten.Image
@@ -135,6 +139,17 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 	})
 	state.face = face
 
+	state.charactersSection = widget.NewContainer(
+		widget.ContainerOpts.WidgetOpts(
+			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+				Position: widget.RowLayoutPositionCenter,
+			}),
+		),
+		widget.ContainerOpts.Layout(widget.NewRowLayout(
+			widget.RowLayoutOpts.Direction(widget.DirectionVertical),
+		)),
+	)
+
 	state.charactersContainer = widget.NewContainer(
 		widget.ContainerOpts.WidgetOpts(
 			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
@@ -147,6 +162,45 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 			widget.RowLayoutOpts.Spacing(1),
 		)),
 	)
+	state.charactersSection.AddChild(state.charactersContainer)
+
+	state.charactersControls = widget.NewContainer(
+		widget.ContainerOpts.WidgetOpts(
+			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+				Position: widget.RowLayoutPositionCenter,
+			}),
+		),
+		widget.ContainerOpts.Layout(widget.NewRowLayout(
+			widget.RowLayoutOpts.Direction(widget.DirectionHorizontal),
+			widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(10)),
+			widget.RowLayoutOpts.Spacing(10),
+		)),
+	)
+	state.charactersSection.AddChild(state.charactersControls)
+
+	state.charactersJoinButton = widget.NewButton(
+		widget.ButtonOpts.WidgetOpts(
+			widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+				HorizontalPosition: widget.AnchorLayoutPositionCenter,
+				VerticalPosition:   widget.AnchorLayoutPositionCenter,
+			}),
+			widget.WidgetOpts.CursorHovered("interactive"),
+		),
+		widget.ButtonOpts.Image(buttonImages),
+		widget.ButtonOpts.Text("join", face, &widget.ButtonTextColor{
+			Idle: color.NRGBA{0xdf, 0xf4, 0xff, 0xff},
+		}),
+		widget.ButtonOpts.TextPadding(widget.Insets{
+			Left:   30,
+			Right:  30,
+			Top:    5,
+			Bottom: 5,
+		}),
+		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
+			// TODO: Join.
+		}),
+	)
+	state.charactersControls.AddChild(state.charactersJoinButton)
 
 	deleteContents := widget.NewContainer(
 		widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{100, 100, 100, 255})),
@@ -189,7 +243,7 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 		}),
 		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 			state.connection.Write(net.DeleteCharacterMessage{
-				Name: state.characterToDelete,
+				Name: state.selectedCharacter,
 			})
 			state.deleteWindow.Close()
 		}),
@@ -366,7 +420,7 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 	)
 
 	state.ui.Container.AddChild(state.resultText)
-	state.ui.Container.AddChild(state.charactersContainer)
+	state.ui.Container.AddChild(state.charactersSection)
 	state.ui.Container.AddChild(state.archetypesSection)
 	state.ui.Container.AddChild(state.logoutButton)
 
@@ -429,6 +483,7 @@ func (state *Create) loadImage(src string, scale float64) (*ebiten.Image, error)
 }
 
 func (state *Create) populateCharacters(characters []game.Character) {
+	state.characters = characters
 	state.charactersContainer.RemoveChildren()
 
 	buttonImage := &widget.ButtonImage{
@@ -451,12 +506,11 @@ func (state *Create) populateCharacters(characters []game.Character) {
 			)
 			rowContainerButton := widget.NewButton(
 				widget.ButtonOpts.Image(buttonImage),
-				// add a handler that reacts to clicking the button
 				widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
-					fmt.Println("use char", ch)
-					// TODO
+					state.selectedCharacter = ch.Name
 				}),
 				widget.ButtonOpts.WidgetOpts(
+					widget.WidgetOpts.CustomData(ch.Name), // Store name for sync reference.
 					widget.WidgetOpts.CursorHovered("interactive"),
 				),
 			)
@@ -528,7 +582,7 @@ func (state *Create) populateCharacters(characters []game.Character) {
 					r = r.Add(image.Point{100, 50})
 					state.deleteWindow.SetLocation(r)
 					state.ui.AddWindow(state.deleteWindow)
-					state.characterToDelete = ch.Name
+					state.selectedCharacter = ch.Name
 				}),
 			)
 
@@ -539,7 +593,7 @@ func (state *Create) populateCharacters(characters []game.Character) {
 			state.charactersContainer.AddChild(rowContainer)
 		}(ch)
 	}
-	widget.NewRadioGroup(
+	state.charactersRadioGroup = widget.NewRadioGroup(
 		widget.RadioGroupOpts.Elements(rowButtons...),
 	)
 }
@@ -642,6 +696,7 @@ func (state *Create) refreshArchetypes() {
 						widget.WidgetOpts.MouseButtonPressedHandler(func(args *widget.WidgetMouseButtonPressedEventArgs) {
 							state.sortBy = p
 							state.refreshArchetypes()
+							state.syncUI()
 						}),
 					),
 				)
@@ -717,6 +772,7 @@ func (state *Create) refreshArchetypes() {
 					state.archetypesCreateImage.Image = arch.Image
 				}),
 				widget.ButtonOpts.WidgetOpts(
+					widget.WidgetOpts.CustomData(arch.Archetype.UUID), // Store name for sync reference.
 					widget.WidgetOpts.CursorHovered("interactive"),
 				),
 			)
@@ -812,10 +868,74 @@ func (state *Create) refreshArchetypes() {
 		}(arch)
 	}
 
-	widget.NewRadioGroup(
+	state.archetypesRadioGroup = widget.NewRadioGroup(
 		widget.RadioGroupOpts.Elements(rowButtons...),
 	)
+}
 
+func (state *Create) syncUI() {
+	// Set a default selected character if none exists.
+	hasSelected := false
+	for _, ch := range state.characters {
+		if ch.Name == state.selectedCharacter {
+			hasSelected = true
+			break
+		}
+	}
+	if !hasSelected && len(state.characters) > 0 {
+		state.selectedCharacter = state.characters[0].Name
+	}
+	// Set a default selected archetype.
+	hasSelected = false
+	for _, a := range state.archetypes {
+		if a.Archetype.UUID == state.selectedArchetype {
+			hasSelected = true
+			break
+		}
+	}
+	if !hasSelected && len(state.archetypes) > 0 {
+		state.selectedArchetype = state.archetypes[0].Archetype.UUID
+		state.archetypesCreateImage.Image = state.archetypes[0].Image
+	}
+
+	// Synchronize the selected character. The button, which doubles as the radio, is the first child of the containing row, so we find it, then do appropriate checks until we can set the active radio to it.
+	for _, w := range state.charactersContainer.Children() {
+		w, ok := w.(*widget.Container)
+		if !ok || len(w.Children()) == 0 {
+			continue
+		}
+		btn, ok := w.Children()[0].(*widget.Button)
+		if !ok {
+			continue
+		}
+		n, ok := (btn.GetWidget().CustomData).(string)
+		if !ok {
+			continue
+		}
+		if n == state.selectedCharacter {
+			state.charactersRadioGroup.SetActive(btn)
+			break
+		}
+	}
+	// Synchronize the selected archetype row. The button, which doubles as the radio, is the first child of the containing row, so we find it, then do appropriate checks until we can set the active radio to it.
+	for _, w := range state.archetypesContainer.Children() {
+		w, ok := w.(*widget.Container)
+		if !ok || len(w.Children()) == 0 {
+			continue
+		}
+		btn, ok := w.Children()[0].(*widget.Button)
+		if !ok {
+			continue
+		}
+		u, ok := (btn.GetWidget().CustomData).(id.UUID)
+		if !ok {
+			continue
+		}
+		if u == state.selectedArchetype {
+			state.archetypesRadioGroup.SetActive(btn)
+			break
+		}
+	}
 }
 
 func (state *Create) doCreate() {
@@ -844,8 +964,10 @@ func (state *Create) Update(ctx ifs.RunContext) error {
 		case net.ArchetypesMessage:
 			state.acquireArchetypes(m.Archetypes)
 			state.refreshArchetypes()
+			state.syncUI()
 		case net.CharactersMessage:
 			state.populateCharacters(m.Characters)
+			state.syncUI()
 		case net.CreateCharacterMessage:
 			state.resultText.Label = m.Result
 		case net.DeleteCharacterMessage:
