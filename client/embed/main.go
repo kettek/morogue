@@ -19,6 +19,8 @@ var CursorPointer *ebiten.Image
 var CursorPointerTooltip *ebiten.Image
 var CursorText *ebiten.Image
 var CursorTextTooltip *ebiten.Image
+var CursorDelete *ebiten.Image
+var CursorDeleteTooltip *ebiten.Image
 
 func Setup() {
 	f, err := Assets.Open("images/cursors.png")
@@ -33,6 +35,8 @@ func Setup() {
 	CursorPointerTooltip = ebiten.NewImageFromImage(i.SubImage(image.Rect(16, 16, 32, 32)))
 	CursorText = ebiten.NewImageFromImage(i.SubImage(image.Rect(32, 0, 48, 16)))
 	CursorTextTooltip = ebiten.NewImageFromImage(i.SubImage(image.Rect(32, 16, 48, 32)))
+	CursorDelete = ebiten.NewImageFromImage(i.SubImage(image.Rect(48, 0, 64, 16)))
+	CursorDeleteTooltip = ebiten.NewImageFromImage(i.SubImage(image.Rect(48, 16, 64, 32)))
 
 	//
 	einput.SetCursorImage(einput.CURSOR_DEFAULT, CursorDefault)
@@ -41,4 +45,6 @@ func Setup() {
 	einput.SetCursorImage("interactive-tooltip", CursorPointerTooltip)
 	einput.SetCursorImage("text", CursorText)
 	einput.SetCursorImage("text-tooltip", CursorTextTooltip)
+	einput.SetCursorImage("delete", CursorDelete)
+	einput.SetCursorImage("delete-tooltip", CursorDeleteTooltip)
 }
