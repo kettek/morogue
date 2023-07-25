@@ -105,8 +105,10 @@ func (m CharactersMessage) Type() string {
 }
 
 type CreateCharacterMessage struct {
-	Name      string
-	Archetype id.UUID
+	Result     string  `json:"r,omitempty"`
+	ResultCode int     `json:"c,omitempty"`
+	Name       string  `json:"n,omitempty"`
+	Archetype  id.UUID `json:"a,omitempty"`
 }
 
 func (m CreateCharacterMessage) Type() string {
