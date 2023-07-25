@@ -207,6 +207,26 @@ func (u *universe) updateClient(cl *client) error {
 						})
 					}
 				}
+			case net.DeleteCharacterMessage:
+				if cl.state != clientStateLoggedIn {
+					cl.conn.Write(net.RegisterMessage{
+						ResultCode: 400,
+						Result:     ErrNotLoggedIn.Error(),
+					})
+				} else {
+					if err := cl.account.DeleteCharacter(m.Name); err != nil {
+						cl.conn.Write(net.DeleteCharacterMessage{
+							ResultCode: 400,
+							Result:     err.Error(),
+						})
+					} else {
+						u.accounts.SaveAccount(cl.account)
+						// Re-send the player's characters.
+						cl.conn.Write(net.CharactersMessage{
+							Characters: cl.account.Characters,
+						})
+					}
+				}
 			}
 		case err := <-cl.closedChan:
 			if cl.account.username != "" {
