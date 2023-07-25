@@ -42,6 +42,10 @@ func (w *Wrapper) Message() Message {
 		var m CreateCharacterMessage
 		json.Unmarshal(w.Data, &m)
 		return m
+	case (DeleteCharacterMessage{}).Type():
+		var m DeleteCharacterMessage
+		json.Unmarshal(w.Data, &m)
+		return m
 	}
 	return nil
 }
@@ -113,4 +117,14 @@ type CreateCharacterMessage struct {
 
 func (m CreateCharacterMessage) Type() string {
 	return "create-character"
+}
+
+type DeleteCharacterMessage struct {
+	Result     string `json:"r,omitempty"`
+	ResultCode int    `json:"c,omitempty"`
+	Name       string `json:"n,omitempty"`
+}
+
+func (m DeleteCharacterMessage) Type() string {
+	return "delete-character"
 }
