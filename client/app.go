@@ -6,6 +6,7 @@ import (
 
 	"github.com/carlmjohnson/versioninfo"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/kettek/morogue/client/embed"
 	"github.com/kettek/morogue/client/ifs"
 	"github.com/kettek/morogue/client/states"
 	"github.com/tinne26/etxt"
@@ -38,6 +39,8 @@ func newApp() *app {
 
 	a.runContext.Txt = ifs.NewTextRenderer(renderer)
 	a.drawContext.Txt = ifs.NewTextRenderer(renderer)
+
+	embed.Setup()
 
 	a.connectState.Begin(a.runContext)
 

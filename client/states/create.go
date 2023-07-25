@@ -140,6 +140,7 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 				HorizontalPosition: widget.AnchorLayoutPositionCenter,
 				VerticalPosition:   widget.AnchorLayoutPositionCenter,
 			}),
+			widget.WidgetOpts.CursorHovered("interactive"),
 		),
 
 		// specify the images to use
@@ -331,6 +332,7 @@ func (state *Create) refreshArchetypes() {
 							Stretch: true,
 						}),
 						widget.WidgetOpts.ToolTip(tool),
+						widget.WidgetOpts.CursorHovered("interactive"),
 						widget.WidgetOpts.MouseButtonPressedHandler(func(args *widget.WidgetMouseButtonPressedEventArgs) {
 							state.sortBy = p
 							state.refreshArchetypes()
@@ -403,11 +405,13 @@ func (state *Create) refreshArchetypes() {
 			)
 			rowContainerButton := widget.NewButton(
 				widget.ButtonOpts.Image(buttonImage),
-
 				// add a handler that reacts to clicking the button
 				widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 					state.selectedArchetype = arch.Archetype.Title
 				}),
+				widget.ButtonOpts.WidgetOpts(
+					widget.WidgetOpts.CursorHovered("interactive"),
+				),
 			)
 			rowButtons = append(rowButtons, rowContainerButton)
 			rowContainer.AddChild(rowContainerButton)

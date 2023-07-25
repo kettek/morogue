@@ -62,6 +62,7 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 				Position: widget.RowLayoutPositionCenter,
 				Stretch:  true,
 			}),
+			widget.WidgetOpts.CursorHovered("text"),
 		),
 
 		//Set the Idle and Disabled background image for the text input
@@ -112,6 +113,7 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 				Position: widget.RowLayoutPositionCenter,
 				Stretch:  true,
 			}),
+			widget.WidgetOpts.CursorHovered("text"),
 		),
 		widget.TextInputOpts.Image(&widget.TextInputImage{
 			Idle:     image.NewNineSliceColor(color.NRGBA{R: 100, G: 100, B: 100, A: 255}),
@@ -146,6 +148,7 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 				Position: widget.RowLayoutPositionCenter,
 				Stretch:  true,
 			}),
+			widget.WidgetOpts.CursorHovered("text"),
 		),
 		widget.TextInputOpts.Image(&widget.TextInputImage{
 			Idle:     image.NewNineSliceColor(color.NRGBA{R: 100, G: 100, B: 100, A: 255}),
@@ -182,6 +185,7 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 				HorizontalPosition: widget.AnchorLayoutPositionCenter,
 				VerticalPosition:   widget.AnchorLayoutPositionCenter,
 			}),
+			widget.WidgetOpts.CursorHovered("interactive"),
 		),
 
 		// specify the images to use
@@ -214,6 +218,7 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 				HorizontalPosition: widget.AnchorLayoutPositionCenter,
 				VerticalPosition:   widget.AnchorLayoutPositionCenter,
 			}),
+			widget.WidgetOpts.CursorHovered("interactive"),
 		),
 
 		// specify the images to use
