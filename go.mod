@@ -16,6 +16,7 @@ require (
 	github.com/ebitengine/purego v0.3.2 // indirect
 	github.com/ebitenui/ebitenui v0.5.4 // indirect
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20221017161538-93cebf72946b // indirect
+	github.com/gofrs/uuid/v5 v5.0.0 // indirect
 	github.com/jezek/xgb v1.1.0 // indirect
 	github.com/klauspost/compress v1.10.3 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
