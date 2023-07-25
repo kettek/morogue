@@ -42,9 +42,20 @@ func (a *Account) CreateCharacter(name string, archetype id.UUID) error {
 	return nil
 }
 
+func (a *Account) DeleteCharacter(name string) error {
+	for i, ch := range a.Characters {
+		if ch.Name == name {
+			a.Characters = append(a.Characters[:i], a.Characters[i+1:]...)
+			return nil
+		}
+	}
+	return ErrCharacterDoesNotExist
+}
+
 var (
-	ErrNotLoggedIn     = errors.New("not logged in")
-	ErrBadPassword     = errors.New("bad password")
-	ErrCharacterExists = errors.New("character exists")
-	ErrNoSuchArchetype = errors.New("no such archetype")
+	ErrNotLoggedIn           = errors.New("not logged in")
+	ErrBadPassword           = errors.New("bad password")
+	ErrCharacterExists       = errors.New("character exists")
+	ErrCharacterDoesNotExist = errors.New("character does not exist")
+	ErrNoSuchArchetype       = errors.New("no such archetype")
 )
