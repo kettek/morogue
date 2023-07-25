@@ -46,6 +46,10 @@ func (w *Wrapper) Message() Message {
 		var m DeleteCharacterMessage
 		json.Unmarshal(w.Data, &m)
 		return m
+	case (JoinCharacterMessage{}).Type():
+		var m JoinCharacterMessage
+		json.Unmarshal(w.Data, &m)
+		return m
 	}
 	return nil
 }
@@ -127,4 +131,14 @@ type DeleteCharacterMessage struct {
 
 func (m DeleteCharacterMessage) Type() string {
 	return "delete-character"
+}
+
+type JoinCharacterMessage struct {
+	Result     string `json:"r,omitempty"`
+	ResultCode int    `json:"c,omitempty"`
+	Name       string `json:"n,omitempty"`
+}
+
+func (m JoinCharacterMessage) Type() string {
+	return "join-character"
 }

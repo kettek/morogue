@@ -197,7 +197,7 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 			Bottom: 5,
 		}),
 		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
-			// TODO: Join.
+			state.doJoin()
 		}),
 	)
 	state.charactersControls.AddChild(state.charactersJoinButton)
@@ -957,6 +957,12 @@ func (state *Create) doCreate() {
 	})
 }
 
+func (state *Create) doJoin() {
+	state.connection.Write(net.JoinCharacterMessage{
+		Name: state.selectedCharacter,
+	})
+}
+
 func (state *Create) Update(ctx ifs.RunContext) error {
 	select {
 	case msg := <-state.messageChan:
@@ -972,6 +978,12 @@ func (state *Create) Update(ctx ifs.RunContext) error {
 			state.resultText.Label = m.Result
 		case net.DeleteCharacterMessage:
 			if m.Result != "" {
+				state.resultText.Label = m.Result
+			}
+		case net.JoinCharacterMessage:
+			if m.ResultCode == 200 {
+				fmt.Println("TODO: Switch to join world state!")
+			} else {
 				state.resultText.Label = m.Result
 			}
 		}

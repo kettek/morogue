@@ -173,8 +173,13 @@ func (u *universe) updateClient(cl *client) error {
 				cl.account = Account{}
 				cl.state = clientStateWaiting
 			case net.CreateCharacterMessage:
-				if cl.state != clientStateLoggedIn {
-					cl.conn.Write(net.RegisterMessage{
+				if cl.state == clientStateSelectedCharacter {
+					cl.conn.Write(net.JoinCharacterMessage{
+						ResultCode: 400,
+						Result:     ErrAlreadyJoined.Error(),
+					})
+				} else if cl.state != clientStateLoggedIn {
+					cl.conn.Write(net.CreateCharacterMessage{
 						ResultCode: 400,
 						Result:     ErrNotLoggedIn.Error(),
 					})
@@ -208,8 +213,13 @@ func (u *universe) updateClient(cl *client) error {
 					}
 				}
 			case net.DeleteCharacterMessage:
-				if cl.state != clientStateLoggedIn {
-					cl.conn.Write(net.RegisterMessage{
+				if cl.state == clientStateSelectedCharacter {
+					cl.conn.Write(net.JoinCharacterMessage{
+						ResultCode: 400,
+						Result:     ErrAlreadyJoined.Error(),
+					})
+				} else if cl.state != clientStateLoggedIn {
+					cl.conn.Write(net.DeleteCharacterMessage{
 						ResultCode: 400,
 						Result:     ErrNotLoggedIn.Error(),
 					})
@@ -224,6 +234,33 @@ func (u *universe) updateClient(cl *client) error {
 						// Re-send the player's characters.
 						cl.conn.Write(net.CharactersMessage{
 							Characters: cl.account.Characters,
+						})
+					}
+				}
+			case net.JoinCharacterMessage:
+				if cl.state == clientStateSelectedCharacter {
+					cl.conn.Write(net.JoinCharacterMessage{
+						ResultCode: 400,
+						Result:     ErrAlreadyJoined.Error(),
+					})
+				} else if cl.state != clientStateLoggedIn {
+					cl.conn.Write(net.JoinCharacterMessage{
+						ResultCode: 400,
+						Result:     ErrNotLoggedIn.Error(),
+					})
+				} else {
+					if !cl.account.HasCharacter(m.Name) {
+						cl.conn.Write(net.JoinCharacterMessage{
+							ResultCode: 400,
+							Result:     ErrCharacterDoesNotExist.Error(),
+						})
+					} else {
+						// Mark character as desired for client.
+						cl.character = m.Name
+						cl.state = clientStateSelectedCharacter
+						// Let the character know we've considered them as joined for that character.
+						cl.conn.Write(net.JoinCharacterMessage{
+							ResultCode: 200,
 						})
 					}
 				}
@@ -260,5 +297,6 @@ func (u *universe) removeAccountLoggedIn(username string) {
 }
 
 var (
-	ErrUserLoggedIn = errors.New("user is logged in")
+	ErrAlreadyJoined = errors.New("character is already joined")
+	ErrUserLoggedIn  = errors.New("user is logged in")
 )
