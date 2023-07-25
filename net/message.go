@@ -50,6 +50,10 @@ func (w *Wrapper) Message() Message {
 		var m JoinCharacterMessage
 		json.Unmarshal(w.Data, &m)
 		return m
+	case (UnjoinCharacterMessage{}).Type():
+		var m UnjoinCharacterMessage
+		json.Unmarshal(w.Data, &m)
+		return m
 	}
 	return nil
 }
@@ -141,4 +145,13 @@ type JoinCharacterMessage struct {
 
 func (m JoinCharacterMessage) Type() string {
 	return "join-character"
+}
+
+type UnjoinCharacterMessage struct {
+	Result     string `json:"r,omitempty"`
+	ResultCode int    `json:"c,omitempty"`
+}
+
+func (m UnjoinCharacterMessage) Type() string {
+	return "unjoin-character"
 }
