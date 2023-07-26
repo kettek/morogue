@@ -66,6 +66,10 @@ func (w *Wrapper) Message() Message {
 		var m JoinWorldMessage
 		json.Unmarshal(w.Data, &m)
 		return m
+	case (LocationMessage{}).Type():
+		var m LocationMessage
+		json.Unmarshal(w.Data, &m)
+		return m
 	}
 	return nil
 }
@@ -198,4 +202,18 @@ type JoinWorldMessage struct {
 
 func (m JoinWorldMessage) Type() string {
 	return "join-world"
+}
+
+type LocationMessage struct {
+	Result     string           `json:"r,omitempty"`
+	ResultCode int              `json:"c,omitempty"`
+	ID         id.UUID          `json:"id,omitempty"`
+	Mobs       []game.Mob       `json:"m,omitempty"`
+	Objects    []game.Object    `json:"o,omitempty"`
+	Characters []game.Character `json:"ch,omitempty"`
+	Tiles      game.Tiles       `json:"g,omitempty"`
+}
+
+func (m LocationMessage) Type() string {
+	return "location"
 }
