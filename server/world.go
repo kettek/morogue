@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/kettek/morogue/game"
 )
 
@@ -21,7 +22,14 @@ type world struct {
 }
 
 func newWorld() *world {
+	id, err := uuid.NewV4()
+	if err != nil {
+		panic(err)
+	}
 	w := &world{
+		info: game.WorldInfo{
+			ID: id,
+		},
 		quitChan:   make(chan struct{}),
 		clientChan: make(chan *client, 2),
 	}
