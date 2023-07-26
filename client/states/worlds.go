@@ -331,7 +331,8 @@ func (state *Worlds) Update(ctx ifs.RunContext) error {
 			fmt.Println("handle result of create", m)
 		case net.JoinWorldMessage:
 			if m.ResultCode == 200 {
-				fmt.Println("TODO: Switch to game state", m)
+				ctx.Sm.Push(NewGame(state.connection, state.messageChan))
+				return nil
 			}
 			if m.Result == "" {
 				// TODO: Show info
