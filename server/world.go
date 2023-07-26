@@ -15,6 +15,7 @@ type world struct {
 	clients           []*client
 	password          string
 	live              bool
+	data              *Data
 	locations         []*location
 	clientChan        chan *client
 	clientRemoveChan  chan *client
@@ -22,7 +23,7 @@ type world struct {
 	quitChan          chan struct{}
 }
 
-func newWorld() *world {
+func newWorld(d *Data) *world {
 	id, err := uuid.NewV4()
 	if err != nil {
 		panic(err)
@@ -31,6 +32,7 @@ func newWorld() *world {
 		info: game.WorldInfo{
 			ID: id,
 		},
+		data:       d,
 		quitChan:   make(chan struct{}),
 		clientChan: make(chan *client, 2),
 	}

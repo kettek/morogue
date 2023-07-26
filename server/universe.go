@@ -23,17 +23,17 @@ type universe struct {
 	checkChan              chan struct{}
 	worlds                 []*world
 	//
-	archetypes []game.Archetype
+	data *Data
 }
 
-func newUniverse(accounts Accounts, archetypes []game.Archetype) universe {
+func newUniverse(accounts Accounts, data *Data) universe {
 	return universe{
 		accounts:               accounts,
 		clientChan:             make(chan client, 10),
 		checkChan:              make(chan struct{}, 10),
 		clientRemoveChan:       make(chan *client, 10),
 		clientAddFromWorldChan: make(chan *client, 10),
-		archetypes:             archetypes,
+		data:                   data,
 	}
 }
 
@@ -88,15 +88,6 @@ func (u *universe) checkClients() {
 	u.clients = u.clients[:i]
 }
 
-func (u *universe) hasArchetype(uuid id.UUID) bool {
-	for _, a := range u.archetypes {
-		if a.UUID == uuid {
-			return true
-		}
-	}
-	return false
-}
-
 func (u *universe) checkName(name string) error {
 	if name == "" {
 		return errors.New("name cannot be empty")
@@ -112,7 +103,7 @@ func (u *universe) loginClient(cl *client) {
 	u.loggedInAccounts = append(u.loggedInAccounts, cl.account.username)
 	// Send the available archetypes.
 	cl.conn.Write(net.ArchetypesMessage{
-		Archetypes: u.archetypes,
+		Archetypes: u.data.Archetypes,
 	})
 	// Send the player's characters.
 	cl.conn.Write(net.CharactersMessage{
@@ -207,7 +198,7 @@ func (u *universe) updateClient(cl *client) error {
 						Result:     ErrNotLoggedIn.Error(),
 					})
 				} else {
-					if !u.hasArchetype(m.Archetype) {
+					if !u.data.hasArchetype(m.Archetype) {
 						cl.conn.Write(net.CreateCharacterMessage{
 							ResultCode: 400,
 							Result:     ErrNoSuchArchetype.Error(),
@@ -349,7 +340,7 @@ func (u *universe) updateClient(cl *client) error {
 					})
 				} else {
 					// TODO: Throttle this as well.
-					w := newWorld()
+					w := newWorld(u.data)
 					if m.Password != "" {
 						w.info.Private = true
 						w.password = m.Password

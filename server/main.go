@@ -2,18 +2,13 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
-	"path/filepath"
-	"strings"
 	"time"
-
-	"github.com/kettek/morogue/game"
 )
 
 func main() {
@@ -33,32 +28,12 @@ func run() error {
 	}
 	log.Printf("listening on http://%v", l.Addr())
 
-	// Load archetypes.
-	var archetypes []game.Archetype
-	{
-		entries, err := os.ReadDir("archetypes")
-		if err != nil {
-			return err
-		}
-		for _, entry := range entries {
-			if entry.IsDir() {
-				continue
-			}
-			if strings.HasSuffix(entry.Name(), ".json") {
-				bytes, err := os.ReadFile(filepath.Join("archetypes", entry.Name()))
-				if err != nil {
-					log.Println(err)
-					continue
-				}
-				var a game.Archetype
-				err = json.Unmarshal(bytes, &a)
-				if err != nil {
-					log.Println(err)
-					continue
-				}
-				archetypes = append(archetypes, a)
-			}
-		}
+	data := &Data{}
+	if err := data.loadArchetypes(); err != nil {
+		return err
+	}
+	if err := data.loadTiles(); err != nil {
+		return err
 	}
 
 	accounts, err := newAccounts("accounts")
@@ -66,13 +41,14 @@ func run() error {
 		return err
 	}
 
-	u := newUniverse(accounts, archetypes)
+	u := newUniverse(accounts, data)
 	u.Run()
 
 	ps := newSocketServer(u.clientChan, u.checkChan)
 
 	// Allow access to archetypes via archetypes subdir.
 	ps.serveMux.Handle("/archetypes/", http.StripPrefix("/archetypes/", http.FileServer(http.Dir("./archetypes"))))
+	ps.serveMux.Handle("/tiles/", http.StripPrefix("/tiles/", http.FileServer(http.Dir("./tiles"))))
 
 	ps.serveMux.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("./images"))))
 
