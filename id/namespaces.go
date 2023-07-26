@@ -8,12 +8,14 @@ import (
 
 const (
 	KeyArchetype = "morogue:archetype"
+	KeyTile      = "morogue:tile"
 	KeyMob       = "morogue:mob"
 	KeyItem      = "morogue:item"
 )
 
 var (
 	Archetype uuid.UUID
+	Tile      uuid.UUID
 	Mob       uuid.UUID
 	Item      uuid.UUID
 )
@@ -30,6 +32,14 @@ func init() {
 
 		Archetype, _ = uuid.FromBytes(sha[:16])
 		NamespaceToKey[Archetype] = KeyArchetype
+	}
+	{
+		hasher := sha1.New()
+		hasher.Write([]byte(KeyTile))
+		sha := hasher.Sum(nil)
+
+		Tile, _ = uuid.FromBytes(sha[:16])
+		NamespaceToKey[Tile] = KeyTile
 	}
 	{
 		hasher := sha1.New()

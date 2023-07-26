@@ -18,12 +18,14 @@ func main() {
 	switch os.Args[1] {
 	case "archetype":
 		namespace = id.Archetype
+	case "tile":
+		namespace = id.Tile
 	case "mob":
 		namespace = id.Mob
 	case "item":
 		namespace = id.Item
 	default:
-		fmt.Println("namespace must be one of: archetype, mob, item")
+		fmt.Println("namespace must be one of: archetype, tile, mob, item")
 		return
 	}
 
