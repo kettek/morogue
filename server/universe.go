@@ -303,7 +303,8 @@ func (u *universe) updateClient(cl *client) error {
 							})
 						} else {
 							cl.conn.Write(net.WorldsMessage{
-								Worlds: u.getWorldsInfos(),
+								ResultCode: 200,
+								Worlds:     u.getWorldsInfos(),
 							})
 							cl.lastWorldsSent = t
 						}
@@ -353,9 +354,11 @@ func (u *universe) updateClient(cl *client) error {
 						w.info.Private = true
 						w.password = m.Password
 					}
+					w.info.Name = m.Name
 					u.spinWorld(w)
 					cl.conn.Write(net.JoinWorldMessage{
 						ResultCode: 200,
+						World:      w.info.ID,
 					})
 					w.clientChan <- cl
 					return errRemoveClientFromUniverse
