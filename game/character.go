@@ -11,6 +11,7 @@ type Character struct {
 	Inventory []Item
 }
 
+// Item represents an item in the world
 type Item struct {
 	Name string
 	ID   int

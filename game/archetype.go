@@ -2,6 +2,8 @@ package game
 
 import "github.com/kettek/morogue/id"
 
+// Archetype is a structure that is used to act as a "template" for
+// creating playable characters.
 type Archetype struct {
 	Title string
 	UUID  id.UUID

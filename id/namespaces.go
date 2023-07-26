@@ -18,6 +18,7 @@ var (
 	Item      uuid.UUID
 )
 
+// NamespaceToKey provides a mapping of morogue's UUIDv5s to their string keys.
 var NamespaceToKey map[uuid.UUID]string
 
 func init() {

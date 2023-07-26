@@ -6,6 +6,9 @@ import (
 	"github.com/gofrs/uuid/v5"
 )
 
+// UUID is a UUID. In general, most UUIDs in morogue are UUIDv5s used to identify
+// static types of objects, such as archetypes, items, and weapons. These are
+// generally acquired through the UID func.
 type UUID = uuid.UUID
 
 // UID generates a unique identifier for the given name in the given morogue namespace. The namespace must be NSArchetype, NSMob, or NSItem.

@@ -1,5 +1,6 @@
 package game
 
+// WeaponType is the type the weapon is considered as.
 type WeaponType uint8
 
 const (
@@ -8,6 +9,7 @@ const (
 	WeaponTypeUnarmed
 )
 
+// Weapon is a weapon.
 type Weapon struct {
 	PrimaryAttribute   Attribute // Primary attribute to draw damage from.
 	SecondaryAttribute Attribute // Secondary attribute to draw 50% damage from.

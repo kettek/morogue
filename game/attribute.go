@@ -2,12 +2,17 @@ package game
 
 import "image/color"
 
+// Attribute represents a particular physical or mental ability of a character.
 type Attribute uint8
 
 const (
+	// AttributeSwole represents physicality
 	AttributeSwole Attribute = iota
+	// AttributeZooms represents speed
 	AttributeZooms
+	// AttributeBrains represents intelligence
 	AttributeBrains
+	// AttributeFunk represents the funk
 	AttributeFunk
 )
 
@@ -18,6 +23,9 @@ const (
 	AttributeFunkDescription   = "Funk determines luck and area of effect bonuses"
 )
 
+// AttributeLevel represents the level of an attribute, with the whole number
+// representing the level and the fractional representing the experience until
+// the next level.
 type AttributeLevel float64
 
 var (
