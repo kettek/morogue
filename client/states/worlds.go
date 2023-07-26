@@ -79,6 +79,8 @@ func (state *Worlds) Update(ctx ifs.RunContext) error {
 			}
 		case net.WorldsMessage:
 			fmt.Println("populate worlds", m)
+		case net.CreateWorldMessage:
+			fmt.Println("handle result of create", m)
 		default:
 			fmt.Println(m)
 		}

@@ -319,6 +319,16 @@ func (u *universe) updateClient(cl *client) error {
 					})
 					cl.lastWorldsSent = t
 				}
+			case net.CreateWorldMessage:
+				if cl.state < clientStateSelectedCharacter {
+					cl.conn.Write(net.CreateWorldMessage{
+						ResultCode: 400,
+						Result:     ErrWrongState.Error(),
+					})
+				} else {
+					// TODO: Throttle this as well.
+					// TODO: Create new world from the message.
+				}
 			}
 		case err := <-cl.closedChan:
 			if cl.account.username != "" {

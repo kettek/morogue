@@ -58,6 +58,10 @@ func (w *Wrapper) Message() Message {
 		var m WorldsMessage
 		json.Unmarshal(w.Data, &m)
 		return m
+	case (CreateWorldMessage{}).Type():
+		var m CreateWorldMessage
+		json.Unmarshal(w.Data, &m)
+		return m
 	}
 	return nil
 }
@@ -168,4 +172,15 @@ type WorldsMessage struct {
 
 func (m WorldsMessage) Type() string {
 	return "worlds"
+}
+
+type CreateWorldMessage struct {
+	Result     string `json:"r,omitempty"`
+	ResultCode int    `json:"c,omitempty"`
+	Name       string `json:"n,omitempty"`
+	Password   string `json:"p,omitempty"`
+}
+
+func (m CreateWorldMessage) Type() string {
+	return "create-world"
 }
