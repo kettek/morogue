@@ -11,6 +11,10 @@ import (
 	"github.com/kettek/morogue/net"
 )
 
+// Worlds is the state for joining and creating worlds. It displays a list of
+// worlds acquired from net.WorldsMessage and has a section for specifying
+// world options and thereafter sending a net.CreateWorldMessage.
+// Popping Worlds should return to the Create state.
 type Worlds struct {
 	connection  net.Connection
 	messageChan chan net.Message
@@ -18,6 +22,7 @@ type Worlds struct {
 	backButton  *widget.Button
 }
 
+// NewWorlds creates a new Worlds instance.
 func NewWorlds(connection net.Connection, msgCh chan net.Message) *Worlds {
 	state := &Worlds{
 		connection:  connection,

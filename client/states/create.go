@@ -24,6 +24,8 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+// Create is a rather massive and messy state that controls character selection, creation,
+// and deletion. Popping Create should return to the Login state.
 type Create struct {
 	connection  net.Connection
 	messageChan chan net.Message
@@ -70,6 +72,7 @@ type archetype struct {
 	Image     *ebiten.Image
 }
 
+// NewCreate creates a new Create instance.
 func NewCreate(connection net.Connection, msgCh chan net.Message) *Create {
 	state := &Create{
 		connection:  connection,

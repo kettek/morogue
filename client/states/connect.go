@@ -13,6 +13,13 @@ const (
 	modeSuccess    = "success"
 )
 
+// Connect is a state that manages and watches a connection to a
+// morogue server. It should be noted that this doesn't sit in
+// the state machine, but rather runs directly in the app struct.
+// FIXME: At the moment, this doesn't handle reconnection and all
+// that. What it should do is when a connection is lost, to pop
+// the entire state machine, then attempt to connect and push
+// the login state upon success.
 type Connect struct {
 	connection     net.Connection
 	connectionChan chan error

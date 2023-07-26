@@ -11,6 +11,8 @@ import (
 	"github.com/kettek/morogue/net"
 )
 
+// Login is the first state when connecting to a server. It provides
+// the ability to login or register an account with the server.
 type Login struct {
 	connection  net.Connection
 	messageChan chan net.Message
@@ -23,6 +25,7 @@ type Login struct {
 	loginButton, registerButton *widget.Button
 }
 
+// NewLogin creates a new Login instance.
 func NewLogin(connection net.Connection, msgCh chan net.Message) *Login {
 	state := &Login{
 		connection:  connection,
