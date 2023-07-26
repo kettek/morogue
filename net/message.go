@@ -161,9 +161,9 @@ func (m UnjoinCharacterMessage) Type() string {
 }
 
 type WorldsMessage struct {
-	Result     string       `json:"r,omitempty"`
-	ResultCode int          `json:"c,omitempty"`
-	Worlds     []game.World `json:"w,omitempty"`
+	Result     string           `json:"r,omitempty"`
+	ResultCode int              `json:"c,omitempty"`
+	Worlds     []game.WorldInfo `json:"w,omitempty"`
 }
 
 func (m WorldsMessage) Type() string {
