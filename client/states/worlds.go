@@ -77,6 +77,8 @@ func (state *Worlds) Update(ctx ifs.RunContext) error {
 				ctx.Sm.Pop()
 				return nil
 			}
+		case net.WorldsMessage:
+			fmt.Println("populate worlds", m)
 		default:
 			fmt.Println(m)
 		}

@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/kettek/morogue/game"
 	"github.com/kettek/morogue/id"
@@ -103,6 +104,7 @@ func (u *universe) loginClient(cl *client) {
 
 func (u *universe) updateClient(cl *client) error {
 	for {
+		t := time.Now()
 		select {
 		case msg := <-cl.msgChan:
 			switch m := msg.(type) {
@@ -272,6 +274,18 @@ func (u *universe) updateClient(cl *client) error {
 						cl.conn.Write(net.JoinCharacterMessage{
 							ResultCode: 200,
 						})
+						// And send the current list of worlds.
+						if t.Sub(cl.lastWorldsSent) <= 2*time.Second {
+							cl.conn.Write(net.WorldsMessage{
+								ResultCode: 429,
+								Result:     ErrTooSoon.Error(),
+							})
+						} else {
+							cl.conn.Write(net.WorldsMessage{
+								Worlds: u.getWorldsInfos(),
+							})
+							cl.lastWorldsSent = t
+						}
 					}
 				}
 			case net.UnjoinCharacterMessage:
@@ -286,6 +300,24 @@ func (u *universe) updateClient(cl *client) error {
 					cl.conn.Write(net.UnjoinCharacterMessage{
 						ResultCode: 200,
 					})
+				}
+			case net.WorldsMessage:
+				if cl.state < clientStateSelectedCharacter {
+					cl.conn.Write(net.WorldsMessage{
+						ResultCode: 400,
+						Result:     ErrWrongState.Error(),
+					})
+				} else if t.Sub(cl.lastWorldsSent) <= 2*time.Second {
+					cl.conn.Write(net.WorldsMessage{
+						ResultCode: 429,
+						Result:     ErrTooSoon.Error(),
+					})
+				} else {
+					cl.conn.Write(net.WorldsMessage{
+						ResultCode: 200,
+						Worlds:     u.getWorldsInfos(),
+					})
+					cl.lastWorldsSent = t
 				}
 			}
 		case err := <-cl.closedChan:
@@ -319,7 +351,16 @@ func (u *universe) removeAccountLoggedIn(username string) {
 	}
 }
 
+func (u *universe) getWorldsInfos() (worlds []game.WorldInfo) {
+	for _, w := range u.worlds {
+		worlds = append(worlds, w.info)
+	}
+	return
+}
+
 var (
+	ErrWrongState    = errors.New("message sent in wrong state")
+	ErrTooSoon       = errors.New("message sent too soon, please wait and try again")
 	ErrNotJoined     = errors.New("character not joined")
 	ErrAlreadyJoined = errors.New("character is already joined")
 	ErrUserLoggedIn  = errors.New("user is logged in")

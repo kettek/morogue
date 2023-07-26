@@ -1,7 +1,10 @@
 package main
 
+import "github.com/kettek/morogue/game"
+
 // world represents an entire game world state that runs in its own goroutine.
 type world struct {
+	info     game.WorldInfo
 	live     bool
 	quitChan chan struct{}
 }
