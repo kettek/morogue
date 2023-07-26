@@ -54,6 +54,10 @@ func (w *Wrapper) Message() Message {
 		var m UnjoinCharacterMessage
 		json.Unmarshal(w.Data, &m)
 		return m
+	case (WorldsMessage{}).Type():
+		var m WorldsMessage
+		json.Unmarshal(w.Data, &m)
+		return m
 	}
 	return nil
 }
@@ -154,4 +158,14 @@ type UnjoinCharacterMessage struct {
 
 func (m UnjoinCharacterMessage) Type() string {
 	return "unjoin-character"
+}
+
+type WorldsMessage struct {
+	Result     string       `json:"r,omitempty"`
+	ResultCode int          `json:"c,omitempty"`
+	Worlds     []game.World `json:"w,omitempty"`
+}
+
+func (m WorldsMessage) Type() string {
+	return "worlds"
 }
