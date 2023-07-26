@@ -32,12 +32,13 @@ type Create struct {
 	logoutButton *widget.Button
 	resultText   *widget.Text
 	//
-	charactersSection    *widget.Container
-	charactersContainer  *widget.Container
-	charactersRadioGroup *widget.RadioGroup
-	charactersControls   *widget.Container
-	charactersJoinButton *widget.Button
-	deleteWindow         *widget.Window
+	charactersSection      *widget.Container
+	charactersContainer    *widget.Container
+	charactersRadioGroup   *widget.RadioGroup
+	charactersControls     *widget.Container
+	charactersJoinButton   *widget.Button
+	charactersDeleteButton *widget.Button
+	deleteWindow           *widget.Window
 	//
 	archetypesSection      *widget.Container
 	archetypesContainer    *widget.Container
@@ -175,6 +176,23 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 		}),
 	)
 	state.charactersControls.AddChild(state.charactersJoinButton)
+
+	state.charactersDeleteButton = widget.NewButton(
+		widget.ButtonOpts.WidgetOpts(
+			widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+				HorizontalPosition: widget.AnchorLayoutPositionCenter,
+				VerticalPosition:   widget.AnchorLayoutPositionCenter,
+			}),
+			widget.WidgetOpts.CursorHovered("interactive"),
+		),
+		widget.ButtonOpts.Image(ctx.UI.ButtonImage),
+		widget.ButtonOpts.Text("delete", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
+		widget.ButtonOpts.TextPadding(ctx.UI.ButtonPadding),
+		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
+			state.doDelete()
+		}),
+	)
+	state.charactersControls.AddChild(state.charactersDeleteButton)
 
 	deleteContents := widget.NewContainer(
 		widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{100, 100, 100, 255})),
@@ -494,28 +512,8 @@ func (state *Create) populateCharacters(ctx ifs.RunContext, characters []game.Ch
 				),
 			)
 
-			delete := widget.NewButton(
-				widget.ButtonOpts.Image(ctx.UI.ButtonImage),
-				widget.ButtonOpts.WidgetOpts(
-					widget.WidgetOpts.CursorHovered("delete"),
-					widget.WidgetOpts.LayoutData(widget.RowLayoutData{
-						Stretch: true,
-					}),
-				),
-				widget.ButtonOpts.Text("delete", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
-				widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
-					x, y := state.deleteWindow.Contents.PreferredSize()
-					r := image.Rect(0, 0, x, y)
-					r = r.Add(image.Point{100, 50})
-					state.deleteWindow.SetLocation(r)
-					state.ui.AddWindow(state.deleteWindow)
-					state.selectedCharacter = ch.Name
-				}),
-			)
-
 			row.AddChild(graphicContainer)
 			row.AddChild(name)
-			row.AddChild(delete)
 
 			state.charactersContainer.AddChild(rowContainer)
 		}(ch)
@@ -882,6 +880,14 @@ func (state *Create) doJoin() {
 	state.connection.Write(net.JoinCharacterMessage{
 		Name: state.selectedCharacter,
 	})
+}
+
+func (state *Create) doDelete() {
+	x, y := state.deleteWindow.Contents.PreferredSize()
+	r := image.Rect(0, 0, x, y)
+	r = r.Add(image.Point{100, 50})
+	state.deleteWindow.SetLocation(r)
+	state.ui.AddWindow(state.deleteWindow)
 }
 
 func (state *Create) Update(ctx ifs.RunContext) error {
