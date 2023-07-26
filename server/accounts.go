@@ -10,7 +10,7 @@ import (
 
 // Accounts is an interface for loading, creating, and saving accounts.
 type Accounts interface {
-	GetAccount(username string) (account Account, err error)
+	Account(username string) (account Account, err error)
 	NewAccount(username string, password string) error
 	SaveAccount(account Account) error
 }
@@ -37,8 +37,8 @@ func newAccounts(path string) (*accounts, error) {
 	return a, err
 }
 
-// GetAccount returns an account with the given username.
-func (a *accounts) GetAccount(username string) (account Account, err error) {
+// Account returns an account with the given username.
+func (a *accounts) Account(username string) (account Account, err error) {
 	err = a.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("accounts"))
 		data := b.Get([]byte(username))

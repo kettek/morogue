@@ -135,7 +135,7 @@ func (u *universe) updateClient(cl *client) error {
 						ResultCode: 400,
 					})
 				} else {
-					account, err := u.accounts.GetAccount(m.User)
+					account, err := u.accounts.Account(m.User)
 					if err != nil {
 						cl.conn.Write(net.LoginMessage{
 							Result:     err.Error(),
@@ -175,7 +175,7 @@ func (u *universe) updateClient(cl *client) error {
 							ResultCode: 404,
 						})
 					} else {
-						account, err := u.accounts.GetAccount(m.User)
+						account, err := u.accounts.Account(m.User)
 						if err != nil {
 							cl.conn.Write(net.RegisterMessage{
 								Result:     err.Error(),
