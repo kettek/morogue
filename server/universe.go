@@ -11,31 +11,32 @@ import (
 )
 
 type universe struct {
-	accounts         Accounts
-	loggedInAccounts []string
-	clients          []*client
-	clientChan       chan client
-	checkChan        chan struct{}
-	worlds           []world
+	accounts               Accounts
+	loggedInAccounts       []string
+	clients                []*client
+	clientChan             chan client
+	clientRemoveChan       chan *client
+	clientAddFromWorldChan chan *client
+	checkChan              chan struct{}
+	worlds                 []*world
 	//
 	archetypes []game.Archetype
 }
 
 func newUniverse(accounts Accounts, archetypes []game.Archetype) universe {
 	return universe{
-		accounts:   accounts,
-		clientChan: make(chan client, 10),
-		checkChan:  make(chan struct{}, 10),
-		archetypes: archetypes,
+		accounts:               accounts,
+		clientChan:             make(chan client, 10),
+		checkChan:              make(chan struct{}, 10),
+		clientRemoveChan:       make(chan *client, 10),
+		clientAddFromWorldChan: make(chan *client, 10),
+		archetypes:             archetypes,
 	}
 }
 
-func (u *universe) spinWorld() *world {
-	w := &world{
-		quitChan: make(chan struct{}),
-	}
-
-	return w
+func (u *universe) spinWorld(w *world) {
+	u.worlds = append(u.worlds, w)
+	go w.loop(u.clientAddFromWorldChan, u.clientRemoveChan)
 }
 
 func (u *universe) Run() chan struct{} {
@@ -50,6 +51,11 @@ func (u *universe) Run() chan struct{} {
 				u.clients = append(u.clients, &client)
 			case <-u.checkChan:
 				u.checkClients()
+			case cl := <-u.clientRemoveChan:
+				u.removeAccountLoggedIn(cl.account.username)
+			case cl := <-u.clientAddFromWorldChan:
+				cl.state = clientStateLoggedIn
+				u.clients = append(u.clients, cl)
 			}
 		}
 	}()
@@ -62,7 +68,7 @@ func (u *universe) checkClients() {
 		if err := u.updateClient(cl); err == nil {
 			u.clients[i] = cl
 			i++
-		} else {
+		} else if err != errRemoveClientFromUniverse {
 			fmt.Println(err)
 		}
 	}
@@ -320,14 +326,47 @@ func (u *universe) updateClient(cl *client) error {
 					cl.lastWorldsSent = t
 				}
 			case net.CreateWorldMessage:
-				if cl.state < clientStateSelectedCharacter {
+				if cl.state < clientStateSelectedCharacter || cl.state > clientStateSelectedCharacter {
 					cl.conn.Write(net.CreateWorldMessage{
 						ResultCode: 400,
 						Result:     ErrWrongState.Error(),
 					})
 				} else {
 					// TODO: Throttle this as well.
-					// TODO: Create new world from the message.
+					w := newWorld()
+					if m.Password != "" {
+						w.info.Private = true
+						w.password = m.Password
+					}
+					u.spinWorld(w)
+					cl.conn.Write(net.JoinWorldMessage{
+						ResultCode: 200,
+					})
+					w.clientChan <- cl
+					return errRemoveClientFromUniverse
+				}
+			case net.JoinWorldMessage:
+				if cl.state < clientStateSelectedCharacter || cl.state > clientStateSelectedCharacter {
+					cl.conn.Write(net.JoinWorldMessage{
+						ResultCode: 400,
+						Result:     ErrWrongState.Error(),
+					})
+				} else if w, err := u.getWorld(m.World); err != nil {
+					cl.conn.Write(net.JoinWorldMessage{
+						ResultCode: 400,
+						Result:     err.Error(),
+					})
+				} else if w.password != m.Password {
+					cl.conn.Write(net.JoinWorldMessage{
+						ResultCode: 400,
+						Result:     ErrBadPassword.Error(),
+					})
+				} else {
+					cl.conn.Write(net.JoinWorldMessage{
+						ResultCode: 200,
+					})
+					w.clientChan <- cl
+					return errRemoveClientFromUniverse
 				}
 			}
 		case err := <-cl.closedChan:
@@ -368,10 +407,21 @@ func (u *universe) getWorldsInfos() (worlds []game.WorldInfo) {
 	return
 }
 
+func (u *universe) getWorld(uuid id.UUID) (*world, error) {
+	for _, w := range u.worlds {
+		if w.info.ID == uuid {
+			return w, nil
+		}
+	}
+	return nil, ErrWorldDoesNotExist
+}
+
 var (
-	ErrWrongState    = errors.New("message sent in wrong state")
-	ErrTooSoon       = errors.New("message sent too soon, please wait and try again")
-	ErrNotJoined     = errors.New("character not joined")
-	ErrAlreadyJoined = errors.New("character is already joined")
-	ErrUserLoggedIn  = errors.New("user is logged in")
+	ErrWrongState               = errors.New("message sent in wrong state")
+	ErrTooSoon                  = errors.New("message sent too soon, please wait and try again")
+	ErrNotJoined                = errors.New("character not joined")
+	ErrAlreadyJoined            = errors.New("character is already joined")
+	ErrUserLoggedIn             = errors.New("user is logged in")
+	ErrWorldDoesNotExist        = errors.New("world does not exist")
+	errRemoveClientFromUniverse = errors.New("this is not an error lol")
 )
