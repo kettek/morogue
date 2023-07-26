@@ -70,6 +70,10 @@ func (w *Wrapper) Message() Message {
 		var m LocationMessage
 		json.Unmarshal(w.Data, &m)
 		return m
+	case (TileMessage{}).Type():
+		var m TileMessage
+		json.Unmarshal(w.Data, &m)
+		return m
 	}
 	return nil
 }
@@ -211,9 +215,20 @@ type LocationMessage struct {
 	Mobs       []game.Mob       `json:"m,omitempty"`
 	Objects    []game.Object    `json:"o,omitempty"`
 	Characters []game.Character `json:"ch,omitempty"`
-	Tiles      game.Tiles       `json:"g,omitempty"`
+	Cells      game.Cells       `json:"g,omitempty"`
 }
 
 func (m LocationMessage) Type() string {
 	return "location"
+}
+
+type TileMessage struct {
+	Result     string    `json:"r,omitempty"`
+	ResultCode int       `json:"c,omitempty"`
+	ID         id.UUID   `json:"id,omitempty"`
+	Tile       game.Tile `sjon:"t,omitempty"`
+}
+
+func (m TileMessage) Type() string {
+	return "tile"
 }

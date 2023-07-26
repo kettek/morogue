@@ -108,7 +108,24 @@ func (w *world) update() error {
 func (w *world) updateClient(cl *client) error {
 	select {
 	case msg := <-cl.msgChan:
-		fmt.Println("TODO: handle client message", msg)
+		switch m := msg.(type) {
+		case net.TileMessage:
+			if t, err := w.data.Tile(m.ID); err != nil {
+				cl.conn.Write(net.TileMessage{
+					ResultCode: 404,
+					Result:     err.Error(),
+					ID:         m.ID,
+				})
+			} else {
+				cl.conn.Write(net.TileMessage{
+					ResultCode: 200,
+					ID:         m.ID,
+					Tile:       t,
+				})
+			}
+		default:
+			fmt.Println("TODO: handle client message", m)
+		}
 		// TODO: If the location the client is traveling to is not done, send progress reports to client.
 	case err := <-cl.closedChan:
 		w.clientRemoveChan <- cl
