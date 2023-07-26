@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/kettek/morogue/game"
+	"github.com/kettek/morogue/net"
 )
 
 // world represents an entire game world state that runs in its own goroutine.
@@ -50,6 +51,16 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 	ticker := time.NewTicker(100 * time.Millisecond)
 
 	// TODO: Ensure a starting location is being created.
+	lid, err := uuid.NewV4()
+	if err != nil {
+		panic(err)
+	}
+	start := location{}
+	start.ID = lid
+	err = start.generate()
+	if err != nil {
+		fmt.Println("OH NO", err)
+	}
 
 	w.live = true
 	for w.live {
@@ -63,6 +74,14 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 			return
 		case cl := <-w.clientChan:
 			w.clients = append(w.clients, cl)
+			// Send starting location to client.
+			cl.conn.Write(net.LocationMessage{
+				ID:         start.ID,
+				Mobs:       start.Mobs,
+				Cells:      start.Cells,
+				Characters: start.Characters,
+				Objects:    start.Objects,
+			})
 		default:
 		}
 		// Select for timer delay.
