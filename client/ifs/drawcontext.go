@@ -41,9 +41,9 @@ func (ui *DrawContextUI) Init(txt *TextRenderer) {
 	})
 
 	ui.ButtonImage = &widget.ButtonImage{
-		Idle:    eimage.NewNineSliceColor(color.NRGBA{R: 60, G: 60, B: 60, A: 255}),
-		Hover:   eimage.NewNineSliceColor(color.NRGBA{R: 50, G: 50, B: 50, A: 255}),
-		Pressed: eimage.NewNineSliceColor(color.NRGBA{R: 30, G: 30, B: 30, A: 255}),
+		Idle:    eimage.NewNineSliceColor(color.NRGBA{R: 40, G: 30, B: 40, A: 255}),
+		Hover:   eimage.NewNineSliceColor(color.NRGBA{R: 50, G: 40, B: 50, A: 255}),
+		Pressed: eimage.NewNineSliceColor(color.NRGBA{R: 60, G: 50, B: 60, A: 255}),
 	}
 
 	ui.ButtonPadding = widget.Insets{
@@ -58,7 +58,7 @@ func (ui *DrawContextUI) Init(txt *TextRenderer) {
 	}
 
 	ui.TextInputImage = &widget.TextInputImage{
-		Idle:     eimage.NewNineSliceColor(color.NRGBA{R: 100, G: 100, B: 100, A: 255}),
+		Idle:     eimage.NewNineSliceColor(color.NRGBA{R: 60, G: 50, B: 60, A: 255}),
 		Disabled: eimage.NewNineSliceColor(color.NRGBA{R: 100, G: 100, B: 100, A: 255}),
 	}
 
