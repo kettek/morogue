@@ -10,6 +10,9 @@ import (
 	"github.com/kettek/morogue/net"
 )
 
+// universe is the structure used to manage clients, accounts, character
+// creation, and worlds. clients are moved to worlds for handling when
+// they join and are no longer handled by the universe.
 type universe struct {
 	accounts               Accounts
 	loggedInAccounts       []string
@@ -34,11 +37,16 @@ func newUniverse(accounts Accounts, archetypes []game.Archetype) universe {
 	}
 }
 
+// spinWorld adds the given world to the universe and starts the world's
+// loop in a goroutine.
 func (u *universe) spinWorld(w *world) {
 	u.worlds = append(u.worlds, w)
 	go w.loop(u.clientAddFromWorldChan, u.clientRemoveChan)
 }
 
+// Run starts the universe and returns a channel through which the world's
+// processing can be stopped. The universe runs in a goroutine and handles
+// client processing until a world takes over the client.
 func (u *universe) Run() chan struct{} {
 	closeCh := make(chan struct{})
 	go func() {
@@ -62,6 +70,8 @@ func (u *universe) Run() chan struct{} {
 	return closeCh
 }
 
+// checkClients calls updateClient on all clients and removes
+// any clients that are disconnected.
 func (u *universe) checkClients() {
 	i := 0
 	for _, cl := range u.clients {
@@ -95,6 +105,8 @@ func (u *universe) checkName(name string) error {
 	return nil
 }
 
+// loginClient sets a client to logged in and adds it to the
+// logged in accounts slice.
 func (u *universe) loginClient(cl *client) {
 	cl.state = clientStateLoggedIn
 	u.loggedInAccounts = append(u.loggedInAccounts, cl.account.username)
@@ -108,6 +120,9 @@ func (u *universe) loginClient(cl *client) {
 	})
 }
 
+// updateClient processes all network messaging with a client,
+// including logins, registrations, character creations,
+// character deletions, world creation, and world joining.
 func (u *universe) updateClient(cl *client) error {
 	for {
 		t := time.Now()
@@ -400,6 +415,7 @@ func (u *universe) removeAccountLoggedIn(username string) {
 	}
 }
 
+// getWorldsInfos returns the infos of all worlds.
 func (u *universe) getWorldsInfos() (worlds []game.WorldInfo) {
 	for _, w := range u.worlds {
 		worlds = append(worlds, w.info)

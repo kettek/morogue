@@ -15,6 +15,7 @@ const (
 	clientStateInWorld
 )
 
+// client contains a network connection, account, character, and more.
 type client struct {
 	account        Account
 	character      string // Character the client is joining as.

@@ -8,6 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Accounts is an interface for loading, creating, and saving accounts.
 type Accounts interface {
 	GetAccount(username string) (account Account, err error)
 	NewAccount(username string, password string) error
@@ -36,6 +37,7 @@ func newAccounts(path string) (*accounts, error) {
 	return a, err
 }
 
+// GetAccount returns an account with the given username.
 func (a *accounts) GetAccount(username string) (account Account, err error) {
 	err = a.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("accounts"))
@@ -53,6 +55,7 @@ func (a *accounts) GetAccount(username string) (account Account, err error) {
 	return
 }
 
+// NewAccount creates a new account.
 func (a *accounts) NewAccount(username string, password string) error {
 	err := a.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("accounts"))

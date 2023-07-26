@@ -8,6 +8,7 @@ import (
 )
 
 // world represents an entire game world state that runs in its own goroutine.
+// clients can join and leave the world via passed in channels.
 type world struct {
 	info              game.WorldInfo
 	clients           []*client
