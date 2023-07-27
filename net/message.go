@@ -74,6 +74,18 @@ func (w *Wrapper) Message() Message {
 		var m TileMessage
 		json.Unmarshal(w.Data, &m)
 		return m
+	case (MoveMessage{}).Type():
+		var m MoveMessage
+		json.Unmarshal(w.Data, &m)
+		return m
+	case (OwnerMessage{}).Type():
+		var m OwnerMessage
+		json.Unmarshal(w.Data, &m)
+		return m
+	case (PositionMessage{}).Type():
+		var m PositionMessage
+		json.Unmarshal(w.Data, &m)
+		return m
 	}
 	return nil
 }
@@ -129,7 +141,7 @@ func (m ArchetypesMessage) Type() string {
 }
 
 type CharactersMessage struct {
-	Characters []game.Character `json:"c,omitempty"`
+	Characters []*game.Character `json:"c,omitempty"`
 }
 
 func (m CharactersMessage) Type() string {
@@ -209,13 +221,13 @@ func (m JoinWorldMessage) Type() string {
 }
 
 type LocationMessage struct {
-	Result     string           `json:"r,omitempty"`
-	ResultCode int              `json:"c,omitempty"`
-	ID         id.UUID          `json:"id,omitempty"`
-	Mobs       []game.Mob       `json:"m,omitempty"`
-	Objects    []game.Object    `json:"o,omitempty"`
-	Characters []game.Character `json:"ch,omitempty"`
-	Cells      game.Cells       `json:"g,omitempty"`
+	Result     string            `json:"r,omitempty"`
+	ResultCode int               `json:"c,omitempty"`
+	ID         id.UUID           `json:"id,omitempty"`
+	Mobs       []game.Mob        `json:"m,omitempty"`
+	Objects    []game.Object     `json:"o,omitempty"`
+	Characters []*game.Character `json:"ch,omitempty"`
+	Cells      game.Cells        `json:"g,omitempty"`
 }
 
 func (m LocationMessage) Type() string {
@@ -231,4 +243,69 @@ type TileMessage struct {
 
 func (m TileMessage) Type() string {
 	return "tile"
+}
+
+type OwnerMessage struct {
+	WID id.WID `json:"wid,omitempty"`
+}
+
+func (m OwnerMessage) Type() string {
+	return "owner"
+}
+
+type MoveDirection uint8
+
+func (d MoveDirection) Position() (int, int) {
+	switch d {
+	case LeftMoveDirection:
+		return -1, 0
+	case RightMoveDirection:
+		return 1, 0
+	case UpMoveDirection:
+		return 0, -1
+	case DownMoveDirection:
+		return 0, 1
+	case UpLeftMoveDirection:
+		return -1, -1
+	case UpRightMoveDirection:
+		return 1, -1
+	case DownLeftMoveDirection:
+		return -1, 1
+	case DownRightMoveDirection:
+		return 1, 1
+	}
+	return 0, 0
+}
+
+const (
+	UpMoveDirection        MoveDirection = 8
+	LeftMoveDirection      MoveDirection = 4
+	RightMoveDirection     MoveDirection = 6
+	DownMoveDirection      MoveDirection = 2
+	UpLeftMoveDirection    MoveDirection = 7
+	UpRightMoveDirection   MoveDirection = 9
+	DownRightMoveDirection MoveDirection = 3
+	DownLeftMoveDirection  MoveDirection = 1
+	CenterMoveDirection    MoveDirection = 5
+)
+
+type MoveMessage struct {
+	Result     string        `json:"r,omitempty"`
+	ResultCode int           `json:"c,omitempty"`
+	WID        id.WID        `json:"wid,omitempty"`
+	Direction  MoveDirection `json:"m,omitempty"`
+}
+
+func (m MoveMessage) Type() string {
+	return "move"
+}
+
+type PositionMessage struct {
+	WID id.WID `json:"wid,omitempty"`
+	X   int    `json:"x,omitempty"`
+	Y   int    `json:"y,omitempty"`
+}
+
+func (m PositionMessage) Type() string {
+	return "position"
 }
