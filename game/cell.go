@@ -47,7 +47,8 @@ func NewCells(w, h int) (cells [][]Cell) {
 type MovementType uint8
 
 const (
-	MovementAll MovementType = iota
+	MovementNone MovementType = iota
+	MovementAll
 	MovementWalk
 	MovementSwim
 	MovementHover
