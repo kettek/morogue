@@ -3,6 +3,7 @@ package main
 import (
 	"time"
 
+	"github.com/kettek/morogue/game"
 	"github.com/kettek/morogue/net"
 )
 
@@ -17,11 +18,13 @@ const (
 
 // client contains a network connection, account, character, and more.
 type client struct {
-	account        Account
-	character      string // Character the client is joining as.
-	state          clientState
-	conn           *net.Connection
-	msgChan        chan net.Message
-	closedChan     chan error
-	lastWorldsSent time.Time
+	account          Account
+	character        string // Character the client is joining as.
+	currentCharacter *game.Character
+	currentLocation  *location
+	state            clientState
+	conn             *net.Connection
+	msgChan          chan net.Message
+	closedChan       chan error
+	lastWorldsSent   time.Time
 }

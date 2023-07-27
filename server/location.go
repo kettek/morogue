@@ -1,16 +1,70 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"math/rand"
 
 	"github.com/kettek/morogue/game"
 	"github.com/kettek/morogue/gen"
 	"github.com/kettek/morogue/id"
+	"github.com/kettek/morogue/net"
 )
 
 type location struct {
 	game.Location
 	active bool
+}
+
+func (l *location) addCharacter(character *game.Character) error {
+	if l.hasCharacter(character.WID) {
+		return ErrCharacterAlreadyInLocation
+	}
+
+	// Find an open spot for them in wherever is appropriate.
+	openCells := l.filterCells(func(c game.Cell) bool {
+		return c.Blocks == game.MovementNone
+	})
+	if len(openCells) == 0 {
+		return ErrCharacterCannotPlaceInLocation
+	}
+	// TODO: We want to also handle non-random spawning, such as through stairs, etc.
+	// Add to location.
+	spawnCell := openCells[rand.Intn(len(openCells)-1)]
+	character.X = spawnCell.X
+	character.Y = spawnCell.Y
+	l.Characters = append(l.Characters, character)
+	return nil
+}
+
+func (l *location) hasCharacter(wid id.WID) bool {
+	for _, char := range l.Characters {
+		if char.WID == wid {
+			return true
+		}
+	}
+	return false
+}
+
+func (l *location) removeCharacter(wid id.WID) error {
+	for i, char := range l.Characters {
+		if char.WID == wid {
+			l.Characters = append(l.Characters[:i], l.Characters[i+1:]...)
+			return nil
+		}
+	}
+	return ErrCharacterNotInLocation
+}
+
+func (l *location) moveCharacter(wid id.WID, dir net.MoveDirection) error {
+	ch := l.Character(wid)
+	if ch == nil {
+		return ErrCharacterNotInLocation
+	}
+	x, y := dir.Position()
+	ch.X += x
+	ch.Y += y
+	return nil
 }
 
 func (l *location) generate() error {
@@ -73,7 +127,40 @@ func (l *location) process() error {
 	return nil
 }
 
+// TODO: Allow returning world-munging requests.
+func (l *location) handleClientMessage(cl *client, msg net.Message) error {
+	switch m := msg.(type) {
+	case net.MoveMessage:
+		if ch := l.Character(cl.currentCharacter.WID); ch != nil {
+			if err := l.moveCharacter(cl.currentCharacter.WID, m.Direction); err == nil {
+				cl.conn.Write(net.PositionMessage{
+					WID: cl.currentCharacter.WID,
+					X:   cl.currentCharacter.X,
+					Y:   cl.currentCharacter.Y,
+				})
+			} else {
+				cl.conn.Write(net.MoveMessage{
+					ResultCode: 500,
+					WID:        m.WID,
+				})
+			}
+		} else {
+			cl.conn.Write(net.MoveMessage{
+				ResultCode: 404,
+				WID:        m.WID,
+			})
+		}
+	}
+	return nil
+}
+
 type locationConfig struct {
 	ID    id.UUID
 	Depth int
 }
+
+var (
+	ErrCharacterNotInLocation         = errors.New("character is not in location")
+	ErrCharacterAlreadyInLocation     = errors.New("character is already in location")
+	ErrCharacterCannotPlaceInLocation = errors.New("character cannot be placed in location")
+)

@@ -12,7 +12,7 @@ import (
 type Account struct {
 	username   string
 	ID         int
-	Characters []game.Character
+	Characters []*game.Character
 	Password   string
 }
 
@@ -38,7 +38,7 @@ func (a *Account) CreateCharacter(name string, archetype id.UUID) error {
 		return ErrCharacterExists
 	}
 
-	a.Characters = append(a.Characters, game.Character{
+	a.Characters = append(a.Characters, &game.Character{
 		Name:      name,
 		Archetype: archetype,
 	})

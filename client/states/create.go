@@ -47,7 +47,7 @@ type Create struct {
 	archetypesCreateName   *widget.TextInput
 	archetypesCreateButton *widget.Button
 	//
-	characters []game.Character
+	characters []*game.Character
 	archetypes []archetype
 	//
 	tooltips map[string]*widget.Container
@@ -402,13 +402,13 @@ func (state *Create) haveArchetype(archetype game.Archetype) bool {
 	return false
 }
 
-func (state *Create) populateCharacters(ctx ifs.RunContext, characters []game.Character) {
+func (state *Create) populateCharacters(ctx ifs.RunContext, characters []*game.Character) {
 	state.characters = characters
 	state.charactersContainer.RemoveChildren()
 
 	var rowButtons []widget.RadioGroupElement
 	for _, ch := range characters {
-		func(ch game.Character) {
+		func(ch *game.Character) {
 			rowContainer := widget.NewContainer(
 				widget.ContainerOpts.Layout(widget.NewStackedLayout()),
 				widget.ContainerOpts.WidgetOpts(

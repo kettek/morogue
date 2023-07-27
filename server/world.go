@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -19,6 +18,7 @@ type world struct {
 	password          string
 	live              bool
 	data              *Data
+	wids              id.WIDGenerator
 	locations         []*location
 	clientChan        chan *client
 	clientRemoveChan  chan *client
@@ -57,7 +57,7 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 	if err != nil {
 		panic(err)
 	}
-	start := location{}
+	start := &location{}
 	start.ID = id.UUID(lid)
 	err = start.generate()
 	if err != nil {
@@ -77,28 +77,18 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 		case cl := <-w.clientChan:
 			w.clients = append(w.clients, cl)
 
-			var char game.Character
+			var char *game.Character
 			for _, ch := range cl.account.Characters {
 				if ch.Name == cl.character {
 					char = ch
 					break
 				}
 			}
-			// Find open cell for character.
-			openCells := start.filterCells(func(c game.Cell) bool {
-				if c.Blocks == game.MovementNone {
-					return true
-				}
-				return false
-			})
-			if len(openCells) == 0 {
-				// TODO: BIG error, can't place character.
-			}
-			spawnCell := openCells[rand.Intn(len(openCells)-1)]
-			char.X = spawnCell.X
-			char.Y = spawnCell.Y
+			char.WID = w.wids.Next()
 			// Add client as character to world.
-			start.Characters = append(start.Characters, char)
+			start.addCharacter(char)
+			cl.currentLocation = start
+			cl.currentCharacter = char
 
 			// Send starting location to client.
 			cl.conn.Write(net.LocationMessage{
@@ -108,6 +98,12 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 				Characters: start.Characters,
 				Objects:    start.Objects,
 			})
+
+			// Send client their character owner message
+			cl.conn.Write(net.OwnerMessage{
+				WID: char.WID,
+			})
+
 		default:
 		}
 		// Select for timer delay.
@@ -126,6 +122,15 @@ func (w *world) update() error {
 		} else {
 			// TODO: Remove character from the client character's current location.
 			fmt.Println(err)
+			// This shouldn't ever be nil, but let's be safe.
+			if cl.currentCharacter != nil {
+				for _, l := range w.locations {
+					if err := l.removeCharacter(cl.currentCharacter.WID); err == nil {
+						break
+					}
+				}
+			}
+			// TODO: Save character!!!
 		}
 	}
 	for j := i; j < len(w.clients); j++ {
@@ -170,7 +175,12 @@ func (w *world) updateClient(cl *client) error {
 				})
 			}
 		default:
-			fmt.Println("TODO: handle client message", m)
+			// For all other messages, pass off handling to client's current location.
+			if cl.currentLocation != nil {
+				cl.currentLocation.handleClientMessage(cl, msg)
+			} else {
+				fmt.Println("message sent to the ether", msg)
+			}
 		}
 		// TODO: If the location the client is traveling to is not done, send progress reports to client.
 	case err := <-cl.closedChan:

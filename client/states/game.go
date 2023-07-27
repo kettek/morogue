@@ -25,8 +25,12 @@ type Game struct {
 	locations map[id.UUID]*game.Location
 	location  *game.Location // current
 	//
+	characterWID id.WID
+	//
+	binds    clgame.Binds
 	scroller clgame.Scroller
 	grid     clgame.Grid
+	mover    clgame.Mover
 }
 
 // NewGame creates a new Game instance.
@@ -46,6 +50,8 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 		},
 		locations: make(map[id.UUID]*game.Location),
 	}
+	state.binds.Init()
+	state.mover.Init()
 	state.scroller.Init()
 	state.scroller.SetHandler(func(x, y int) {
 		state.grid.SetOffset(x, y)
@@ -141,15 +147,30 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 					}
 				}
 			}
+		case net.PositionMessage:
+			if ch := state.location.Character(m.WID); ch != nil {
+				ch.X = m.X
+				ch.Y = m.Y
+			}
+		case net.OwnerMessage:
+			state.characterWID = m.WID
 		default:
 			fmt.Println("TODO: Handle", m)
 		}
 	default:
 	}
+	state.binds.Update(ctx)
 
 	state.ui.Update()
 
 	state.scroller.Update(ctx)
+
+	if dir := state.mover.Update(state.binds); dir != 0 {
+		state.connection.Write(net.MoveMessage{
+			WID:       state.characterWID,
+			Direction: dir,
+		})
+	}
 
 	return nil
 }
