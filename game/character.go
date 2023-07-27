@@ -5,6 +5,7 @@ import "github.com/kettek/morogue/id"
 // Character represents a playable character.
 type Character struct {
 	Position
+	WID       id.WID // ID assigned when entering da world.
 	Archetype id.UUID
 	Name      string
 	Level     int
