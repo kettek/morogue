@@ -14,6 +14,7 @@ import (
 	"github.com/ebitenui/ebitenui/widget"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kettek/morogue/client/ifs"
+	clgame "github.com/kettek/morogue/client/states/game"
 	"github.com/kettek/morogue/game"
 	"github.com/kettek/morogue/id"
 	"github.com/kettek/morogue/net"
@@ -32,6 +33,8 @@ type Game struct {
 	//
 	tiles      map[id.UUID]game.Tile
 	tileImages map[id.UUID]*ebiten.Image
+	//
+	scroller clgame.Scroller
 }
 
 // NewGame creates a new Game instance.
@@ -52,6 +55,7 @@ func NewGame(connection net.Connection, msgCh chan net.Message) *Game {
 		tiles:      make(map[id.UUID]game.Tile),
 		tileImages: make(map[id.UUID]*ebiten.Image),
 	}
+	state.scroller.Init()
 	return state
 }
 
@@ -110,6 +114,16 @@ func (state *Game) travelTo(id id.UUID) {
 	state.location = l
 }
 
+func (state *Game) syncUIToLocation(ctx ifs.RunContext) {
+	if state.location == nil {
+		return
+	}
+	w := len(state.location.Cells) * 16 * 2
+	h := len(state.location.Cells[0]) * 16 * 2
+	state.scroller.SetLimit(w, h)
+	state.scroller.CenterTo(ctx.UI.Width/2-w/2, ctx.UI.Height/2-h/2)
+}
+
 func (state *Game) Update(ctx ifs.RunContext) error {
 	select {
 	case msg := <-state.messageChan:
@@ -117,6 +131,7 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 		case net.LocationMessage:
 			state.setLocationFromMessage(m)
 			state.travelTo(m.ID)
+			state.syncUIToLocation(ctx)
 		case net.TileMessage:
 			if m.ResultCode == 200 {
 				// Store the tile and request the image.
@@ -135,6 +150,8 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 	}
 
 	state.ui.Update()
+
+	state.scroller.Update(ctx)
 
 	return nil
 }
@@ -174,6 +191,8 @@ func (state *Game) loadImage(src string, scale float64) (*ebiten.Image, error) {
 }
 
 func (state *Game) Draw(ctx ifs.DrawContext) {
+	scrollOpts := ebiten.GeoM{}
+	scrollOpts.Translate(ToFloat64(state.scroller.Scroll()))
 
 	if state.location != nil {
 		// TODO: Replace map access and cells with a client-centric cell wrapper that contains the ebiten.image ptr directly for efficiency.
@@ -186,6 +205,7 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 				py := y * 16 * 2
 				if img := state.tileImages[*cell.TileID]; img != nil {
 					opts := ebiten.DrawImageOptions{}
+					opts.GeoM.Concat(scrollOpts)
 					opts.GeoM.Translate(float64(px), float64(py))
 					ctx.Screen.DrawImage(img, &opts)
 				}
@@ -194,4 +214,8 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 	}
 
 	state.ui.Draw(ctx.Screen)
+}
+
+func ToFloat64(a int, b int) (float64, float64) {
+	return float64(a), float64(b)
 }
