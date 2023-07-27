@@ -40,12 +40,12 @@ func main() {
 		Run("build-server").
 		Run("run-server")
 	Task("watch-client").
-		Watch("client/*.go", "client/*/*.go", "net/*.go", "game/*.go").
+		Watch("client/*.go", "client/*/*.go", "client/*/*/*.go", "net/*.go", "game/*.go").
 		Signaler(SigQuit).
 		Run("build-client").
 		Run("run-client")
 	Task("watch-client-wasm").
-		Watch("client/*.go", "client/*/*.go", "net/*.go", "game/*.go").
+		Watch("client/*.go", "client/*/*.go", "client/*/*/*.go", "net/*.go", "game/*.go").
 		Signaler(SigQuit).
 		Run("build-client-wasm")
 
