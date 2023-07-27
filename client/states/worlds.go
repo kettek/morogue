@@ -18,6 +18,7 @@ import (
 // world options and thereafter sending a net.CreateWorldMessage.
 // Popping Worlds should return to the Create state.
 type Worlds struct {
+	data        *Data
 	connection  net.Connection
 	messageChan chan net.Message
 	ui          *ebitenui.UI
@@ -43,8 +44,9 @@ type Worlds struct {
 }
 
 // NewWorlds creates a new Worlds instance.
-func NewWorlds(connection net.Connection, msgCh chan net.Message) *Worlds {
+func NewWorlds(connection net.Connection, msgCh chan net.Message, data *Data) *Worlds {
 	state := &Worlds{
+		data:        data,
 		connection:  connection,
 		messageChan: msgCh,
 		ui: &ebitenui.UI{
@@ -111,6 +113,7 @@ func (state *Worlds) Begin(ctx ifs.RunContext) error {
 			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
 				Position: widget.RowLayoutPositionCenter,
 			}),
+			widget.WidgetOpts.MinSize(800, 20),
 		),
 		widget.ContainerOpts.Layout(widget.NewRowLayout(
 			widget.RowLayoutOpts.Direction(widget.DirectionVertical),
@@ -160,6 +163,7 @@ func (state *Worlds) Begin(ctx ifs.RunContext) error {
 			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
 				Position: widget.RowLayoutPositionCenter,
 			}),
+			widget.WidgetOpts.MinSize(300, 20),
 		),
 		widget.ContainerOpts.Layout(widget.NewRowLayout(
 			widget.RowLayoutOpts.Direction(widget.DirectionVertical),
@@ -331,7 +335,7 @@ func (state *Worlds) Update(ctx ifs.RunContext) error {
 			fmt.Println("handle result of create", m)
 		case net.JoinWorldMessage:
 			if m.ResultCode == 200 {
-				ctx.Sm.Push(NewGame(state.connection, state.messageChan))
+				ctx.Sm.Push(NewGame(state.connection, state.messageChan, state.data))
 				return nil
 			}
 			if m.Result == "" {

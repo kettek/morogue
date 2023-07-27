@@ -1,32 +1,29 @@
 package states
 
 import (
-	"bytes"
-	"context"
 	"fmt"
 	"image"
 	"image/color"
 	_ "image/png"
-	"io/ioutil"
-	"log"
-	"net/http"
 	"time"
 
 	"github.com/ebitenui/ebitenui"
 	eimage "github.com/ebitenui/ebitenui/image"
+	"github.com/ebitenui/ebitenui/input"
 	"github.com/ebitenui/ebitenui/widget"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kettek/morogue/client/ifs"
 	"github.com/kettek/morogue/game"
 	"github.com/kettek/morogue/id"
 	"github.com/kettek/morogue/net"
-	"github.com/nfnt/resize"
 	"golang.org/x/exp/slices"
 )
 
 // Create is a rather massive and messy state that controls character selection, creation,
 // and deletion. Popping Create should return to the Login state.
 type Create struct {
+	data *Data
+	//
 	connection  net.Connection
 	messageChan chan net.Message
 	ui          *ebitenui.UI
@@ -75,6 +72,7 @@ type archetype struct {
 // NewCreate creates a new Create instance.
 func NewCreate(connection net.Connection, msgCh chan net.Message) *Create {
 	state := &Create{
+		data:        NewData(),
 		connection:  connection,
 		messageChan: msgCh,
 		ui: &ebitenui.UI{
@@ -93,32 +91,32 @@ func NewCreate(connection net.Connection, msgCh chan net.Message) *Create {
 
 func (state *Create) Begin(ctx ifs.RunContext) error {
 	// Load attributes images.
-	if img, err := state.loadImage("images/swole.png", 2); err != nil {
+	if img, err := state.data.loadImage("images/swole.png", 2); err != nil {
 		return err
 	} else {
 		state.swoleImage = img
 	}
-	if img, err := state.loadImage("images/zooms.png", 2); err != nil {
+	if img, err := state.data.loadImage("images/zooms.png", 2); err != nil {
 		return err
 	} else {
 		state.zoomsImage = img
 	}
-	if img, err := state.loadImage("images/brains.png", 2); err != nil {
+	if img, err := state.data.loadImage("images/brains.png", 2); err != nil {
 		return err
 	} else {
 		state.brainsImage = img
 	}
-	if img, err := state.loadImage("images/funk.png", 2); err != nil {
+	if img, err := state.data.loadImage("images/funk.png", 2); err != nil {
 		return err
 	} else {
 		state.funkImage = img
 	}
-	if img, err := state.loadImage("images/traits.png", 2); err != nil {
+	if img, err := state.data.loadImage("images/traits.png", 2); err != nil {
 		return err
 	} else {
 		state.traitsImage = img
 	}
-	if img, err := state.loadImage("images/archetype.png", 2); err != nil {
+	if img, err := state.data.loadImage("images/archetype.png", 2); err != nil {
 		return err
 	} else {
 		state.archetypeImage = img
@@ -404,40 +402,6 @@ func (state *Create) haveArchetype(archetype game.Archetype) bool {
 	return false
 }
 
-func (state *Create) loadImage(src string, scale float64) (*ebiten.Image, error) {
-	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*5)
-	defer cancel()
-	req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost:8080/"+src, nil)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	if res.StatusCode != 200 {
-		return nil, err
-	}
-
-	resBody, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	img, _, err := image.Decode(bytes.NewReader(resBody))
-	if err != nil {
-		return nil, err
-	}
-
-	// Resize the image to 2x until ebitenui has scaling built-in.
-	img = resize.Resize(uint(float64(img.Bounds().Dx())*scale), uint(float64(img.Bounds().Dy())*scale), img, resize.NearestNeighbor)
-
-	return ebiten.NewImageFromImage(img), nil
-}
-
 func (state *Create) populateCharacters(ctx ifs.RunContext, characters []game.Character) {
 	state.characters = characters
 	state.charactersContainer.RemoveChildren()
@@ -539,11 +503,12 @@ func (state *Create) acquireArchetypes(archetypes []game.Archetype) {
 			state.archetypes = append(state.archetypes, arche)
 		}()
 
-		img, err := state.loadImage("archetypes/"+arch.Image, 2.0)
+		img, err := state.data.loadImage("archetypes/"+arch.Image, 2.0)
 		if err != nil {
 			// TODO: Show error image
 			continue
 		}
+		state.data.archetypeImages[arch.ID] = img
 
 		arche.Image = img
 	}
@@ -887,8 +852,11 @@ func (state *Create) doJoin() {
 
 func (state *Create) doDelete() {
 	x, y := state.deleteWindow.Contents.PreferredSize()
-	r := image.Rect(0, 0, x, y)
-	r = r.Add(image.Point{100, 50})
+	r := image.Rect(0, 0, 0, 0)
+	pt := input.GetWindowSize()
+	r = r.Add(image.Point{pt.X / 2, pt.Y / 2})
+	r = r.Sub(image.Point{x / 2, y / 2})
+
 	state.deleteWindow.SetLocation(r)
 	state.ui.AddWindow(state.deleteWindow)
 }
@@ -898,6 +866,9 @@ func (state *Create) Update(ctx ifs.RunContext) error {
 	case msg := <-state.messageChan:
 		switch m := msg.(type) {
 		case net.ArchetypesMessage:
+			for _, a := range m.Archetypes {
+				state.data.archetypes[a.ID] = a
+			}
 			state.acquireArchetypes(m.Archetypes)
 			state.refreshArchetypes(ctx)
 			state.syncUI()
@@ -919,7 +890,7 @@ func (state *Create) Update(ctx ifs.RunContext) error {
 			}
 		case net.JoinCharacterMessage:
 			if m.ResultCode == 200 {
-				ctx.Sm.Push(NewWorlds(state.connection, state.messageChan))
+				ctx.Sm.Push(NewWorlds(state.connection, state.messageChan, state.data))
 			} else {
 				state.resultText.Label = m.Result
 			}

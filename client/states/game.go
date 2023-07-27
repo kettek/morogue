@@ -1,15 +1,8 @@
 package states
 
 import (
-	"bytes"
-	"context"
 	"fmt"
-	"image"
 	"image/color"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"time"
 
 	"github.com/ebitenui/ebitenui"
 	"github.com/ebitenui/ebitenui/widget"
@@ -19,11 +12,11 @@ import (
 	"github.com/kettek/morogue/game"
 	"github.com/kettek/morogue/id"
 	"github.com/kettek/morogue/net"
-	"github.com/nfnt/resize"
 )
 
 // Game represents the running game in the world.
 type Game struct {
+	data        *Data
 	connection  net.Connection
 	messageChan chan net.Message
 	//
@@ -32,16 +25,14 @@ type Game struct {
 	locations map[id.UUID]*game.Location
 	location  *game.Location // current
 	//
-	tiles      map[id.UUID]game.Tile
-	tileImages map[id.UUID]*ebiten.Image
-	//
 	scroller clgame.Scroller
 	grid     clgame.Grid
 }
 
 // NewGame creates a new Game instance.
-func NewGame(connection net.Connection, msgCh chan net.Message) *Game {
+func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Game {
 	state := &Game{
+		data:        data,
 		connection:  connection,
 		messageChan: msgCh,
 		ui: &ebitenui.UI{
@@ -53,9 +44,7 @@ func NewGame(connection net.Connection, msgCh chan net.Message) *Game {
 				),
 			),
 		},
-		locations:  make(map[id.UUID]*game.Location),
-		tiles:      make(map[id.UUID]game.Tile),
-		tileImages: make(map[id.UUID]*ebiten.Image),
+		locations: make(map[id.UUID]*game.Location),
 	}
 	state.scroller.Init()
 	state.scroller.SetHandler(func(x, y int) {
@@ -98,7 +87,7 @@ func (state *Game) setLocationFromMessage(m net.LocationMessage) {
 		for _, cell := range c {
 			if cell.TileID != nil {
 				if _, ok := requestedTiles[*cell.TileID]; !ok {
-					if _, ok := state.tiles[*cell.TileID]; !ok {
+					if _, ok := state.data.tiles[*cell.TileID]; !ok {
 						fmt.Println("requesting", *cell.TileID)
 						state.connection.Write(net.TileMessage{
 							ID: *cell.TileID,
@@ -144,11 +133,11 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 		case net.TileMessage:
 			if m.ResultCode == 200 {
 				// Store the tile and request the image.
-				state.tiles[m.Tile.ID] = m.Tile
-				if _, ok := state.tileImages[m.Tile.ID]; !ok {
+				state.data.tiles[m.Tile.ID] = m.Tile
+				if _, ok := state.data.tileImages[m.Tile.ID]; !ok {
 					src := "tiles/" + m.Tile.Image
-					if img, err := state.loadImage(src, 2.0); err == nil {
-						state.tileImages[m.Tile.ID] = img
+					if img, err := state.data.loadImage(src, 2.0); err == nil {
+						state.data.tileImages[m.Tile.ID] = img
 					}
 				}
 			}
@@ -163,40 +152,6 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 	state.scroller.Update(ctx)
 
 	return nil
-}
-
-func (state *Game) loadImage(src string, scale float64) (*ebiten.Image, error) {
-	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*5)
-	defer cancel()
-	req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost:8080/"+src, nil)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	if res.StatusCode != 200 {
-		return nil, err
-	}
-
-	resBody, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	img, _, err := image.Decode(bytes.NewReader(resBody))
-	if err != nil {
-		return nil, err
-	}
-
-	// Resize the image to 2x until ebitenui has scaling built-in.
-	img = resize.Resize(uint(float64(img.Bounds().Dx())*scale), uint(float64(img.Bounds().Dy())*scale), img, resize.NearestNeighbor)
-
-	return ebiten.NewImageFromImage(img), nil
 }
 
 func (state *Game) Draw(ctx ifs.DrawContext) {
@@ -220,12 +175,23 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 					continue
 				}
 
-				if img := state.tileImages[*cell.TileID]; img != nil {
+				if img := state.data.tileImages[*cell.TileID]; img != nil {
 					opts := ebiten.DrawImageOptions{}
 					opts.GeoM.Concat(scrollOpts)
 					opts.GeoM.Translate(float64(px), float64(py))
 					ctx.Screen.DrawImage(img, &opts)
 				}
+			}
+		}
+		// Draw characters
+		for _, ch := range state.location.Characters {
+			if img := state.data.archetypeImages[ch.Archetype]; img != nil {
+				px := ch.X * 16 * 2
+				py := ch.Y * 16 * 2
+				opts := ebiten.DrawImageOptions{}
+				opts.GeoM.Concat(scrollOpts)
+				opts.GeoM.Translate(float64(px), float64(py))
+				ctx.Screen.DrawImage(img, &opts)
 			}
 		}
 	}
