@@ -17,6 +17,8 @@ type DrawContext struct {
 }
 
 type DrawContextUI struct {
+	Width, Height int
+	//
 	HeadlineFace     font.Face
 	BodyCopyFace     font.Face
 	ButtonImage      *widget.ButtonImage

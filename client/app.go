@@ -65,6 +65,8 @@ func (a *app) Update() error {
 
 func (a *app) Draw(screen *ebiten.Image) {
 	a.drawContext.Screen = screen
+	a.runContext.UI.Width = screen.Bounds().Dx()
+	a.runContext.UI.Height = screen.Bounds().Dy()
 	if t := a.Top(); t != nil {
 		t.Draw(a.drawContext)
 	}
