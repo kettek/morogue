@@ -3,6 +3,7 @@ package clgame
 import (
 	"math"
 
+	"github.com/ebitenui/ebitenui/input"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/kettek/morogue/client/ifs"
@@ -28,12 +29,16 @@ func (scroller *Scroller) Update(ctx ifs.RunContext) error {
 		scroller.held = true
 		scroller.moved = 0
 	} else if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
+		if scroller.moved > 2 {
+			input.SetCursorShape(input.CURSOR_DEFAULT)
+		}
 		scroller.held = false
 		scroller.moved = 0
 	}
 	x, y := scroller.GetConstrainedMousePosition()
 	if scroller.held {
 		if scroller.moved > 2 {
+			input.SetCursorShape("move")
 			scroller.SetScroll(
 				scroller.x+(x-scroller.lastX),
 				scroller.y+(y-scroller.lastY),
