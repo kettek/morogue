@@ -40,6 +40,26 @@ func (l *location) generate() error {
 	return nil
 }
 
+type cellLocation struct {
+	X, Y int
+	Cell game.Cell
+}
+
+func (l *location) filterCells(cb func(c game.Cell) bool) (cells []cellLocation) {
+	for x, r := range l.Cells {
+		for y, c := range r {
+			if cb(c) {
+				cells = append(cells, cellLocation{
+					X:    x,
+					Y:    y,
+					Cell: c,
+				})
+			}
+		}
+	}
+	return
+}
+
 func (l *location) process() error {
 	for _, c := range l.Characters {
 		fmt.Println("TODO: Handle character", c)
