@@ -1,4 +1,4 @@
-package clgame
+package game
 
 import (
 	"math"
@@ -16,6 +16,7 @@ type Scroller struct {
 	held           bool
 	moved          float64
 	maxW, maxH     int
+	handler        func(x, y int)
 }
 
 func (scroller *Scroller) Init() {
@@ -81,6 +82,9 @@ func (scroller *Scroller) SetScroll(x, y int) {
 	}
 	scroller.x = x
 	scroller.y = y
+	if scroller.handler != nil {
+		scroller.handler(scroller.x, scroller.y)
+	}
 }
 
 func (scroller *Scroller) Scroll() (int, int) {
@@ -98,6 +102,10 @@ func (scroller *Scroller) Limit() (int, int) {
 
 func (scroller *Scroller) CenterTo(x, y int) {
 	scroller.SetScroll(x, y)
+}
+
+func (scoller *Scroller) SetHandler(cb func(x, y int)) {
+	scoller.handler = cb
 }
 
 func (scroller *Scroller) GetConstrainedMousePosition() (int, int) {

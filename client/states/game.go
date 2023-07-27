@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"image"
+	"image/color"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -35,6 +36,7 @@ type Game struct {
 	tileImages map[id.UUID]*ebiten.Image
 	//
 	scroller clgame.Scroller
+	grid     clgame.Grid
 }
 
 // NewGame creates a new Game instance.
@@ -56,6 +58,12 @@ func NewGame(connection net.Connection, msgCh chan net.Message) *Game {
 		tileImages: make(map[id.UUID]*ebiten.Image),
 	}
 	state.scroller.Init()
+	state.scroller.SetHandler(func(x, y int) {
+		state.grid.SetOffset(x, y)
+	})
+	state.grid.SetCellSize(16*2, 16*2)
+	state.grid.SetColor(color.NRGBA{255, 255, 255, 15})
+
 	return state
 }
 
@@ -122,6 +130,7 @@ func (state *Game) syncUIToLocation(ctx ifs.RunContext) {
 	h := len(state.location.Cells[0]) * 16 * 2
 	state.scroller.SetLimit(w, h)
 	state.scroller.CenterTo(ctx.UI.Width/2-w/2, ctx.UI.Height/2-h/2)
+	state.grid.SetSize(w, h)
 }
 
 func (state *Game) Update(ctx ifs.RunContext) error {
@@ -195,6 +204,8 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 	scrollOpts.Translate(ToFloat64(state.scroller.Scroll()))
 
 	if state.location != nil {
+		state.grid.Draw(ctx)
+
 		// TODO: Replace map access and cells with a client-centric cell wrapper that contains the ebiten.image ptr directly for efficiency.
 		for x, col := range state.location.Cells {
 			for y, cell := range col {
