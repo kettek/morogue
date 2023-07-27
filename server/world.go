@@ -77,7 +77,6 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 		case cl := <-w.clientChan:
 			w.clients = append(w.clients, cl)
 
-			// Add client as character to world.
 			var char game.Character
 			for _, ch := range cl.account.Characters {
 				if ch.Name == cl.character {
@@ -85,7 +84,6 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 					break
 				}
 			}
-			start.Characters = append(start.Characters, char)
 			// Find open cell for character.
 			openCells := start.filterCells(func(c game.Cell) bool {
 				if c.Blocks == game.MovementNone {
@@ -97,7 +95,10 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 				// TODO: BIG error, can't place character.
 			}
 			spawnCell := openCells[rand.Intn(len(openCells)-1)]
-			fmt.Println("spawn character at", spawnCell, char)
+			char.X = spawnCell.X
+			char.Y = spawnCell.Y
+			// Add client as character to world.
+			start.Characters = append(start.Characters, char)
 
 			// Send starting location to client.
 			cl.conn.Write(net.LocationMessage{
@@ -123,6 +124,7 @@ func (w *world) update() error {
 			w.clients[i] = cl
 			i++
 		} else {
+			// TODO: Remove character from the client character's current location.
 			fmt.Println(err)
 		}
 	}
