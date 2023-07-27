@@ -201,7 +201,8 @@ func (state *Game) loadImage(src string, scale float64) (*ebiten.Image, error) {
 
 func (state *Game) Draw(ctx ifs.DrawContext) {
 	scrollOpts := ebiten.GeoM{}
-	scrollOpts.Translate(ToFloat64(state.scroller.Scroll()))
+	sx, sy := state.scroller.Scroll()
+	scrollOpts.Translate(float64(sx), float64(sy))
 
 	if state.location != nil {
 		state.grid.Draw(ctx)
@@ -214,6 +215,11 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 				}
 				px := x * 16 * 2
 				py := y * 16 * 2
+
+				if px+sx > ctx.UI.Width || py+sy > ctx.UI.Height || px+sx+16*2 < 0 || py+sy+16*2 < 0 {
+					continue
+				}
+
 				if img := state.tileImages[*cell.TileID]; img != nil {
 					opts := ebiten.DrawImageOptions{}
 					opts.GeoM.Concat(scrollOpts)
