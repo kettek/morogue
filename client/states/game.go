@@ -120,11 +120,11 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 		case net.TileMessage:
 			if m.ResultCode == 200 {
 				// Store the tile and request the image.
-				state.tiles[m.Tile.UUID] = m.Tile
-				if _, ok := state.tileImages[m.Tile.UUID]; !ok {
+				state.tiles[m.Tile.ID] = m.Tile
+				if _, ok := state.tileImages[m.Tile.ID]; !ok {
 					src := "tiles/" + m.Tile.Image
 					if img, err := state.loadImage(src, 2.0); err == nil {
-						state.tileImages[m.Tile.UUID] = img
+						state.tileImages[m.Tile.ID] = img
 					}
 				}
 			}

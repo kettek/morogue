@@ -397,7 +397,7 @@ func (state *Create) End() (interface{}, error) {
 
 func (state *Create) haveArchetype(archetype game.Archetype) bool {
 	for _, arch := range state.archetypes {
-		if arch.Archetype.UUID == archetype.UUID {
+		if arch.Archetype.ID == archetype.ID {
 			return true
 		}
 	}
@@ -488,7 +488,7 @@ func (state *Create) populateCharacters(ctx ifs.RunContext, characters []game.Ch
 
 			var img *ebiten.Image
 			for _, arch := range state.archetypes {
-				if arch.Archetype.UUID == ch.Archetype {
+				if arch.Archetype.ID == ch.Archetype {
 					img = arch.Image
 					break
 				}
@@ -690,11 +690,11 @@ func (state *Create) refreshArchetypes(ctx ifs.RunContext) {
 				widget.ButtonOpts.Image(ctx.UI.ButtonImage),
 				// add a handler that reacts to clicking the button
 				widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
-					state.selectedArchetype = arch.Archetype.UUID
+					state.selectedArchetype = arch.Archetype.ID
 					state.archetypesCreateImage.Image = arch.Image
 				}),
 				widget.ButtonOpts.WidgetOpts(
-					widget.WidgetOpts.CustomData(arch.Archetype.UUID), // Store name for sync reference.
+					widget.WidgetOpts.CustomData(arch.Archetype.ID), // Store name for sync reference.
 					widget.WidgetOpts.CursorHovered("interactive"),
 				),
 			)
@@ -810,13 +810,13 @@ func (state *Create) syncUI() {
 	// Set a default selected archetype.
 	hasSelected = false
 	for _, a := range state.archetypes {
-		if a.Archetype.UUID == state.selectedArchetype {
+		if a.Archetype.ID == state.selectedArchetype {
 			hasSelected = true
 			break
 		}
 	}
 	if !hasSelected && len(state.archetypes) > 0 {
-		state.selectedArchetype = state.archetypes[0].Archetype.UUID
+		state.selectedArchetype = state.archetypes[0].Archetype.ID
 		state.archetypesCreateImage.Image = state.archetypes[0].Image
 	}
 

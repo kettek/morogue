@@ -14,47 +14,53 @@ const (
 )
 
 var (
-	Archetype uuid.UUID
-	Tile      uuid.UUID
-	Mob       uuid.UUID
-	Item      uuid.UUID
+	Archetype UUID
+	Tile      UUID
+	Mob       UUID
+	Item      UUID
 )
 
 // NamespaceToKey provides a mapping of morogue's UUIDv5s to their string keys.
-var NamespaceToKey map[uuid.UUID]string
+var NamespaceToKey map[UUID]string
+var KeyToNamespace map[string]UUID
 
 func init() {
-	NamespaceToKey = make(map[uuid.UUID]string)
+	NamespaceToKey = make(map[UUID]string)
+	KeyToNamespace = make(map[string]UUID)
 	{
 		hasher := sha1.New()
 		hasher.Write([]byte(KeyArchetype))
 		sha := hasher.Sum(nil)
 
-		Archetype, _ = uuid.FromBytes(sha[:16])
+		Archetype = UUID(uuid.Must(uuid.FromBytes(sha[:16])))
 		NamespaceToKey[Archetype] = KeyArchetype
+		KeyToNamespace[KeyArchetype] = Archetype
 	}
 	{
 		hasher := sha1.New()
 		hasher.Write([]byte(KeyTile))
 		sha := hasher.Sum(nil)
 
-		Tile, _ = uuid.FromBytes(sha[:16])
+		Tile = UUID(uuid.Must(uuid.FromBytes(sha[:16])))
 		NamespaceToKey[Tile] = KeyTile
+		KeyToNamespace[KeyTile] = Tile
 	}
 	{
 		hasher := sha1.New()
 		hasher.Write([]byte(KeyMob))
 		sha := hasher.Sum(nil)
 
-		Mob, _ = uuid.FromBytes(sha[:16])
+		Mob = UUID(uuid.Must(uuid.FromBytes(sha[:16])))
 		NamespaceToKey[Mob] = KeyMob
+		KeyToNamespace[KeyMob] = Mob
 	}
 	{
 		hasher := sha1.New()
 		hasher.Write([]byte(KeyItem))
 		sha := hasher.Sum(nil)
 
-		Item, _ = uuid.FromBytes(sha[:16])
+		Item = UUID(uuid.Must(uuid.FromBytes(sha[:16])))
 		NamespaceToKey[Item] = KeyItem
+		KeyToNamespace[KeyItem] = Item
 	}
 }

@@ -1,7 +1,9 @@
 package id
 
 import (
+	"encoding/json"
 	"errors"
+	"strings"
 
 	"github.com/gofrs/uuid/v5"
 )
@@ -9,12 +11,60 @@ import (
 // UUID is a UUID. In general, most UUIDs in morogue are UUIDv5s used to identify
 // static types of objects, such as archetypes, items, and weapons. These are
 // generally acquired through the UID func.
-type UUID = uuid.UUID
+type UUID uuid.UUID
+
+// UnmarshalJSON unmarshals a UUID from data in either UUID form or in a morogue valid "namespace:name" format, such as "morogue:tile:stone-wall".
+func (u *UUID) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		var v [16]byte
+		if err := json.Unmarshal(data, &v); err != nil {
+			return err
+		}
+		*u = UUID(v)
+		return nil
+	}
+	if len(v) == 0 {
+		return nil
+	}
+	uuid, err := uuid.FromString(v)
+	if err == nil {
+		*u = UUID(uuid)
+	} else {
+		strs := strings.SplitN(v, ":", 3)
+		if len(strs) < 3 {
+			return errors.New("bad namespace length")
+		}
+		if ns, ok := KeyToNamespace[strs[0]+":"+strs[1]]; !ok {
+			return errors.New("no namespace")
+		} else {
+			uid, err := UID(ns, strs[2])
+			if err != nil {
+				return err
+			}
+			*u = uid
+		}
+	}
+	return nil
+}
+
+func (u UUID) IsNil() bool {
+	return uuid.UUID(u).IsNil()
+}
+
+// Bytes returns a byte slice representation of the UUID.
+func (u UUID) Bytes() []byte {
+	return u[:]
+}
+
+func (u UUID) String() string {
+	return uuid.UUID(u).String()
+}
 
 // UID generates a unique identifier for the given name in the given morogue namespace. The namespace must be NSArchetype, NSMob, or NSItem.
-func UID(ns uuid.UUID, name string) (uuid.UUID, error) {
+func UID(ns UUID, name string) (UUID, error) {
 	if ns != Archetype && ns != Tile && ns != Mob && ns != Item {
-		return uuid.UUID{}, errors.New("namespace not morogue")
+		return UUID{}, errors.New("namespace not morogue")
 	}
-	return uuid.NewV5(ns, name), nil
+	return UUID(uuid.NewV5(uuid.UUID(ns), name)), nil
 }

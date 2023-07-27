@@ -19,7 +19,7 @@ type Data struct {
 
 func (d *Data) hasArchetype(uuid id.UUID) bool {
 	for _, a := range d.Archetypes {
-		if a.UUID == uuid {
+		if a.ID == uuid {
 			return true
 		}
 	}
@@ -28,7 +28,7 @@ func (d *Data) hasArchetype(uuid id.UUID) bool {
 
 func (d *Data) Tile(uuid id.UUID) (game.Tile, error) {
 	for _, t := range d.Tiles {
-		if t.UUID == uuid {
+		if t.ID == uuid {
 			return t, nil
 		}
 	}

@@ -6,7 +6,7 @@ import "github.com/kettek/morogue/id"
 // creating playable characters.
 type Archetype struct {
 	Title string
-	UUID  id.UUID
+	ID    id.UUID
 
 	Image string // Image for the archetype. Should be requested via HTTP to the resources backend.
 	//

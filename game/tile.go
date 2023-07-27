@@ -6,7 +6,7 @@ import "github.com/kettek/morogue/id"
 // and appearance of a given cell.
 type Tile struct {
 	Title string
-	UUID  id.UUID
+	ID    id.UUID
 
 	Image string // Image for the tile. It should be requested via HTTP to the resources backend.
 	// TODO: Other tile properties.

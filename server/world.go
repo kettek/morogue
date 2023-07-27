@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/kettek/morogue/game"
+	"github.com/kettek/morogue/id"
 	"github.com/kettek/morogue/net"
 )
 
@@ -25,13 +26,13 @@ type world struct {
 }
 
 func newWorld(d *Data) *world {
-	id, err := uuid.NewV4()
+	wid, err := uuid.NewV4()
 	if err != nil {
 		panic(err)
 	}
 	w := &world{
 		info: game.WorldInfo{
-			ID: id,
+			ID: id.UUID(wid),
 		},
 		data:       d,
 		quitChan:   make(chan struct{}),
@@ -56,7 +57,7 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 		panic(err)
 	}
 	start := location{}
-	start.ID = lid
+	start.ID = id.UUID(lid)
 	err = start.generate()
 	if err != nil {
 		fmt.Println("OH NO", err)
