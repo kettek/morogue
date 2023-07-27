@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -75,6 +76,29 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 			return
 		case cl := <-w.clientChan:
 			w.clients = append(w.clients, cl)
+
+			// Add client as character to world.
+			var char game.Character
+			for _, ch := range cl.account.Characters {
+				if ch.Name == cl.character {
+					char = ch
+					break
+				}
+			}
+			start.Characters = append(start.Characters, char)
+			// Find open cell for character.
+			openCells := start.filterCells(func(c game.Cell) bool {
+				if c.Blocks == game.MovementNone {
+					return true
+				}
+				return false
+			})
+			if len(openCells) == 0 {
+				// TODO: BIG error, can't place character.
+			}
+			spawnCell := openCells[rand.Intn(len(openCells)-1)]
+			fmt.Println("spawn character at", spawnCell, char)
+
 			// Send starting location to client.
 			cl.conn.Write(net.LocationMessage{
 				ID:         start.ID,
