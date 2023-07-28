@@ -6,6 +6,7 @@ import (
 	"github.com/kettek/morogue/id"
 )
 
+// Event is the result of something happening on the server that is to be sent to the client. This includes sounds, position information, damage dealt, and more. Many events are as the result of client-sent Desires.
 type Event interface {
 	Type() string
 }
@@ -16,6 +17,7 @@ type EventWrapper struct {
 	Data json.RawMessage `json:"d"`
 }
 
+// WrapEvent wraps up an event to be sent over the wire.
 func WrapEvent(e Event) (EventWrapper, error) {
 	b, err := json.Marshal(e)
 	if err != nil {
@@ -28,6 +30,7 @@ func WrapEvent(e Event) (EventWrapper, error) {
 	}, nil
 }
 
+// Event returns the event stored in the wrapper.
 func (w *EventWrapper) Event() Event {
 	switch w.Type {
 	case (EventPosition{}).Type():
@@ -43,6 +46,7 @@ func (w *EventWrapper) Event() Event {
 	return nil
 }
 
+// EventPosition represents a position update of something in a world location.
 type EventPosition struct {
 	WID  id.WID
 	X, Y int
@@ -52,6 +56,7 @@ func (e EventPosition) Type() string {
 	return "position"
 }
 
+// EventSound represents a sound emitted from a location. FromX and FromY are used to modify the visual offset of the sound. This makes it so when you bump into a wall or hit an enemy, the sound effect appears between the two points.
 type EventSound struct {
 	WID     id.WID `json:"wid,omitempty"`
 	X       int    `json:"x,omitempty"`
