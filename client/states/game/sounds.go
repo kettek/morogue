@@ -64,14 +64,15 @@ func (sounds *Sounds) Update() {
 }
 
 func (sounds *Sounds) Draw(ctx ifs.DrawContext) {
+	ctx.Txt.Save()
 
-	prevSize := ctx.Txt.Renderer.GetSize()
-	prevClr := ctx.Txt.Renderer.GetColor()
-	ctx.Txt.Renderer.SetSize(16)
+	ctx.Txt.SetSize(16)
 	for _, sound := range sounds.sounds {
 		clr := color.NRGBA{225, 225, 225, 255}
+		oclr := color.NRGBA{0, 0, 0, 100}
 		if sound.lifetime < 10 {
 			clr.A = uint8(float64(sound.lifetime) / 10 * 255)
+			oclr.A = uint8(float64(sound.lifetime) / 10 * 100)
 		}
 
 		// FIXME: 16*2 and 16*2/2 are placeholders for cellSize * zoom and halfCellSize * zoom
@@ -90,9 +91,10 @@ func (sounds *Sounds) Draw(ctx ifs.DrawContext) {
 			y -= 16 * 2 / 2
 		}
 
-		ctx.Txt.Renderer.SetColor(clr)
-		ctx.Txt.Renderer.Draw(ctx.Screen, sound.message, x, y)
+		ctx.Txt.SetColor(clr)
+		ctx.Txt.SetOutlineColor(oclr)
+		ctx.Txt.DrawWithOutline(ctx.Screen, sound.message, x, y)
 	}
-	ctx.Txt.Renderer.SetColor(prevClr)
-	ctx.Txt.Renderer.SetSize(prevSize)
+
+	ctx.Txt.Restore()
 }
