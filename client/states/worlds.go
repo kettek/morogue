@@ -26,6 +26,7 @@ type Worlds struct {
 	backButton      *widget.Button
 	controlsSection *widget.Container
 	//
+	password      string
 	selectedWorld id.UUID
 	worldName     string
 	//
@@ -153,6 +154,50 @@ func (state *Worlds) Begin(ctx ifs.RunContext) error {
 		)),
 	)
 
+	passwordInput := widget.NewTextInput(
+		widget.TextInputOpts.WidgetOpts(
+			widget.WidgetOpts.MinSize(200, 20),
+			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+				Position: widget.RowLayoutPositionCenter,
+				Stretch:  true,
+			}),
+			widget.WidgetOpts.CursorHovered("text"),
+		),
+		widget.TextInputOpts.Secure(true),
+		widget.TextInputOpts.Image(ctx.UI.TextInputImage),
+		widget.TextInputOpts.Face(ctx.UI.BodyCopyFace),
+		widget.TextInputOpts.Color(ctx.UI.TextInputColor),
+		widget.TextInputOpts.Padding(ctx.UI.TextInputPadding),
+		widget.TextInputOpts.CaretOpts(
+			widget.CaretOpts.Size(ctx.UI.BodyCopyFace, 2),
+		),
+		widget.TextInputOpts.Placeholder("password"),
+		widget.TextInputOpts.ChangedHandler(func(args *widget.TextInputChangedEventArgs) {
+			state.password = args.InputText
+		}),
+	)
+	state.worldsControls.AddChild(passwordInput)
+
+	joinButton := widget.NewButton(
+		widget.ButtonOpts.WidgetOpts(
+			widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+				HorizontalPosition: widget.AnchorLayoutPositionCenter,
+				VerticalPosition:   widget.AnchorLayoutPositionCenter,
+			}),
+			widget.WidgetOpts.CursorHovered("interactive"),
+		),
+		widget.ButtonOpts.Image(ctx.UI.ButtonImage),
+		widget.ButtonOpts.Text("join", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
+		widget.ButtonOpts.TextPadding(ctx.UI.ButtonPadding),
+		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
+			state.connection.Write(net.JoinWorldMessage{
+				World:    state.selectedWorld,
+				Password: state.password,
+			})
+		}),
+	)
+	state.worldsControls.AddChild(joinButton)
+
 	state.worldsSection.AddChild(state.worldsRowsHeader)
 	state.worldsSection.AddChild(state.worldsRowsContent)
 	state.worldsSection.AddChild(state.worldsControls)
@@ -278,6 +323,7 @@ func (state *Worlds) populate(ctx ifs.RunContext, worlds []game.WorldInfo) {
 			rowContainerButton := widget.NewButton(
 				widget.ButtonOpts.Image(ctx.UI.ButtonImage),
 				widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
+					state.selectedWorld = w.ID
 					//
 				}),
 				widget.ButtonOpts.WidgetOpts(
