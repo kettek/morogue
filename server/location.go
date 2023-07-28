@@ -144,12 +144,16 @@ func (l *location) process() (events []game.Event) {
 							y += c.Y
 							if err == ErrMovementBlocked {
 								events = append(events, game.EventSound{
+									FromX:   c.X,
+									FromY:   c.Y,
 									X:       x,
 									Y:       y,
 									Message: "*bump*",
 								})
 							} else if err == game.ErrOutOfBoundCell {
 								events = append(events, game.EventSound{
+									FromX:   c.X,
+									FromY:   c.Y,
 									X:       x,
 									Y:       y,
 									Message: "*pmub*",

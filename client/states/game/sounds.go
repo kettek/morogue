@@ -23,14 +23,15 @@ func (sounds *Sounds) SetOffset(x, y int) {
 type sound struct {
 	offsetX, offsetY int
 	x, y             int
+	fromX, fromY     int
 	lifetime         int
 	message          string
 }
 
-func (sounds *Sounds) Add(x, y int, message string) {
+func (sounds *Sounds) Add(message string, x, y int, fromX, fromY int) {
 	// Replace sounds at same position. TODO: Maybe vertical stack sounds in same position?
 	for _, s := range sounds.sounds {
-		if s.x == x && s.y == y {
+		if s.x == x && s.y == y && s.fromX == fromX && s.fromY == fromY {
 			s.message = message
 			s.lifetime = 10 * len(message)
 			return
@@ -40,6 +41,8 @@ func (sounds *Sounds) Add(x, y int, message string) {
 	sounds.sounds = append(sounds.sounds, &sound{
 		x:        x,
 		y:        y,
+		fromX:    fromX,
+		fromY:    fromY,
 		lifetime: 10 * len(message),
 		message:  message,
 	})
@@ -70,8 +73,23 @@ func (sounds *Sounds) Draw(ctx ifs.DrawContext) {
 		if sound.lifetime < 10 {
 			clr.A = uint8(float64(sound.lifetime) / 10 * 255)
 		}
+
+		// FIXME: 16*2 and 16*2/2 are placeholders for cellSize * zoom and halfCellSize * zoom
 		x := sound.x*16*2 + sounds.offsetX + (16 * 2 / 2)
-		y := sound.y*16*2 + sounds.offsetY // + (16 * 2 / 2)
+		y := sound.y*16*2 + sounds.offsetY + (16 * 2 / 2)
+
+		// Adjust the sound in the direction of where it came from, if available.
+		if sound.fromX > sound.x {
+			x += 16 * 2 / 2
+		} else if sound.fromX < sound.x {
+			x -= 16 * 2 / 2
+		}
+		if sound.fromY > sound.y {
+			y += 16 * 2 / 2
+		} else if sound.fromY < sound.y {
+			y -= 16 * 2 / 2
+		}
+
 		ctx.Txt.Renderer.SetColor(clr)
 		ctx.Txt.Renderer.Draw(ctx.Screen, sound.message, x, y)
 	}

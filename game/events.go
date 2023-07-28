@@ -56,6 +56,8 @@ type EventSound struct {
 	WID     id.WID `json:"wid,omitempty"`
 	X       int    `json:"x,omitempty"`
 	Y       int    `json:"y,omitempty"`
+	FromX   int    `json:"fx,omitempty"`
+	FromY   int    `json:"fy,omitempty"`
 	Message string `json:"m,omitempty"`
 }
 
