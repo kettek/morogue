@@ -1,6 +1,8 @@
 package game
 
 import (
+	"errors"
+
 	"github.com/kettek/morogue/gen"
 	"github.com/kettek/morogue/id"
 )
@@ -43,6 +45,13 @@ func NewCells(w, h int) (cells [][]Cell) {
 	return
 }
 
+func (c Cells) At(x, y int) (Cell, error) {
+	if x < 0 || y < 0 || x >= len(c) || y >= len(c[0]) {
+		return Cell{}, ErrOutOfBoundCell
+	}
+	return c[x][y], nil
+}
+
 // TODO: Replace MovementType with bitflag
 type MovementType uint8
 
@@ -53,4 +62,8 @@ const (
 	MovementSwim
 	MovementHover
 	MovementFly
+)
+
+var (
+	ErrOutOfBoundCell = errors.New("oob cell")
 )
