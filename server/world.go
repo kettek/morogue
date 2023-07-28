@@ -132,7 +132,6 @@ func (w *world) update() error {
 					}
 				}
 			}
-			// TODO: Save character!!!
 		}
 	}
 	for j := i; j < len(w.clients); j++ {
@@ -186,6 +185,10 @@ func (w *world) updateClient(cl *client) error {
 		}
 		// TODO: If the location the client is traveling to is not done, send progress reports to client.
 	case err := <-cl.closedChan:
+		// Remove from location
+		if cl.currentLocation != nil && cl.currentCharacter != nil {
+			cl.currentLocation.removeCharacter(cl.currentCharacter.WID)
+		}
 		w.clientRemoveChan <- cl
 		fmt.Println("client yeeted from world context", err)
 		return err

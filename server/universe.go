@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/kettek/morogue/game"
@@ -61,6 +62,9 @@ func (u *universe) Run() chan struct{} {
 				u.checkClients()
 			case cl := <-u.clientRemoveChan:
 				u.removeAccountLoggedIn(cl.account.username)
+				if err := u.accounts.SaveAccount(cl.account); err != nil {
+					log.Println(err)
+				}
 			case cl := <-u.clientAddFromWorldChan:
 				cl.state = clientStateLoggedIn
 				u.clients = append(u.clients, cl)
@@ -184,6 +188,9 @@ func (u *universe) updateClient(cl *client) error {
 				}
 			case net.LogoutMessage:
 				u.removeAccountLoggedIn(cl.account.username)
+				if err := u.accounts.SaveAccount(cl.account); err != nil {
+					log.Println(err)
+				}
 				cl.account = Account{}
 				cl.state = clientStateWaiting
 			case net.CreateCharacterMessage:
@@ -381,6 +388,9 @@ func (u *universe) updateClient(cl *client) error {
 		case err := <-cl.closedChan:
 			if cl.account.username != "" {
 				u.removeAccountLoggedIn(cl.account.username)
+				if err := u.accounts.SaveAccount(cl.account); err != nil {
+					log.Println(err)
+				}
 			}
 			fmt.Println("client yeeted", err)
 			return err
