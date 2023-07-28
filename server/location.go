@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"time"
 
 	"github.com/kettek/morogue/game"
 	"github.com/kettek/morogue/gen"
@@ -13,7 +14,9 @@ import (
 
 type location struct {
 	game.Location
-	active bool
+	active     bool
+	removable  bool // destroyable is used to allow a location to be removed.
+	emptySince time.Time
 }
 
 func (l *location) addCharacter(character *game.Character) error {
@@ -34,6 +37,9 @@ func (l *location) addCharacter(character *game.Character) error {
 	character.X = spawnCell.X
 	character.Y = spawnCell.Y
 	l.Characters = append(l.Characters, character)
+
+	l.active = true
+
 	return nil
 }
 
@@ -50,6 +56,12 @@ func (l *location) removeCharacter(wid id.WID) error {
 	for i, char := range l.Characters {
 		if char.WID == wid {
 			l.Characters = append(l.Characters[:i], l.Characters[i+1:]...)
+
+			if len(l.Characters) == 0 {
+				l.active = false
+				l.emptySince = time.Now()
+			}
+
 			return nil
 		}
 	}

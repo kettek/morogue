@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -179,7 +180,9 @@ func (w *world) update() error {
 			w.locations[i] = l
 			i++
 		} else {
-			fmt.Println(err)
+			if err != errRemoveLocationFromWorld {
+				fmt.Println(err)
+			}
 		}
 	}
 	for j := i; j < len(w.locations); j++ {
@@ -239,6 +242,9 @@ func (w *world) clientsInLocation(l *location) []*client {
 func (w *world) processLocation(l *location) error {
 	// TODO: Probably add remove/clear timer for particular location types?
 	if !l.active {
+		if l.removable && time.Since(l.emptySince) > 5*time.Minute {
+			return errRemoveLocationFromWorld
+		}
 		return nil
 	}
 
@@ -267,3 +273,7 @@ func (w *world) processLocation(l *location) error {
 
 	return nil
 }
+
+var (
+	errRemoveLocationFromWorld = errors.New("this is also not an error lol")
+)
