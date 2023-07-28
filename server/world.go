@@ -59,10 +59,12 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 	}
 	start := &location{}
 	start.ID = id.UUID(lid)
+	start.active = true
 	err = start.generate()
 	if err != nil {
 		fmt.Println("OH NO", err)
 	}
+	w.locations = append(w.locations, start)
 
 	w.live = true
 	for w.live {
@@ -197,5 +199,35 @@ func (w *world) processLocation(l *location) error {
 	if !l.active {
 		return nil
 	}
-	return l.process()
+
+	var locationClients []*client
+	for _, cl := range w.clients {
+		if l.Character(cl.currentCharacter.WID) != nil {
+			locationClients = append(locationClients, cl)
+			break
+		}
+	}
+
+	var eventsMessage net.EventsMessage
+	events := l.process()
+	for _, event := range events {
+		switch event.(type) {
+		case game.EventPosition:
+			if evt, err := game.WrapEvent(event); err == nil {
+				eventsMessage.Events = append(eventsMessage.Events, evt)
+			}
+		case game.EventSound:
+			if evt, err := game.WrapEvent(event); err == nil {
+				eventsMessage.Events = append(eventsMessage.Events, evt)
+			}
+		}
+	}
+
+	if len(eventsMessage.Events) > 0 {
+		for _, cl := range locationClients {
+			cl.conn.Write(eventsMessage)
+		}
+	}
+
+	return nil
 }

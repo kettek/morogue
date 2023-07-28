@@ -56,14 +56,23 @@ func (l *location) removeCharacter(wid id.WID) error {
 	return ErrCharacterNotInLocation
 }
 
-func (l *location) moveCharacter(wid id.WID, dir net.MoveDirection) error {
+func (l *location) moveCharacter(wid id.WID, dir game.MoveDirection) error {
 	ch := l.Character(wid)
 	if ch == nil {
 		return ErrCharacterNotInLocation
 	}
 	x, y := dir.Position()
-	ch.X += x
-	ch.Y += y
+	x += ch.X
+	y += ch.Y
+
+	if cell, err := l.Cells.At(x, y); err != nil {
+		return err
+	} else if cell.Blocks == game.MovementAll {
+		return ErrMovementBlocked
+	}
+
+	ch.X = x
+	ch.Y = y
 	return nil
 }
 
@@ -114,9 +123,45 @@ func (l *location) filterCells(cb func(c game.Cell) bool) (cells []cellLocation)
 	return
 }
 
-func (l *location) process() error {
+func (l *location) process() (events []game.Event) {
 	for _, c := range l.Characters {
-		fmt.Println("TODO: Handle character", c)
+		if c.Desire != nil {
+			switch d := c.Desire.(type) {
+			case game.DesireMove:
+				if err := l.moveCharacter(c.WID, d.Direction); err == nil {
+					events = append(events, game.EventPosition{
+						WID: c.WID,
+						X:   c.X,
+						Y:   c.Y,
+					})
+				} else {
+					// Make bump sounds if the character is moving in the same direction as their last desire.
+					if last, ok := c.LastDesire.(game.DesireMove); ok {
+						if last.Direction == d.Direction {
+							// Make the sfx come from the cell bumped into.
+							x, y := d.Direction.Position()
+							x += c.X
+							y += c.Y
+							if err == ErrMovementBlocked {
+								events = append(events, game.EventSound{
+									X:       x,
+									Y:       y,
+									Message: "*bump*",
+								})
+							} else if err == game.ErrOutOfBoundCell {
+								events = append(events, game.EventSound{
+									X:       x,
+									Y:       y,
+									Message: "*pmub*",
+								})
+							}
+						}
+					}
+				}
+			}
+			c.LastDesire = c.Desire
+			c.Desire = nil
+		}
 	}
 	for _, m := range l.Mobs {
 		fmt.Println("TODO: Handle mob", m)
@@ -124,29 +169,19 @@ func (l *location) process() error {
 	for _, o := range l.Objects {
 		fmt.Println("TODO: Handle object", o)
 	}
-	return nil
+	return events
 }
 
 // TODO: Allow returning world-munging requests.
 func (l *location) handleClientMessage(cl *client, msg net.Message) error {
 	switch m := msg.(type) {
-	case net.MoveMessage:
+	case net.DesireMessage:
 		if ch := l.Character(cl.currentCharacter.WID); ch != nil {
-			if err := l.moveCharacter(cl.currentCharacter.WID, m.Direction); err == nil {
-				cl.conn.Write(net.PositionMessage{
-					WID: cl.currentCharacter.WID,
-					X:   cl.currentCharacter.X,
-					Y:   cl.currentCharacter.Y,
-				})
-			} else {
-				cl.conn.Write(net.MoveMessage{
-					ResultCode: 500,
-					WID:        m.WID,
-				})
-			}
+			ch.Desire = m.Desire.Desire()
 		} else {
-			cl.conn.Write(net.MoveMessage{
+			cl.conn.Write(net.DesireMessage{
 				ResultCode: 404,
+				Result:     ErrCharacterNotInLocation.Error(),
 				WID:        m.WID,
 			})
 		}
@@ -163,4 +198,8 @@ var (
 	ErrCharacterNotInLocation         = errors.New("character is not in location")
 	ErrCharacterAlreadyInLocation     = errors.New("character is already in location")
 	ErrCharacterCannotPlaceInLocation = errors.New("character cannot be placed in location")
+)
+
+var (
+	ErrMovementBlocked = errors.New("movement blocked")
 )

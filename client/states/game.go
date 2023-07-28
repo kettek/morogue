@@ -1,6 +1,7 @@
 package states
 
 import (
+	"encoding/json"
 	"fmt"
 	"image/color"
 
@@ -31,6 +32,7 @@ type Game struct {
 	scroller clgame.Scroller
 	grid     clgame.Grid
 	mover    clgame.Mover
+	sounds   clgame.Sounds
 }
 
 // NewGame creates a new Game instance.
@@ -55,6 +57,7 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 	state.scroller.Init()
 	state.scroller.SetHandler(func(x, y int) {
 		state.grid.SetOffset(x, y)
+		state.sounds.SetOffset(x, y)
 	})
 	state.grid.SetCellSize(16*2, 16*2)
 	state.grid.SetColor(color.NRGBA{255, 255, 255, 15})
@@ -147,15 +150,14 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 					}
 				}
 			}
-		case net.PositionMessage:
-			if ch := state.location.Character(m.WID); ch != nil {
-				ch.X = m.X
-				ch.Y = m.Y
+		case net.EventsMessage:
+			for _, evt := range m.Events {
+				state.handleEvent(evt.Event())
 			}
 		case net.OwnerMessage:
 			state.characterWID = m.WID
 		default:
-			fmt.Println("TODO: Handle", m)
+			fmt.Println("TODO: Handle", m.Type())
 		}
 	default:
 	}
@@ -165,13 +167,49 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 
 	state.scroller.Update(ctx)
 
-	if dir := state.mover.Update(state.binds); dir != 0 {
-		state.connection.Write(net.MoveMessage{
-			WID:       state.characterWID,
-			Direction: dir,
-		})
+	state.sounds.Update()
+
+	if state.location != nil {
+		if character := state.location.Character(state.characterWID); character != nil {
+			if dir := state.mover.Update(state.binds); dir != 0 {
+				state.sendDesire(state.characterWID, game.DesireMove{
+					Direction: dir,
+				})
+			}
+		}
 	}
 
+	return nil
+}
+
+func (state *Game) handleEvent(e game.Event) {
+	if state.location == nil {
+		return
+	}
+	switch evt := e.(type) {
+	case game.EventPosition:
+		if c := state.location.Character(evt.WID); c != nil {
+			c.X = evt.X
+			c.Y = evt.Y
+		}
+	case game.EventSound:
+		state.sounds.Add(evt.X, evt.Y, evt.Message)
+	}
+}
+
+func (state *Game) sendDesire(wid id.WID, d game.Desire) error {
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+
+	state.connection.Write(net.DesireMessage{
+		WID: wid,
+		Desire: game.DesireWrapper{
+			Type: d.Type(),
+			Data: b,
+		},
+	})
 	return nil
 }
 
@@ -215,6 +253,8 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 				ctx.Screen.DrawImage(img, &opts)
 			}
 		}
+
+		state.sounds.Draw(ctx)
 	}
 
 	state.ui.Draw(ctx.Screen)

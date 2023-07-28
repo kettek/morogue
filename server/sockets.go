@@ -71,7 +71,6 @@ func (s *socketServer) handleSockit(w http.ResponseWriter, r *http.Request) {
 			} else if m := w.Message(); m != nil {
 				client.msgChan <- m
 				s.checkChan <- struct{}{}
-				conn.Write(&net.PingMessage{})
 			}
 		}
 

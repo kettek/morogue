@@ -1,7 +1,7 @@
 package game
 
 import (
-	"github.com/kettek/morogue/net"
+	"github.com/kettek/morogue/game"
 )
 
 type Mover struct {
@@ -12,24 +12,24 @@ type Mover struct {
 func (mover *Mover) Init() {
 }
 
-func (mover *Mover) Update(binds Binds) net.MoveDirection {
-	var d net.MoveDirection
+func (mover *Mover) Update(binds Binds) game.MoveDirection {
+	var d game.MoveDirection
 	if binds.IsActionHeld("move-upleft") == 0 {
-		d = net.UpLeftMoveDirection
+		d = game.UpLeftMoveDirection
 	} else if binds.IsActionHeld("move-upright") == 0 {
-		d = net.UpRightMoveDirection
+		d = game.UpRightMoveDirection
 	} else if binds.IsActionHeld("move-downleft") == 0 {
-		d = net.DownLeftMoveDirection
+		d = game.DownLeftMoveDirection
 	} else if binds.IsActionHeld("move-downright") == 0 {
-		d = net.DownRightMoveDirection
+		d = game.DownRightMoveDirection
 	} else if binds.IsActionHeld("move-left") == 0 {
-		d = net.LeftMoveDirection
+		d = game.LeftMoveDirection
 	} else if binds.IsActionHeld("move-right") == 0 {
-		d = net.RightMoveDirection
+		d = game.RightMoveDirection
 	} else if binds.IsActionHeld("move-down") == 0 {
-		d = net.DownMoveDirection
+		d = game.DownMoveDirection
 	} else if binds.IsActionHeld("move-up") == 0 {
-		d = net.UpMoveDirection
+		d = game.UpMoveDirection
 	}
 
 	return d
