@@ -64,8 +64,10 @@ func (sounds *Sounds) Update() {
 }
 
 func (sounds *Sounds) Draw(ctx ifs.DrawContext) {
-	ctx.Txt.Save()
+	cw := int(float64(ctx.Game.CellWidth) * ctx.Game.Zoom)
+	ch := int(float64(ctx.Game.CellHeight) * ctx.Game.Zoom)
 
+	ctx.Txt.Save()
 	ctx.Txt.SetSize(16)
 	for _, sound := range sounds.sounds {
 		clr := color.NRGBA{225, 225, 225, 255}
@@ -75,20 +77,19 @@ func (sounds *Sounds) Draw(ctx ifs.DrawContext) {
 			oclr.A = uint8(float64(sound.lifetime) / 10 * 100)
 		}
 
-		// FIXME: 16*2 and 16*2/2 are placeholders for cellSize * zoom and halfCellSize * zoom
-		x := sound.x*16*2 + sounds.offsetX + (16 * 2 / 2)
-		y := sound.y*16*2 + sounds.offsetY + (16 * 2 / 2)
+		x := sound.x*cw + sounds.offsetX + (cw / 2)
+		y := sound.y*ch + sounds.offsetY + (ch / 2)
 
 		// Adjust the sound in the direction of where it came from, if available.
 		if sound.fromX > sound.x {
-			x += 16 * 2 / 2
+			x += cw / 2
 		} else if sound.fromX < sound.x {
-			x -= 16 * 2 / 2
+			x -= cw / 2
 		}
 		if sound.fromY > sound.y {
-			y += 16 * 2 / 2
+			y += ch / 2
 		} else if sound.fromY < sound.y {
-			y -= 16 * 2 / 2
+			y -= ch / 2
 		}
 
 		ctx.Txt.SetColor(clr)

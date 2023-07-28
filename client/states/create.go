@@ -91,32 +91,32 @@ func NewCreate(connection net.Connection, msgCh chan net.Message) *Create {
 
 func (state *Create) Begin(ctx ifs.RunContext) error {
 	// Load attributes images.
-	if img, err := state.data.loadImage("images/swole.png", 2); err != nil {
+	if img, err := state.data.loadImage("images/swole.png", ctx.Game.Zoom); err != nil {
 		return err
 	} else {
 		state.swoleImage = img
 	}
-	if img, err := state.data.loadImage("images/zooms.png", 2); err != nil {
+	if img, err := state.data.loadImage("images/zooms.png", ctx.Game.Zoom); err != nil {
 		return err
 	} else {
 		state.zoomsImage = img
 	}
-	if img, err := state.data.loadImage("images/brains.png", 2); err != nil {
+	if img, err := state.data.loadImage("images/brains.png", ctx.Game.Zoom); err != nil {
 		return err
 	} else {
 		state.brainsImage = img
 	}
-	if img, err := state.data.loadImage("images/funk.png", 2); err != nil {
+	if img, err := state.data.loadImage("images/funk.png", ctx.Game.Zoom); err != nil {
 		return err
 	} else {
 		state.funkImage = img
 	}
-	if img, err := state.data.loadImage("images/traits.png", 2); err != nil {
+	if img, err := state.data.loadImage("images/traits.png", ctx.Game.Zoom); err != nil {
 		return err
 	} else {
 		state.traitsImage = img
 	}
-	if img, err := state.data.loadImage("images/archetype.png", 2); err != nil {
+	if img, err := state.data.loadImage("images/archetype.png", ctx.Game.Zoom); err != nil {
 		return err
 	} else {
 		state.archetypeImage = img
@@ -490,7 +490,7 @@ func (state *Create) populateCharacters(ctx ifs.RunContext, characters []*game.C
 	)
 }
 
-func (state *Create) acquireArchetypes(archetypes []game.Archetype) {
+func (state *Create) acquireArchetypes(ctx ifs.RunContext, archetypes []game.Archetype) {
 	for _, arch := range archetypes {
 		if state.haveArchetype(arch) {
 			continue
@@ -503,7 +503,7 @@ func (state *Create) acquireArchetypes(archetypes []game.Archetype) {
 			state.archetypes = append(state.archetypes, arche)
 		}()
 
-		img, err := state.data.loadImage("archetypes/"+arch.Image, 2.0)
+		img, err := state.data.loadImage("archetypes/"+arch.Image, ctx.Game.Zoom)
 		if err != nil {
 			// TODO: Show error image
 			continue
@@ -869,7 +869,7 @@ func (state *Create) Update(ctx ifs.RunContext) error {
 			for _, a := range m.Archetypes {
 				state.data.archetypes[a.ID] = a
 			}
-			state.acquireArchetypes(m.Archetypes)
+			state.acquireArchetypes(ctx, m.Archetypes)
 			state.refreshArchetypes(ctx)
 			state.syncUI()
 		case net.CharactersMessage:

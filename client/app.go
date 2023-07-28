@@ -46,6 +46,13 @@ func newApp() *app {
 	a.runContext.UI = a.drawContext.UI
 	a.drawContext.UI.Init(a.drawContext.Txt)
 
+	a.drawContext.Game = &ifs.GameContext{}
+	a.runContext.Game = a.drawContext.Game
+
+	a.drawContext.Game.Zoom = 2.0
+	a.drawContext.Game.CellWidth = 16
+	a.drawContext.Game.CellHeight = 16
+
 	a.connectState.Begin(a.runContext)
 
 	return a

@@ -59,13 +59,15 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 		state.grid.SetOffset(x, y)
 		state.sounds.SetOffset(x, y)
 	})
-	state.grid.SetCellSize(16*2, 16*2)
 	state.grid.SetColor(color.NRGBA{255, 255, 255, 15})
 
 	return state
 }
 
 func (state *Game) Begin(ctx ifs.RunContext) error {
+	cw := int(float64(ctx.Game.CellWidth) * ctx.Game.Zoom)
+	ch := int(float64(ctx.Game.CellHeight) * ctx.Game.Zoom)
+	state.grid.SetCellSize(cw, ch)
 	return nil
 }
 
@@ -123,8 +125,8 @@ func (state *Game) syncUIToLocation(ctx ifs.RunContext) {
 	if state.location == nil {
 		return
 	}
-	w := len(state.location.Cells) * 16 * 2
-	h := len(state.location.Cells[0]) * 16 * 2
+	w := int(float64(len(state.location.Cells)*ctx.Game.CellWidth) * ctx.Game.Zoom)
+	h := int(float64(len(state.location.Cells[0])*ctx.Game.CellHeight) * ctx.Game.Zoom)
 	state.scroller.SetLimit(w, h)
 	state.scroller.CenterTo(ctx.UI.Width/2-w/2, ctx.UI.Height/2-h/2)
 	state.grid.SetSize(w, h)
@@ -144,7 +146,7 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 				state.data.tiles[m.Tile.ID] = m.Tile
 				if _, ok := state.data.tileImages[m.Tile.ID]; !ok {
 					src := "tiles/" + m.Tile.Image
-					if img, err := state.data.loadImage(src, 2.0); err == nil {
+					if img, err := state.data.loadImage(src, ctx.Game.Zoom); err == nil {
 						state.data.tileImages[m.Tile.ID] = img
 					}
 				}
@@ -235,16 +237,19 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 	if state.location != nil {
 		state.grid.Draw(ctx)
 
+		cw := int(float64(ctx.Game.CellWidth) * ctx.Game.Zoom)
+		ch := int(float64(ctx.Game.CellHeight) * ctx.Game.Zoom)
+
 		// TODO: Replace map access and cells with a client-centric cell wrapper that contains the ebiten.image ptr directly for efficiency.
 		for x, col := range state.location.Cells {
 			for y, cell := range col {
 				if cell.TileID == nil {
 					continue
 				}
-				px := x * 16 * 2
-				py := y * 16 * 2
+				px := x * cw
+				py := y * ch
 
-				if px+sx > ctx.UI.Width || py+sy > ctx.UI.Height || px+sx+16*2 < 0 || py+sy+16*2 < 0 {
+				if px+sx > ctx.UI.Width || py+sy > ctx.UI.Height || px+sx+cw < 0 || py+sy+ch < 0 {
 					continue
 				}
 
@@ -257,10 +262,10 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 			}
 		}
 		// Draw characters
-		for _, ch := range state.location.Characters {
-			if img := state.data.archetypeImages[ch.Archetype]; img != nil {
-				px := ch.X * 16 * 2
-				py := ch.Y * 16 * 2
+		for _, char := range state.location.Characters {
+			if img := state.data.archetypeImages[char.Archetype]; img != nil {
+				px := char.X * cw
+				py := char.Y * ch
 				opts := ebiten.DrawImageOptions{}
 				opts.GeoM.Concat(scrollOpts)
 				opts.GeoM.Translate(float64(px), float64(py))

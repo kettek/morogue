@@ -14,6 +14,7 @@ type DrawContext struct {
 	Txt    *TextRenderer
 	Screen *ebiten.Image
 	UI     *DrawContextUI
+	Game   *GameContext
 }
 
 type DrawContextUI struct {
