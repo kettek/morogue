@@ -5,12 +5,14 @@ import "github.com/kettek/morogue/id"
 // Character represents a playable character.
 type Character struct {
 	Position
-	WID       id.WID // ID assigned when entering da world.
-	Archetype id.UUID
-	Name      string
-	Level     int
-	Skills    map[string]float64
-	Inventory []Item
+	Desire     Desire // The current desire of the character. Used server-side.
+	LastDesire Desire // Last desire processed. Used server-side.
+	WID        id.WID // ID assigned when entering da world.
+	Archetype  id.UUID
+	Name       string
+	Level      int
+	Skills     map[string]float64
+	Inventory  []Item
 }
 
 // Item represents an item in the world
