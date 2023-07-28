@@ -41,7 +41,14 @@ func (w *EventWrapper) Event() Event {
 		var d EventSound
 		json.Unmarshal(w.Data, &d)
 		return d
-
+	case (EventRemove{}).Type():
+		var d EventRemove
+		json.Unmarshal(w.Data, &d)
+		return d
+	case (EventAdd{}).Type():
+		var d EventAdd
+		json.Unmarshal(w.Data, &d)
+		return d
 	}
 	return nil
 }
@@ -68,4 +75,20 @@ type EventSound struct {
 
 func (e EventSound) Type() string {
 	return "sound"
+}
+
+type EventRemove struct {
+	WID id.WID `json:"wid,omitempty"`
+}
+
+func (e EventRemove) Type() string {
+	return "remove"
+}
+
+type EventAdd struct {
+	Character Character `json:"c,omitempty"`
+}
+
+func (e EventAdd) Type() string {
+	return "add"
 }

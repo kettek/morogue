@@ -97,7 +97,6 @@ func (state *Game) setLocationFromMessage(m net.LocationMessage) {
 			if cell.TileID != nil {
 				if _, ok := requestedTiles[*cell.TileID]; !ok {
 					if _, ok := state.data.tiles[*cell.TileID]; !ok {
-						fmt.Println("requesting", *cell.TileID)
 						state.connection.Write(net.TileMessage{
 							ID: *cell.TileID,
 						})
@@ -154,6 +153,8 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 			for _, evt := range m.Events {
 				state.handleEvent(evt.Event())
 			}
+		case net.EventMessage:
+			state.handleEvent(m.Event.Event())
 		case net.OwnerMessage:
 			state.characterWID = m.WID
 		default:
@@ -187,6 +188,19 @@ func (state *Game) handleEvent(e game.Event) {
 		return
 	}
 	switch evt := e.(type) {
+	case game.EventAdd:
+		if ch := state.location.Character(evt.Character.WID); ch == nil {
+			state.location.Characters = append(state.location.Characters, &evt.Character)
+		} else {
+			*ch = evt.Character
+		}
+	case game.EventRemove:
+		for i, c := range state.location.Characters {
+			if c.WID == evt.WID {
+				state.location.Characters = append(state.location.Characters[:i], state.location.Characters[i+1:]...)
+				break
+			}
+		}
 	case game.EventPosition:
 		if c := state.location.Character(evt.WID); c != nil {
 			c.X = evt.X

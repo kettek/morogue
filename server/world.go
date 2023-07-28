@@ -50,7 +50,7 @@ func (w *world) generateLocation( /*locationInfo*/ ) {
 func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *client) {
 	w.clientRemoveChan = clientRemoveChan
 	w.addToUniverseChan = addToUniverseChan
-	ticker := time.NewTicker(100 * time.Millisecond)
+	ticker := time.NewTicker(50 * time.Millisecond)
 
 	// TODO: Ensure a starting location is being created.
 	lid, err := uuid.NewV4()
@@ -77,8 +77,6 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 			}
 			return
 		case cl := <-w.clientChan:
-			w.clients = append(w.clients, cl)
-
 			var char *game.Character
 			for _, ch := range cl.account.Characters {
 				if ch.Name == cl.character {
@@ -86,9 +84,18 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 					break
 				}
 			}
+			// Boot back to universe if char is nil... TODO: Add error message.
+			if char == nil {
+				w.addToUniverseChan <- cl
+				return
+			}
+
+			// Add client as character to world. Boot back to universe if placement failed. TODO: Add error message.
+			if err := start.addCharacter(char); err != nil {
+				w.addToUniverseChan <- cl
+				return
+			}
 			char.WID = w.wids.Next()
-			// Add client as character to world.
-			start.addCharacter(char)
 			cl.currentLocation = start
 			cl.currentCharacter = char
 
@@ -106,6 +113,19 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 				WID: char.WID,
 			})
 
+			// Send create to clients in location.
+			if evt, err := game.WrapEvent(game.EventAdd{
+				Character: *cl.currentCharacter,
+			}); err == nil {
+				cls := w.clientsInLocation(start)
+				for _, cl := range cls {
+					cl.conn.Write(net.EventMessage{
+						Event: evt,
+					})
+				}
+			}
+			// Now add the client to the list.
+			w.clients = append(w.clients, cl)
 		default:
 		}
 		// Select for timer delay.
@@ -122,12 +142,25 @@ func (w *world) update() error {
 			w.clients[i] = cl
 			i++
 		} else {
-			// TODO: Remove character from the client character's current location.
 			fmt.Println(err)
 			// This shouldn't ever be nil, but let's be safe.
 			if cl.currentCharacter != nil {
 				for _, l := range w.locations {
 					if err := l.removeCharacter(cl.currentCharacter.WID); err == nil {
+						// Send remove to clients in location, excluding the removed client.
+						if evt, err := game.WrapEvent(game.EventRemove{
+							WID: cl.currentCharacter.WID,
+						}); err == nil {
+							cls := w.clientsInLocation(l)
+							for _, cl2 := range cls {
+								if cl == cl2 {
+									continue
+								}
+								cl2.conn.Write(net.EventMessage{
+									Event: evt,
+								})
+							}
+						}
 						break
 					}
 				}
@@ -185,10 +218,6 @@ func (w *world) updateClient(cl *client) error {
 		}
 		// TODO: If the location the client is traveling to is not done, send progress reports to client.
 	case err := <-cl.closedChan:
-		// Remove from location
-		if cl.currentLocation != nil && cl.currentCharacter != nil {
-			cl.currentLocation.removeCharacter(cl.currentCharacter.WID)
-		}
 		w.clientRemoveChan <- cl
 		fmt.Println("client yeeted from world context", err)
 		return err
@@ -197,19 +226,23 @@ func (w *world) updateClient(cl *client) error {
 	return nil
 }
 
+func (w *world) clientsInLocation(l *location) []*client {
+	var locationClients []*client
+	for _, cl := range w.clients {
+		if l.Character(cl.currentCharacter.WID) != nil {
+			locationClients = append(locationClients, cl)
+		}
+	}
+	return locationClients
+}
+
 func (w *world) processLocation(l *location) error {
 	// TODO: Probably add remove/clear timer for particular location types?
 	if !l.active {
 		return nil
 	}
 
-	var locationClients []*client
-	for _, cl := range w.clients {
-		if l.Character(cl.currentCharacter.WID) != nil {
-			locationClients = append(locationClients, cl)
-			break
-		}
-	}
+	locationClients := w.clientsInLocation(l)
 
 	var eventsMessage net.EventsMessage
 	events := l.process()
