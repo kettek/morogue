@@ -89,6 +89,13 @@ func (a *accounts) NewAccount(username string, password string) error {
 
 // SaveAccount saves the given Account. This must be an account acquired from GetAccount.
 func (a *accounts) SaveAccount(account Account) error {
+	// remove unneeded stuff from account
+	// FIXME: Move this to universe
+	for _, ch := range account.Characters {
+		ch.Desire = nil
+		ch.LastDesire = nil
+	}
+
 	err := a.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("accounts"))
 
