@@ -29,7 +29,7 @@ func (o *Objects) RemoveByWID(wid id.WID) Object {
 
 // MarshalJSON returns bytes as an ObjectsWrapper.
 func (o Objects) MarshalJSON() ([]byte, error) {
-	var ow ObjectsWrapper
+	var ow []ObjectWrapper
 
 	for _, obj := range o {
 		objBytes, err := json.Marshal(obj)
@@ -47,7 +47,7 @@ func (o Objects) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals the given bytes as an ObjectsWrapper and
 // appends objects into the slice.
 func (o *Objects) UnmarshalJSON(b []byte) error {
-	var osw ObjectsWrapper
+	var osw []ObjectWrapper
 	if err := json.Unmarshal(b, &osw); err != nil {
 		return err
 	}

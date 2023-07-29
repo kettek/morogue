@@ -43,6 +43,3 @@ func (ow ObjectWrapper) Object() (Object, error) {
 	}
 	return nil, errors.New("unknown object type: " + string(ow.Type))
 }
-
-// ObjectsWrapper is a slice of ObjectWrappers.
-type ObjectsWrapper []ObjectWrapper
