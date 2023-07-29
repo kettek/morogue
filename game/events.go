@@ -59,6 +59,7 @@ type EventPosition struct {
 	X, Y int
 }
 
+// Type returns "position"
 func (e EventPosition) Type() string {
 	return "position"
 }
@@ -73,25 +74,42 @@ type EventSound struct {
 	Message string `json:"m,omitempty"`
 }
 
+// Type returns "sound"
 func (e EventSound) Type() string {
 	return "sound"
 }
 
+// EventRemove removes an object with the given WID from the current location.
 type EventRemove struct {
 	WID id.WID `json:"wid,omitempty"`
 }
 
+// Type returns "remove"
 func (e EventRemove) Type() string {
 	return "remove"
 }
 
+// EventAdd adds the provided object.
 type EventAdd struct {
 	Object Object `json:"o,omitempty"`
 }
+
+// Type returns "add"
+func (e EventAdd) Type() string {
+	return "add"
+}
+
+// eventAdd is used internally as the real structure for JSON marshal/unmarshal.
+// This is done so as to have the resulting json from EventAdd contain proper
+// fields rather than a direct ObjectWrapper object. That is to say:
+// event: {o: {t: "type", d: ...}} rather than {t: "type", d: ...}
+// This is so if eventAdd ever needs more fields we can add them and also have
+// the expected event->fields structure remain constant amonst all events.
 type eventAdd struct {
 	Object ObjectWrapper `json:"o,omitempty"`
 }
 
+// MarshalJSON marshals EventAdd into eventAdd.
 func (e EventAdd) MarshalJSON() ([]byte, error) {
 	b, err := json.Marshal(e.Object)
 	if err != nil {
@@ -108,6 +126,7 @@ func (e EventAdd) MarshalJSON() ([]byte, error) {
 	return json.Marshal(e2)
 }
 
+// UnmarshalJSON unmarshals EventAdd from eventAdd.
 func (e *EventAdd) UnmarshalJSON(b []byte) error {
 	var e2 eventAdd
 
@@ -121,8 +140,4 @@ func (e *EventAdd) UnmarshalJSON(b []byte) error {
 	e.Object = o
 
 	return nil
-}
-
-func (e EventAdd) Type() string {
-	return "add"
 }
