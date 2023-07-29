@@ -226,13 +226,11 @@ func (m JoinWorldMessage) Type() string {
 }
 
 type LocationMessage struct {
-	Result     string            `json:"r,omitempty"`
-	ResultCode int               `json:"c,omitempty"`
-	ID         id.UUID           `json:"id,omitempty"`
-	Mobs       []game.Mob        `json:"m,omitempty"`
-	Objects    []game.Object     `json:"o,omitempty"`
-	Characters []*game.Character `json:"ch,omitempty"`
-	Cells      game.Cells        `json:"g,omitempty"`
+	Result     string       `json:"r,omitempty"`
+	ResultCode int          `json:"c,omitempty"`
+	ID         id.UUID      `json:"id,omitempty"`
+	Objects    game.Objects `json:"o,omitempty"`
+	Cells      game.Cells   `json:"g,omitempty"`
 }
 
 func (m LocationMessage) Type() string {

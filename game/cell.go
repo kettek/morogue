@@ -10,10 +10,10 @@ import (
 type Cell struct {
 	TileID  *id.UUID     `json:"id,omitempty"` // The Tile ID of the cell.
 	Blocks  MovementType `json:"b,omitempty"`  // Whether the cell blocks. This should be generated from the TileID and the contained Objects.
-	Objects []Object     `json:"o,omitempty"`  // Non-thinking/active objects. These will generally be weapons, armor, gold, food, etc.
+	Objects Objects      `json:"o,omitempty"`  // Non-thinking/active objects. These will generally be weapons, armor, gold, food, etc.
 	//
-	value int
-	flags gen.Flags
+	value int       `json:"-"`
+	flags gen.Flags `json:"-"`
 }
 
 func (t *Cell) Value() int {

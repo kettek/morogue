@@ -13,3 +13,13 @@ type Mob struct {
 	Brains AttributeLevel
 	Funk   AttributeLevel
 }
+
+// Type returns "mob"
+func (m Mob) Type() ObjectType {
+	return "mob"
+}
+
+// GetWID returns the WID.
+func (m *Mob) GetWID() id.WID {
+	return m.WID
+}

@@ -102,11 +102,9 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 
 			// Send starting location to client.
 			cl.conn.Write(net.LocationMessage{
-				ID:         start.ID,
-				Mobs:       start.Mobs,
-				Cells:      start.Cells,
-				Characters: start.Characters,
-				Objects:    start.Objects,
+				ID:      start.ID,
+				Cells:   start.Cells,
+				Objects: start.Objects,
 			})
 
 			// Send client their character owner message

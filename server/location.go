@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"math/rand"
 	"time"
 
@@ -20,7 +19,7 @@ type location struct {
 }
 
 func (l *location) addCharacter(character *game.Character) error {
-	if l.hasCharacter(character.WID) {
+	if l.Character(character.WID) != nil {
 		return ErrCharacterAlreadyInLocation
 	}
 
@@ -36,28 +35,19 @@ func (l *location) addCharacter(character *game.Character) error {
 	spawnCell := openCells[rand.Intn(len(openCells)-1)]
 	character.X = spawnCell.X
 	character.Y = spawnCell.Y
-	l.Characters = append(l.Characters, character)
+	l.Objects = append(l.Objects, character)
 
 	l.active = true
 
 	return nil
 }
 
-func (l *location) hasCharacter(wid id.WID) bool {
-	for _, char := range l.Characters {
-		if char.WID == wid {
-			return true
-		}
-	}
-	return false
-}
-
 func (l *location) removeCharacter(wid id.WID) error {
-	for i, char := range l.Characters {
-		if char.WID == wid {
-			l.Characters = append(l.Characters[:i], l.Characters[i+1:]...)
+	for i, o := range l.Objects {
+		if char, ok := o.(*game.Character); ok && char.WID == wid {
+			l.Objects = append(l.Objects[:i], l.Objects[i+1:]...)
 
-			if len(l.Characters) == 0 {
+			if len(l.Characters()) == 0 {
 				l.active = false
 				l.emptySince = time.Now()
 			}
@@ -136,54 +126,51 @@ func (l *location) filterCells(cb func(c game.Cell) bool) (cells []cellLocation)
 }
 
 func (l *location) process() (events []game.Event) {
-	for _, c := range l.Characters {
-		if c.Desire != nil {
-			switch d := c.Desire.(type) {
-			case game.DesireMove:
-				if err := l.moveCharacter(c.WID, d.Direction); err == nil {
-					events = append(events, game.EventPosition{
-						WID: c.WID,
-						X:   c.X,
-						Y:   c.Y,
-					})
-				} else {
-					// Make bump sounds if the character is moving in the same direction as their last desire.
-					if last, ok := c.LastDesire.(game.DesireMove); ok {
-						if last.Direction == d.Direction {
-							// Make the sfx come from the cell bumped into.
-							x, y := d.Direction.Position()
-							x += c.X
-							y += c.Y
-							if err == ErrMovementBlocked {
-								events = append(events, game.EventSound{
-									FromX:   c.X,
-									FromY:   c.Y,
-									X:       x,
-									Y:       y,
-									Message: "*bump*",
-								})
-							} else if err == game.ErrOutOfBoundCell {
-								events = append(events, game.EventSound{
-									FromX:   c.X,
-									FromY:   c.Y,
-									X:       x,
-									Y:       y,
-									Message: "*pmub*",
-								})
+	for _, o := range l.Objects {
+		switch c := o.(type) {
+		case *game.Character:
+			if c.Desire != nil {
+				switch d := c.Desire.(type) {
+				case game.DesireMove:
+					if err := l.moveCharacter(c.WID, d.Direction); err == nil {
+						events = append(events, game.EventPosition{
+							WID: c.WID,
+							X:   c.X,
+							Y:   c.Y,
+						})
+					} else {
+						// Make bump sounds if the character is moving in the same direction as their last desire.
+						if last, ok := c.LastDesire.(game.DesireMove); ok {
+							if last.Direction == d.Direction {
+								// Make the sfx come from the cell bumped into.
+								x, y := d.Direction.Position()
+								x += c.X
+								y += c.Y
+								if err == ErrMovementBlocked {
+									events = append(events, game.EventSound{
+										FromX:   c.X,
+										FromY:   c.Y,
+										X:       x,
+										Y:       y,
+										Message: "*bump*",
+									})
+								} else if err == game.ErrOutOfBoundCell {
+									events = append(events, game.EventSound{
+										FromX:   c.X,
+										FromY:   c.Y,
+										X:       x,
+										Y:       y,
+										Message: "*pmub*",
+									})
+								}
 							}
 						}
 					}
 				}
+				c.LastDesire = c.Desire
+				c.Desire = nil
 			}
-			c.LastDesire = c.Desire
-			c.Desire = nil
 		}
-	}
-	for _, m := range l.Mobs {
-		fmt.Println("TODO: Handle mob", m)
-	}
-	for _, o := range l.Objects {
-		fmt.Println("TODO: Handle object", o)
 	}
 	return events
 }

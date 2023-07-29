@@ -85,11 +85,9 @@ func (state *Game) End() (interface{}, error) {
 
 func (state *Game) setLocationFromMessage(m net.LocationMessage) {
 	l := &game.Location{
-		ID:         m.ID,
-		Cells:      m.Cells,
-		Characters: m.Characters,
-		Mobs:       m.Mobs,
-		Objects:    m.Objects,
+		ID:      m.ID,
+		Cells:   m.Cells,
+		Objects: m.Objects,
 	}
 
 	// Request any tiles that we don't have.
@@ -191,18 +189,13 @@ func (state *Game) handleEvent(e game.Event) {
 	}
 	switch evt := e.(type) {
 	case game.EventAdd:
-		if ch := state.location.Character(evt.Character.WID); ch == nil {
-			state.location.Characters = append(state.location.Characters, &evt.Character)
+		if ch := state.location.ObjectByWID(evt.Character.WID); ch == nil {
+			state.location.Objects.Add(&evt.Character)
 		} else {
-			*ch = evt.Character
+			state.location.Objects.RemoveByWID(evt.Character.WID)
 		}
 	case game.EventRemove:
-		for i, c := range state.location.Characters {
-			if c.WID == evt.WID {
-				state.location.Characters = append(state.location.Characters[:i], state.location.Characters[i+1:]...)
-				break
-			}
-		}
+		state.location.Objects.RemoveByWID(evt.WID)
 	case game.EventPosition:
 		if c := state.location.Character(evt.WID); c != nil {
 			c.X = evt.X
@@ -262,7 +255,7 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 			}
 		}
 		// Draw characters
-		for _, char := range state.location.Characters {
+		for _, char := range state.location.Characters() {
 			if img := state.data.archetypeImages[char.Archetype]; img != nil {
 				px := char.X * cw
 				py := char.Y * ch
