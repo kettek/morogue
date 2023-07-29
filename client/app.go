@@ -25,6 +25,7 @@ func newApp() *app {
 	a.runContext.Sm = a
 
 	ebiten.SetWindowSize(1280, 720)
+	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 
 	embed.Setup()
 
