@@ -4,14 +4,17 @@ import (
 	"github.com/kettek/morogue/game"
 )
 
+// Mover converts bind actions into move directions.
 type Mover struct {
 	targetX, targetY int
 	currX, currY     int
 }
 
+// Init does nothing at the moment.
 func (mover *Mover) Init() {
 }
 
+// Update returns the current move direction from the current actions.
 func (mover *Mover) Update(binds Binds) game.MoveDirection {
 	var d game.MoveDirection
 	if binds.IsActionHeld("move-upleft") == 0 {

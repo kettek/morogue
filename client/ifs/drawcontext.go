@@ -10,6 +10,7 @@ import (
 	"golang.org/x/image/font/opentype"
 )
 
+// DrawContext contains various structures that are useful during Draw calls.
 type DrawContext struct {
 	Txt    *TextRenderer
 	Screen *ebiten.Image
@@ -17,6 +18,7 @@ type DrawContext struct {
 	Game   *GameContext
 }
 
+// DrawContextUI is a structure containing the UI styling and data.
 type DrawContextUI struct {
 	Width, Height int
 	//
@@ -30,6 +32,7 @@ type DrawContextUI struct {
 	TextInputPadding widget.Insets
 }
 
+// Init sets up the necessary data structuers, such as fonts, styling, images, etc.
 func (ui *DrawContextUI) Init(txt *TextRenderer) {
 	ui.HeadlineFace, _ = opentype.NewFace(txt.Renderer.GetFont(), &opentype.FaceOptions{
 		Size:    16,

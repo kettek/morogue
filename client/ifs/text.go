@@ -7,6 +7,8 @@ import (
 	"golang.org/x/image/font/sfnt"
 )
 
+// TextRenderer is a wrapper around etxt.Renderer with some additional
+// functionality.
 type TextRenderer struct {
 	etxt.Renderer
 

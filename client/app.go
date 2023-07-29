@@ -13,6 +13,11 @@ import (
 	"github.com/tinne26/fonts/liberation/lbrtserif"
 )
 
+// app is our ebiten "game" interface. It contains and sets up our necessary
+// data structures for managing the world. Most importantly, it contains
+// a state machine, of which the top-most will have Update and Draw
+// calls that pass runContext and drawContext respectively. Each state
+// is where to look for actually managing program logic.
 type app struct {
 	states       []ifs.State
 	connectState states.Connect
@@ -59,6 +64,8 @@ func newApp() *app {
 	return a
 }
 
+// Update is called per tick and updates the connect state and whatever the
+// top-most state is.
 func (a *app) Update() error {
 	if err := a.connectState.Update(a.runContext); err != nil {
 		return err
@@ -71,6 +78,8 @@ func (a *app) Update() error {
 	return nil
 }
 
+// Draw updates contexts, draws the connect state, the top-most state, and
+// also renders version and debugh info.
 func (a *app) Draw(screen *ebiten.Image) {
 	a.drawContext.Screen = screen
 	a.runContext.UI.Width = screen.Bounds().Dx()
@@ -93,6 +102,7 @@ func (a *app) Draw(screen *ebiten.Image) {
 	}
 }
 
+// Layout does sizing in accordance to HiDPI scaling.
 func (a *app) Layout(winWidth, winHeight int) (int, int) {
 	scale := ebiten.DeviceScaleFactor()
 	a.runContext.Txt.SetScale(scale) // relevant for HiDPI

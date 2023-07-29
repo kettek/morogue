@@ -8,6 +8,7 @@ import (
 	"github.com/kettek/morogue/client/ifs"
 )
 
+// Grid renders a grid over an area.
 type Grid struct {
 	offsetX, offsetY      int
 	width, height         int
@@ -31,43 +32,52 @@ func (grid *Grid) makeImage() {
 	}
 }
 
+// Size returns the grid's size.
 func (grid *Grid) Size() (int, int) {
 	return grid.width, grid.height
 }
 
+// SetSize sets the grid's size.
 func (grid *Grid) SetSize(w, h int) {
 	grid.width = w
 	grid.height = h
 	grid.makeImage()
 }
 
+// CellSize returns the current cell size.
 func (grid *Grid) CellSize() (int, int) {
 	return grid.cellWidth, grid.cellHeight
 }
 
+// SetCellSize sets the cell size.
 func (grid *Grid) SetCellSize(w, h int) {
 	grid.cellWidth = w
 	grid.cellHeight = h
 	grid.makeImage()
 }
 
+// Offset returns the grid's placement offset.
 func (grid *Grid) Offset() (x, y int) {
 	return grid.offsetX, grid.offsetY
 }
 
+// SetOffset sets the grid's placemeent offset.
 func (grid *Grid) SetOffset(x, y int) {
 	grid.offsetX = x
 	grid.offsetY = y
 }
 
+// Color returns the grid's line color.
 func (grid *Grid) Color() color.Color {
 	return grid.color
 }
 
+// SetColor sets the grid's line color.
 func (grid *Grid) SetColor(c color.Color) {
 	grid.color = c
 }
 
+// Draw draws the grid to the screen.
 func (grid *Grid) Draw(ctx ifs.DrawContext) {
 	if grid.image == nil {
 		return

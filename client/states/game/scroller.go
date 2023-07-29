@@ -9,6 +9,10 @@ import (
 	"github.com/kettek/morogue/client/ifs"
 )
 
+// Scroller allows an area within the limits of the window screen.
+// It will allow areas smaller than the screen to be moved within
+// the screen's bounds and will allow areas beyond the screen
+// to be scrolled into view, up to the screen's bounds.
 type Scroller struct {
 	lastX, lastY   int
 	x, y           int
@@ -19,10 +23,12 @@ type Scroller struct {
 	handler        func(x, y int)
 }
 
+// Init sets some initial state.
 func (scroller *Scroller) Init() {
 	scroller.lastX, scroller.lastY = scroller.GetConstrainedMousePosition()
 }
 
+// Update does the bulk of things.
 func (scroller *Scroller) Update(ctx ifs.RunContext) error {
 	scroller.maxW = ctx.UI.Width
 	scroller.maxH = ctx.UI.Height
@@ -54,6 +60,7 @@ func (scroller *Scroller) Update(ctx ifs.RunContext) error {
 	return nil
 }
 
+// SetScroll sets the current scroll position. This will call the handler if one is set.
 func (scroller *Scroller) SetScroll(x, y int) {
 	var minX, minY, maxX, maxY int
 
@@ -87,27 +94,35 @@ func (scroller *Scroller) SetScroll(x, y int) {
 	}
 }
 
+// Scroll returns the current scroll positions.
 func (scroller *Scroller) Scroll() (int, int) {
 	return scroller.x, scroller.y
 }
 
+// SetLimit sets the scroller's bounds.
 func (scroller *Scroller) SetLimit(x, y int) {
 	scroller.limitX = x
 	scroller.limitY = y
 }
 
+// Limit returns the scroller's bounds.
 func (scroller *Scroller) Limit() (int, int) {
 	return scroller.limitX, scroller.limitY
 }
 
+// CenterTo is supposed to center the scroller on the given coordinate, but
+// currently just called SetScroll.
 func (scroller *Scroller) CenterTo(x, y int) {
 	scroller.SetScroll(x, y)
 }
 
+// SetHandler sets the scroller's handler.
 func (scoller *Scroller) SetHandler(cb func(x, y int)) {
 	scoller.handler = cb
 }
 
+// GetConstrainedMousePosition gets the mouse position fully constrained to
+// the current window's dimensions.
 func (scroller *Scroller) GetConstrainedMousePosition() (int, int) {
 	w, h := ebiten.WindowSize()
 	x, y := ebiten.CursorPosition()

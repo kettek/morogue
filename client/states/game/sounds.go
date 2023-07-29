@@ -6,20 +6,25 @@ import (
 	"github.com/kettek/morogue/client/ifs"
 )
 
+// Sounds provides a visual rendering of sounds in the game world.
+// It manages their timeout, etc.
 type Sounds struct {
 	sounds           []*sound
 	offsetX, offsetY int
 }
 
+// Offset returns the current visual offset of the sounds.
 func (sounds *Sounds) Offset() (x, y int) {
 	return sounds.offsetX, sounds.offsetY
 }
 
+// SetOffset sets the current visual offset of the sounds.
 func (sounds *Sounds) SetOffset(x, y int) {
 	sounds.offsetX = x
 	sounds.offsetY = y
 }
 
+// sound is a given sound instance.
 type sound struct {
 	offsetX, offsetY int
 	x, y             int
@@ -28,6 +33,7 @@ type sound struct {
 	message          string
 }
 
+// Add creates and adds a sound to the world.
 func (sounds *Sounds) Add(message string, x, y int, fromX, fromY int) {
 	// Replace sounds at same position. TODO: Maybe vertical stack sounds in same position?
 	for _, s := range sounds.sounds {
@@ -48,6 +54,7 @@ func (sounds *Sounds) Add(message string, x, y int, fromX, fromY int) {
 	})
 }
 
+// Update manages the lifetime of sounds.
 func (sounds *Sounds) Update() {
 	i := 0
 	for _, sound := range sounds.sounds {
@@ -63,6 +70,7 @@ func (sounds *Sounds) Update() {
 	sounds.sounds = sounds.sounds[:i]
 }
 
+// Draw draws the sounds to the provided context's screen.
 func (sounds *Sounds) Draw(ctx ifs.DrawContext) {
 	cw := int(float64(ctx.Game.CellWidth) * ctx.Game.Zoom)
 	ch := int(float64(ctx.Game.CellHeight) * ctx.Game.Zoom)
