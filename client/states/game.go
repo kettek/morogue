@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"image/color"
+	"log"
 
 	"github.com/ebitenui/ebitenui"
 	"github.com/ebitenui/ebitenui/widget"
@@ -189,10 +190,16 @@ func (state *Game) handleEvent(e game.Event) {
 	}
 	switch evt := e.(type) {
 	case game.EventAdd:
-		if ch := state.location.ObjectByWID(evt.Character.WID); ch == nil {
-			state.location.Objects.Add(&evt.Character)
+		o, err := evt.Object.Object()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		if ch := state.location.ObjectByWID(o.GetWID()); ch == nil {
+			state.location.Objects.Add(o)
 		} else {
-			state.location.Objects.RemoveByWID(evt.Character.WID)
+			state.location.Objects.RemoveByWID(o.GetWID())
+			state.location.Objects.Add(o)
 		}
 	case game.EventRemove:
 		state.location.Objects.RemoveByWID(evt.WID)

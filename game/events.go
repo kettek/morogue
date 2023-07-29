@@ -86,7 +86,7 @@ func (e EventRemove) Type() string {
 }
 
 type EventAdd struct {
-	Character Character `json:"c,omitempty"`
+	Object ObjectWrapper `json:"o,omitempty"`
 }
 
 func (e EventAdd) Type() string {
