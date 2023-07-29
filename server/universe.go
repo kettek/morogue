@@ -132,10 +132,17 @@ func (u *universe) updateClient(cl *client) error {
 				} else {
 					account, err := u.accounts.Account(m.User)
 					if err != nil {
-						cl.conn.Write(net.LoginMessage{
-							Result:     err.Error(),
-							ResultCode: 404,
-						})
+						if err == ErrNoUser {
+							cl.conn.Write(net.LoginMessage{
+								Result:     err.Error(),
+								ResultCode: 404,
+							})
+						} else {
+							cl.conn.Write(net.LoginMessage{
+								Result:     err.Error(),
+								ResultCode: 500,
+							})
+						}
 					} else {
 						if !account.PasswordMatches(m.Password) {
 							cl.conn.Write(net.LoginMessage{
