@@ -114,7 +114,7 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 
 			// Send create to clients in location.
 			if evt, err := game.WrapEvent(game.EventAdd{
-				Object: game.WrapObject(cl.currentCharacter),
+				Object: cl.currentCharacter,
 			}); err == nil {
 				cls := w.clientsInLocation(start)
 				for _, cl := range cls {

@@ -43,15 +43,3 @@ func (ow ObjectWrapper) Object() (Object, error) {
 	}
 	return nil, errors.New("unknown object type: " + string(ow.Type))
 }
-
-// WrapObject wraps the given object interface for save travel across the wire.
-func WrapObject(o Object) ObjectWrapper {
-	objBytes, err := json.Marshal(o)
-	if err != nil {
-		panic(err)
-	}
-	return ObjectWrapper{
-		Type: o.Type(),
-		Data: objBytes,
-	}
-}
