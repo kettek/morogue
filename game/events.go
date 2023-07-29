@@ -88,6 +88,9 @@ func (e EventRemove) Type() string {
 type EventAdd struct {
 	Object Object `json:"o,omitempty"`
 }
+type eventAdd struct {
+	Object ObjectWrapper `json:"o,omitempty"`
+}
 
 func (e EventAdd) MarshalJSON() ([]byte, error) {
 	b, err := json.Marshal(e.Object)
@@ -95,21 +98,23 @@ func (e EventAdd) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	ow := ObjectWrapper{
-		Type: e.Object.Type(),
-		Data: b,
+	e2 := eventAdd{
+		Object: ObjectWrapper{
+			Type: e.Object.Type(),
+			Data: b,
+		},
 	}
 
-	return json.Marshal(ow)
+	return json.Marshal(e2)
 }
 
 func (e *EventAdd) UnmarshalJSON(b []byte) error {
-	var ow ObjectWrapper
+	var e2 eventAdd
 
-	if err := json.Unmarshal(b, &ow); err != nil {
+	if err := json.Unmarshal(b, &e2); err != nil {
 		return err
 	}
-	o, err := ow.Object()
+	o, err := e2.Object.Object()
 	if err != nil {
 		return err
 	}
