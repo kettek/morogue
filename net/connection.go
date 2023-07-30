@@ -28,6 +28,7 @@ func (conn *Connection) Connect() chan error {
 		c, _, err := websocket.Dial(ctx, "ws://localhost:8080/sockit", &websocket.DialOptions{
 			Subprotocols: []string{"morogue"},
 		})
+		c.SetReadLimit(1024 * 1024)
 		if err != nil {
 			ch <- err
 			return
