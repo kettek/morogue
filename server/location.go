@@ -80,14 +80,42 @@ func (l *location) moveCharacter(wid id.WID, dir game.MoveDirection) error {
 
 func (l *location) generate() error {
 	// FIXME: Pull from somewhere.
-	for x := 0; x < 10; x++ {
+	for x := 0; x < 60; x++ {
 		l.Cells = append(l.Cells, make([]game.Cell, 0))
-		for y := 0; y < 10; y++ {
+		for y := 0; y < 60; y++ {
 			l.Cells[x] = append(l.Cells[x], game.Cell{})
 		}
 	}
 
-	gen.Generate(gen.Styles[gen.StyleBox], gen.Config{
+	gen.Generate(gen.Styles[gen.StyleRooms], gen.ConfigRooms{
+		Width:           60,
+		Height:          60,
+		MinRoomSize:     5,
+		MaxRoomSize:     7,
+		MaxRooms:        20,
+		OverlapPadding:  -1,
+		JoinSharedWalls: true,
+		Cell: func(x, y int) gen.Cell {
+			if x < 0 || x >= 60 || y < 0 || y >= 60 {
+				return nil
+			}
+			return &l.Cells[x][y]
+		},
+		SetCell: func(x, y int, cell gen.Cell) {
+			if cell.Flags().Has("room-wall") {
+				l.Cells[x][y].Blocks = game.MovementAll
+				if tid, err := id.UID(id.Tile, "stone-wall"); err == nil {
+					l.Cells[x][y].TileID = &tid
+				}
+			} else if cell.Flags().Has("room-floor") {
+				if tid, err := id.UID(id.Tile, "cobblestone-floor"); err == nil {
+					l.Cells[x][y].TileID = &tid
+				}
+			}
+		},
+	})
+
+	/*gen.Generate(gen.Styles[gen.StyleBox], gen.ConfigBox{
 		Width:  10,
 		Height: 10,
 		Cell: func(x, y int) gen.Cell {
@@ -101,7 +129,7 @@ func (l *location) generate() error {
 				}
 			}
 		},
-	})
+	})*/
 	return nil
 }
 
