@@ -102,12 +102,12 @@ func (l *location) generate() error {
 			return &l.Cells[x][y]
 		},
 		SetCell: func(x, y int, cell gen.Cell) {
-			if cell.Flags().Has("room-wall") {
+			if cell.Flags().Has("wall") {
 				l.Cells[x][y].Blocks = game.MovementAll
 				if tid, err := id.UID(id.Tile, "stone-wall"); err == nil {
 					l.Cells[x][y].TileID = &tid
 				}
-			} else if cell.Flags().Has("room-floor") {
+			} else if cell.Flags().Has("floor") {
 				if tid, err := id.UID(id.Tile, "cobblestone-floor"); err == nil {
 					l.Cells[x][y].TileID = &tid
 				}

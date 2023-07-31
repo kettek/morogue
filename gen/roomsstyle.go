@@ -40,7 +40,7 @@ func isAreaOpen(cell func(x, y int) Cell, x1, y1, x2, y2 int) bool {
 
 	for x := minx; x <= maxx; x++ {
 		for y := miny; y <= maxy; y++ {
-			if c := cell(x, y); c == nil || c.Flags().Has("room-floor") {
+			if c := cell(x, y); c == nil || c.Flags().Has("floor") {
 				return false
 			}
 		}
@@ -130,25 +130,24 @@ func init() {
 				}
 
 				c := cfg.Cell(x, y)
-				c.SetFlags(append(c.Flags(), "room-wall"))
+				c.SetFlags(append(c.Flags(), "wall"))
 				cfg.SetCell(x, y, c)
 
 				if hasTL {
-					FillRange(cfg.Cell, cfg.SetCell, x, y, x1, y1, "room-floor", "room", fmt.Sprintf("room#%d", success))
+					FillRange(cfg.Cell, cfg.SetCell, x, y, x1, y1, "floor", "room", fmt.Sprintf("room#%d", success))
 				}
 				if hasTR {
-					FillRange(cfg.Cell, cfg.SetCell, x, y, x2, y1, "room-floor", "room", fmt.Sprintf("room#%d", success))
+					FillRange(cfg.Cell, cfg.SetCell, x, y, x2, y1, "floor", "room", fmt.Sprintf("room#%d", success))
 				}
 				if hasBL {
-					FillRange(cfg.Cell, cfg.SetCell, x, y, x1, y2, "room-floor", "room", fmt.Sprintf("room#%d", success))
+					FillRange(cfg.Cell, cfg.SetCell, x, y, x1, y2, "floor", "room", fmt.Sprintf("room#%d", success))
 				}
 				if hasBR {
-					FillRange(cfg.Cell, cfg.SetCell, x, y, x2, y2, "room-floor", "room", fmt.Sprintf("room#%d", success))
+					FillRange(cfg.Cell, cfg.SetCell, x, y, x2, y2, "floor", "room", fmt.Sprintf("room#%d", success))
 				}
 
 				success++
 				tries = 0
-				fmt.Println(success, tries)
 				if success >= cfg.MaxRooms {
 					break
 				}
@@ -162,14 +161,14 @@ func init() {
 							count := 0
 							flags := c.Flags()
 							for _, s := range flags {
-								if s == "room-wall" {
+								if s == "wall" {
 									count++
 								}
 							}
 							if count > 1 {
 								i := 0
 								for _, s := range flags {
-									if s != "room-wall" {
+									if s != "wall" {
 										flags[i] = s
 										i++
 									}
