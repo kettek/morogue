@@ -49,6 +49,18 @@ func (w *EventWrapper) Event() Event {
 		var d EventAdd
 		json.Unmarshal(w.Data, &d)
 		return d
+	case (EventPickup{}).Type():
+		var d EventPickup
+		json.Unmarshal(w.Data, &d)
+		return d
+	case (EventDrop{}).Type():
+		var d EventDrop
+		json.Unmarshal(w.Data, &d)
+		return d
+	case (EventApply{}).Type():
+		var d EventApply
+		json.Unmarshal(w.Data, &d)
+		return d
 	}
 	return nil
 }
@@ -159,9 +171,17 @@ type EventPickup struct {
 	IsYours bool `json:"y,omitempty"` // IsYours determines if the recipient of the pickup event is the one who picked it up. This is used for the client to add it to their inventory.
 }
 
+func (e EventPickup) Type() string {
+	return "pickup"
+}
+
 // EventDrop notifies the client that the given item was dropped.
 type EventDrop struct {
 	WID     id.WID
 	IsYours bool `json:"y,omitempty"` // IsYours determines if the recipient of the drop event is the one who dropped it. This is used for the client to remove it from their inventory.
 	X, Y    int  // The position the item is dropped to. Generally this is the same location as the dropper.
+}
+
+func (e EventDrop) Type() string {
+	return "drop"
 }
