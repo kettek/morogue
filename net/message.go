@@ -257,7 +257,9 @@ func (m TileMessage) Type() string {
 }
 
 type OwnerMessage struct {
-	WID id.WID `json:"wid,omitempty"`
+	WID       id.WID        `json:"wid,omitempty"`
+	Inventory []game.Object `json:"i,omitempty"`
+	Skills    game.Skills   `json:"s,omitempty"`
 }
 
 func (m OwnerMessage) Type() string {
