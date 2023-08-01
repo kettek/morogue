@@ -157,6 +157,10 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 			state.handleEvent(m.Event.Event())
 		case net.OwnerMessage:
 			state.characterWID = m.WID
+			if character := state.Character(); character != nil {
+				character.Inventory = m.Inventory
+				character.Skills = m.Skills
+			}
 		default:
 			fmt.Println("TODO: Handle", m.Type())
 		}
@@ -171,7 +175,7 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 	state.sounds.Update()
 
 	if state.location != nil {
-		if character := state.location.Character(state.characterWID); character != nil {
+		if character := state.Character(); character != nil {
 			if dir := state.mover.Update(state.binds); dir != 0 {
 				state.sendDesire(state.characterWID, game.DesireMove{
 					Direction: dir,
@@ -220,6 +224,15 @@ func (state *Game) sendDesire(wid id.WID, d game.Desire) error {
 			Data: b,
 		},
 	})
+	return nil
+}
+
+func (state *Game) Character() *game.Character {
+	if state.location != nil {
+		if character := state.location.Character(state.characterWID); character != nil {
+			return character
+		}
+	}
 	return nil
 }
 
