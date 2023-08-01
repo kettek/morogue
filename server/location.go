@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -194,6 +195,12 @@ func (l *location) process() (events []game.Event) {
 							}
 						}
 					}
+				case game.DesireApply:
+					fmt.Println("TODO: Apply", d.WID)
+				case game.DesirePickup:
+					fmt.Println("TODO: Pickup", d.WID)
+				case game.DesireDrop:
+					fmt.Println("TODO: Drop", d.WID)
 				}
 				c.LastDesire = c.Desire
 				c.Desire = nil
