@@ -71,8 +71,8 @@ func (w *EventWrapper) Event() Event {
 
 // EventPosition represents a position update of something in a world location.
 type EventPosition struct {
-	WID  id.WID
-	X, Y int
+	WID id.WID
+	Position
 }
 
 // Type returns "position"
@@ -82,12 +82,10 @@ func (e EventPosition) Type() string {
 
 // EventSound represents a sound emitted from a location. FromX and FromY are used to modify the visual offset of the sound. This makes it so when you bump into a wall or hit an enemy, the sound effect appears between the two points.
 type EventSound struct {
-	WID     id.WID `json:"wid,omitempty"`
-	X       int    `json:"x,omitempty"`
-	Y       int    `json:"y,omitempty"`
-	FromX   int    `json:"fx,omitempty"`
-	FromY   int    `json:"fy,omitempty"`
-	Message string `json:"m,omitempty"`
+	WID id.WID `json:"wid,omitempty"`
+	Position
+	FromPosition Position `json:"f,omitempty"`
+	Message      string   `json:"m,omitempty"`
 }
 
 // Type returns "sound"

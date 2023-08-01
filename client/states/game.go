@@ -207,7 +207,7 @@ func (state *Game) handleEvent(e game.Event) {
 			c.Y = evt.Y
 		}
 	case game.EventSound:
-		state.sounds.Add(evt.Message, evt.X, evt.Y, evt.FromX, evt.FromY)
+		state.sounds.Add(evt.Message, evt.Position, evt.FromPosition)
 	}
 }
 

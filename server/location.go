@@ -162,9 +162,8 @@ func (l *location) process() (events []game.Event) {
 				case game.DesireMove:
 					if err := l.moveCharacter(c.WID, d.Direction); err == nil {
 						events = append(events, game.EventPosition{
-							WID: c.WID,
-							X:   c.X,
-							Y:   c.Y,
+							WID:      c.WID,
+							Position: c.Position,
 						})
 					} else {
 						// Make bump sounds if the character is moving in the same direction as their last desire.
@@ -176,19 +175,15 @@ func (l *location) process() (events []game.Event) {
 								y += c.Y
 								if err == ErrMovementBlocked {
 									events = append(events, game.EventSound{
-										FromX:   c.X,
-										FromY:   c.Y,
-										X:       x,
-										Y:       y,
-										Message: "*bump*",
+										FromPosition: c.Position,
+										Position:     game.Position{X: x, Y: y},
+										Message:      "*bump*",
 									})
 								} else if err == game.ErrOutOfBoundCell {
 									events = append(events, game.EventSound{
-										FromX:   c.X,
-										FromY:   c.Y,
-										X:       x,
-										Y:       y,
-										Message: "*pmub*",
+										FromPosition: c.Position,
+										Position:     game.Position{X: x, Y: y},
+										Message:      "*pmub*",
 									})
 								}
 							}

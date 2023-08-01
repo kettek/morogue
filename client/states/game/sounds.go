@@ -4,6 +4,7 @@ import (
 	"image/color"
 
 	"github.com/kettek/morogue/client/ifs"
+	"github.com/kettek/morogue/game"
 )
 
 // Sounds provides a visual rendering of sounds in the game world.
@@ -34,10 +35,10 @@ type sound struct {
 }
 
 // Add creates and adds a sound to the world.
-func (sounds *Sounds) Add(message string, x, y int, fromX, fromY int) {
+func (sounds *Sounds) Add(message string, to game.Position, from game.Position) {
 	// Replace sounds at same position. TODO: Maybe vertical stack sounds in same position?
 	for _, s := range sounds.sounds {
-		if s.x == x && s.y == y && s.fromX == fromX && s.fromY == fromY {
+		if s.x == to.X && s.y == to.Y && s.fromX == from.X && s.fromY == from.Y {
 			s.message = message
 			s.lifetime = 10 * len(message)
 			return
@@ -45,10 +46,10 @@ func (sounds *Sounds) Add(message string, x, y int, fromX, fromY int) {
 	}
 
 	sounds.sounds = append(sounds.sounds, &sound{
-		x:        x,
-		y:        y,
-		fromX:    fromX,
-		fromY:    fromY,
+		x:        to.X,
+		y:        to.Y,
+		fromX:    from.X,
+		fromY:    from.Y,
 		lifetime: 10 * len(message),
 		message:  message,
 	})
