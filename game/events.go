@@ -141,3 +141,27 @@ func (e *EventAdd) UnmarshalJSON(b []byte) error {
 
 	return nil
 }
+
+// EventApply notifies the client that the given item was applied.
+type EventApply struct {
+	WID     id.WID
+	Applied bool `json:"a,omitempty"`
+}
+
+// Type returns "apply".
+func (e EventApply) Type() string {
+	return "apply"
+}
+
+// EventPickup notifies the client that the given item was picked up.
+type EventPickup struct {
+	WID     id.WID
+	IsYours bool `json:"y,omitempty"` // IsYours determines if the recipient of the pickup event is the one who picked it up. This is used for the client to add it to their inventory.
+}
+
+// EventDrop notifies the client that the given item was dropped.
+type EventDrop struct {
+	WID     id.WID
+	IsYours bool `json:"y,omitempty"` // IsYours determines if the recipient of the drop event is the one who dropped it. This is used for the client to remove it from their inventory.
+	X, Y    int  // The position the item is dropped to. Generally this is the same location as the dropper.
+}
