@@ -49,3 +49,21 @@ type DesireApply struct {
 func (d DesireApply) Type() string {
 	return "apply"
 }
+
+// DesirePickup represents the desire to pick up a particular object.
+type DesirePickup struct {
+	WID id.WID `json:"wid,omitempty"`
+}
+
+func (d DesirePickup) Type() string {
+	return "pickup"
+}
+
+// DesireDrop represents the desire to drop a particular object.
+type DesireDrop struct {
+	WID id.WID `json:"wid,omitempty"`
+}
+
+func (d DesireDrop) Type() string {
+	return "drop"
+}
