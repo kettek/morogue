@@ -41,9 +41,10 @@ func (d DesireMove) Type() string {
 	return "move"
 }
 
-// DesireApply represents the desire to apply a particular object.
+// DesireApply represents the desire to apply or unapply a particular object.
 type DesireApply struct {
-	WID id.WID `json:"wid,omitempty"`
+	WID   id.WID `json:"wid,omitempty"`
+	Apply bool   `json:"a,omitempty"` // Whether to apply or unapply.
 }
 
 func (d DesireApply) Type() string {

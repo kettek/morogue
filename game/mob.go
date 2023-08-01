@@ -23,3 +23,13 @@ func (m Mob) Type() ObjectType {
 func (m *Mob) GetWID() id.WID {
 	return m.WID
 }
+
+// GetPosition returns the position.
+func (m *Mob) GetPosition() Position {
+	return m.Position
+}
+
+// SetPosition sets the position.
+func (m *Mob) SetPosition(p Position) {
+	m.Position = p
+}

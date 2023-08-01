@@ -250,21 +250,31 @@ func (w *world) processLocation(l *location) error {
 
 	locationClients := w.clientsInLocation(l)
 
-	var eventsMessage net.EventsMessage
+	// Process events for all the clients in this location.
 	events := l.process()
-	for _, event := range events {
-		switch event.(type) {
-		case game.EventPosition:
-			if evt, err := game.WrapEvent(event); err == nil {
-				eventsMessage.Events = append(eventsMessage.Events, evt)
+
+	// Convert & send private client events.
+	for _, cl := range locationClients {
+		if cl.currentCharacter.Events != nil {
+			var eventsMessage net.EventsMessage
+			for _, event := range cl.currentCharacter.Events {
+				if evt, err := game.WrapEvent(event); err == nil {
+					eventsMessage.Events = append(eventsMessage.Events, evt)
+				}
 			}
-		case game.EventSound:
-			if evt, err := game.WrapEvent(event); err == nil {
-				eventsMessage.Events = append(eventsMessage.Events, evt)
-			}
+			cl.conn.Write(eventsMessage)
 		}
+		cl.currentCharacter.Events = nil
 	}
 
+	// Convert events to be sent to clients.
+	var eventsMessage net.EventsMessage
+	for _, event := range events {
+		if evt, err := game.WrapEvent(event); err == nil {
+			eventsMessage.Events = append(eventsMessage.Events, evt)
+		}
+	}
+	// Send events to clients.
 	if len(eventsMessage.Events) > 0 {
 		for _, cl := range locationClients {
 			cl.conn.Write(eventsMessage)

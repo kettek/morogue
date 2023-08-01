@@ -16,6 +16,8 @@ type ObjectType string
 type Object interface {
 	Type() ObjectType
 	GetWID() id.WID
+	SetPosition(Position)
+	GetPosition() Position
 }
 
 // ObjectWrapper wraps an Object interface for json marshal and unmarshal.

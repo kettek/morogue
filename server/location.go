@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"math/rand"
 	"time"
 
@@ -196,11 +195,47 @@ func (l *location) process() (events []game.Event) {
 						}
 					}
 				case game.DesireApply:
-					fmt.Println("TODO: Apply", d.WID)
+					if t := l.ObjectByWID(d.WID); t != nil {
+						var e game.Event
+						if d.Apply {
+							e = c.Apply(t)
+						} else {
+							e = c.Unapply(t)
+						}
+						if _, ok := e.(game.EventNotice); ok {
+							c.Events = append(c.Events, e)
+						} else {
+							events = append(events, e)
+						}
+					}
 				case game.DesirePickup:
-					fmt.Println("TODO: Pickup", d.WID)
+					if t := l.ObjectByWID(d.WID); t != nil {
+						if l.isObjectContained(t) {
+							c.Events = append(c.Events, game.EventNotice{
+								Message: "You can't pick that up.",
+							})
+						} else {
+							if t.GetPosition() != c.GetPosition() {
+								c.Events = append(c.Events, game.EventNotice{
+									Message: "You can't reach that.",
+								})
+							} else {
+								events = append(events, c.Pickup(t))
+							}
+						}
+					}
 				case game.DesireDrop:
-					fmt.Println("TODO: Drop", d.WID)
+					if t := l.ObjectByWID(d.WID); t != nil {
+						e := c.Drop(t)
+						if _, ok := e.(game.EventNotice); ok {
+							c.Events = append(c.Events, e)
+						} else {
+							events = append(events, e)
+							if e, ok := e.(game.EventDrop); ok {
+								t.SetPosition(e.Position)
+							}
+						}
+					}
 				}
 				c.LastDesire = c.Desire
 				c.Desire = nil
@@ -208,6 +243,24 @@ func (l *location) process() (events []game.Event) {
 		}
 	}
 	return events
+}
+
+func (l *location) isObjectContained(o game.Object) bool {
+	switch t := o.(type) {
+	case *game.Item:
+		if t.Container != 0 {
+			return true
+		}
+	case *game.Armor:
+		if t.Container != 0 {
+			return true
+		}
+	case *game.Weapon:
+		if t.Container != 0 {
+			return true
+		}
+	}
+	return false
 }
 
 // TODO: Allow returning world-munging requests.

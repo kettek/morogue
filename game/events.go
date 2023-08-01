@@ -61,6 +61,10 @@ func (w *EventWrapper) Event() Event {
 		var d EventApply
 		json.Unmarshal(w.Data, &d)
 		return d
+	case (EventNotice{}).Type():
+		var d EventNotice
+		json.Unmarshal(w.Data, &d)
+		return d
 	}
 	return nil
 }
@@ -154,8 +158,9 @@ func (e *EventAdd) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// EventApply notifies the client that the given item was applied.
+// EventApply notifies the client that the given item was applied or unapplied.
 type EventApply struct {
+	Applier id.WID `json:"A,omitempty"`
 	WID     id.WID
 	Applied bool `json:"a,omitempty"`
 }
@@ -167,21 +172,33 @@ func (e EventApply) Type() string {
 
 // EventPickup notifies the client that the given item was picked up.
 type EventPickup struct {
-	WID     id.WID
-	IsYours bool `json:"y,omitempty"` // IsYours determines if the recipient of the pickup event is the one who picked it up. This is used for the client to add it to their inventory.
+	Picker id.WID `json:"p,omitempty"`
+	WID    id.WID
 }
 
+// Type returns "pickup"
 func (e EventPickup) Type() string {
 	return "pickup"
 }
 
 // EventDrop notifies the client that the given item was dropped.
 type EventDrop struct {
-	WID     id.WID
-	IsYours bool `json:"y,omitempty"` // IsYours determines if the recipient of the drop event is the one who dropped it. This is used for the client to remove it from their inventory.
-	X, Y    int  // The position the item is dropped to. Generally this is the same location as the dropper.
+	Dropper  id.WID `json:"d,omitempty"`
+	WID      id.WID
+	Position Position
 }
 
+// Type returns "drop"
 func (e EventDrop) Type() string {
 	return "drop"
+}
+
+// EventNotice notifies the client of a generic notice.
+type EventNotice struct {
+	Message string
+}
+
+// Type returns "notice"
+func (e EventNotice) Type() string {
+	return "notice"
 }
