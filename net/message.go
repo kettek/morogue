@@ -82,6 +82,14 @@ func (w *Wrapper) Message() Message {
 		var m OwnerMessage
 		json.Unmarshal(w.Data, &m)
 		return m
+	case (InventoryMessage{}).Type():
+		var m InventoryMessage
+		json.Unmarshal(w.Data, &m)
+		return m
+	case (SkillsMessage{}).Type():
+		var m SkillsMessage
+		json.Unmarshal(w.Data, &m)
+		return m
 	case (EventMessage{}).Type():
 		var m EventMessage
 		json.Unmarshal(w.Data, &m)
@@ -254,6 +262,24 @@ type OwnerMessage struct {
 
 func (m OwnerMessage) Type() string {
 	return "owner"
+}
+
+type InventoryMessage struct {
+	WID       id.WID        `json:"wid,omitempty"`
+	Inventory []game.Object `json:"i,omitempty"`
+}
+
+func (m InventoryMessage) Type() string {
+	return "inventory"
+}
+
+type SkillsMessage struct {
+	WID    id.WID      `json:"wid,omitempty"`
+	Skills game.Skills `json:"s,omitempty"`
+}
+
+func (m SkillsMessage) Type() string {
+	return "skills"
 }
 
 type DesireMessage struct {

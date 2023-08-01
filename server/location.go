@@ -216,6 +216,21 @@ func (l *location) handleClientMessage(cl *client, msg net.Message) error {
 				WID:        m.WID,
 			})
 		}
+	case net.InventoryMessage:
+		// Allow sending for the character's own inventory.
+		if cl.currentCharacter.WID == m.WID {
+			cl.conn.Write(net.InventoryMessage{
+				WID:       m.WID,
+				Inventory: cl.currentCharacter.Inventory,
+			})
+		}
+	case net.SkillsMessage:
+		if cl.currentCharacter.WID == m.WID {
+			cl.conn.Write(net.SkillsMessage{
+				WID:    m.WID,
+				Skills: cl.currentCharacter.Skills,
+			})
+		}
 	}
 	return nil
 }
