@@ -12,13 +12,31 @@ const (
 	ArmorTypeHeavy
 )
 
+// ArmorArchetype is effectively a blueprint for armour.
+type ArmorArchetype struct {
+	ID           id.UUID
+	Title        string    `json:"T,omitempty"`
+	Image        string    `json:"i,omitempty"`
+	ArmorType    ArmorType `json:"t,omitempty"`
+	MinArmor     int       `json:"m,omitempty"` // Character proficiency with a weapon increases min up to max.
+	MaxArmor     int       `json:"M,omitempty"`
+	ArmorPenalty int       `json:"p,omitempty"` // Penalty to movement speed.
+}
+
+func (a ArmorArchetype) Type() string {
+	return "armor"
+}
+
+func (a ArmorArchetype) GetID() id.UUID {
+	return a.ID
+}
+
 // Armor is a weapon.
 type Armor struct {
 	Position
+	Archetype id.UUID `json:"A,omitempty"`
 	WID       id.WID
 	Container id.WID `json:"c,omitempty"` // The container of the item, if any.
-	MinArmor  int    `json:"m,omitempty"` // Character proficiency with a weapon increases min up to max.
-	MaxArmor  int    `json:"M,omitempty"`
 	Applied   bool   `json:"a,omitempty"`
 }
 

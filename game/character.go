@@ -1,15 +1,44 @@
 package game
 
-import "github.com/kettek/morogue/id"
+import (
+	"github.com/kettek/morogue/id"
+)
 
-// Character represents a playable character.
+// CharacterArchetype is a structure that is used to act as a "template" for
+// creating playable characters.
+type CharacterArchetype struct {
+	Title string
+	ID    id.UUID
+
+	PlayerOnly bool // If the archetype is for players only during character creation.
+
+	Image string // Image for the archetype. Should be requested via HTTP to the resources backend.
+	//
+	Swole           AttributeLevel     // Raw Strength + Health
+	Zooms           AttributeLevel     // Dex, basically
+	Brains          AttributeLevel     // Thinkin' and spell-related
+	Funk            AttributeLevel     // Charm and god-related
+	Traits          []string           // Traits
+	StartingObjects []id.UUID          // Starting objects
+	StartingSkills  map[string]float64 // Starting skills
+}
+
+func (c CharacterArchetype) Type() string {
+	return "character"
+}
+
+func (c CharacterArchetype) GetID() id.UUID {
+	return c.ID
+}
+
+// Character represents a character. This can be a player or an NPC.
 type Character struct {
 	Position
 	Events     []Event  `json:"-"` // Events that have happened to the character. These are only sent to the owning client.
 	Desire     Desire   `json:"-"` // The current desire of the character. Used server-side.
 	LastDesire Desire   `json:"-"` // Last desire processed. Used server-side.
 	WID        id.WID   // ID assigned when entering da world.
-	Archetype  id.UUID  `json:"a,omitempty"`
+	Archetype  id.UUID  `json:"A,omitempty"`
 	Name       string   `json:"n,omitempty"`
 	Level      int      `json:"l,omitempty"`
 	Skills     Skills   `json:"-"`

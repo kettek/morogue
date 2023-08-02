@@ -65,7 +65,7 @@ type Create struct {
 }
 
 type archetype struct {
-	Archetype game.Archetype
+	Archetype game.CharacterArchetype
 	Image     *ebiten.Image
 }
 
@@ -395,7 +395,7 @@ func (state *Create) End() (interface{}, error) {
 
 func (state *Create) haveArchetype(archetype game.Archetype) bool {
 	for _, arch := range state.archetypes {
-		if arch.Archetype.ID == archetype.ID {
+		if arch.Archetype.GetID() == archetype.GetID() {
 			return true
 		}
 	}
@@ -452,7 +452,7 @@ func (state *Create) populateCharacters(ctx ifs.RunContext, characters []*game.C
 
 			var img *ebiten.Image
 			for _, arch := range state.archetypes {
-				if arch.Archetype.ID == ch.Archetype {
+				if arch.Archetype.GetID() == ch.Archetype {
 					img = arch.Image
 					break
 				}
@@ -496,21 +496,24 @@ func (state *Create) acquireArchetypes(ctx ifs.RunContext, archetypes []game.Arc
 			continue
 		}
 
-		var arche archetype
-		arche.Archetype = arch
+		switch arch := arch.(type) {
+		case game.CharacterArchetype:
+			var arche archetype
+			arche.Archetype = arch
 
-		defer func() {
-			state.archetypes = append(state.archetypes, arche)
-		}()
+			defer func() {
+				state.archetypes = append(state.archetypes, arche)
+			}()
 
-		img, err := state.data.loadImage("archetypes/"+arch.Image, ctx.Game.Zoom)
-		if err != nil {
-			// TODO: Show error image
-			continue
+			img, err := state.data.loadImage("archetypes/characters/"+arch.Image, ctx.Game.Zoom)
+			if err != nil {
+				// TODO: Show error image
+				continue
+			}
+			state.data.archetypeImages[arch.ID] = img
+
+			arche.Image = img
 		}
-		state.data.archetypeImages[arch.ID] = img
-
-		arche.Image = img
 	}
 }
 
@@ -867,7 +870,7 @@ func (state *Create) Update(ctx ifs.RunContext) error {
 		switch m := msg.(type) {
 		case net.ArchetypesMessage:
 			for _, a := range m.Archetypes {
-				state.data.archetypes[a.ID] = a
+				state.data.archetypes[a.GetID()] = a
 			}
 			state.acquireArchetypes(ctx, m.Archetypes)
 			state.refreshArchetypes(ctx)

@@ -18,7 +18,7 @@ import (
 type Data struct {
 	archetypes      map[id.UUID]game.Archetype
 	archetypeImages map[id.UUID]*ebiten.Image
-	tiles           map[id.UUID]game.Tile
+	tiles           map[id.UUID]game.TileArchetype
 	tileImages      map[id.UUID]*ebiten.Image
 }
 
@@ -26,7 +26,7 @@ func NewData() *Data {
 	return &Data{
 		archetypes:      make(map[id.UUID]game.Archetype),
 		archetypeImages: make(map[id.UUID]*ebiten.Image),
-		tiles:           make(map[id.UUID]game.Tile),
+		tiles:           make(map[id.UUID]game.TileArchetype),
 		tileImages:      make(map[id.UUID]*ebiten.Image),
 	}
 }

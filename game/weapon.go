@@ -11,16 +11,32 @@ const (
 	WeaponTypeUnarmed
 )
 
-// Weapon is a weapon.
-type Weapon struct {
-	Position
-	WID                id.WID
-	Container          id.WID    `json:"c,omitempty"` // The container of the item, if any.
+// WeaponArchetype is effectively a blueprint for a weapon.
+type WeaponArchetype struct {
+	ID                 id.UUID
+	Title              string    `json:"T,omitempty"`
+	Image              string    `json:"i,omitempty"`
 	PrimaryAttribute   Attribute `json:"p,omitempty"` // Primary attribute to draw damage from.
 	SecondaryAttribute Attribute `json:"s,omitempty"` // Secondary attribute to draw 50% damage from.
 	MinDamage          int       `json:"m,omitempty"` // Character proficiency with a weapon increases min up to max.
 	MaxDamage          int       `json:"M,omitempty"`
-	Applied            bool      `json:"a,omitempty"`
+}
+
+func (a WeaponArchetype) Type() string {
+	return "weapon"
+}
+
+func (a WeaponArchetype) GetID() id.UUID {
+	return a.ID
+}
+
+// Weapon is a weapon.
+type Weapon struct {
+	Position
+	Archetype id.UUID `json:"A,omitempty"`
+	WID       id.WID
+	Container id.WID `json:"c,omitempty"` // The container of the item, if any.
+	Applied   bool   `json:"a,omitempty"`
 }
 
 func (w Weapon) Type() ObjectType {

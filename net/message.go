@@ -149,6 +149,59 @@ type ArchetypesMessage struct {
 	Archetypes []game.Archetype `json:"a,omitempty"`
 }
 
+// archetypeWrapper is used to wrap a game.Archetype interface for safe traversal.
+type archetypeWrapper struct {
+	Type string          `json:"t"`
+	Data json.RawMessage `json:"d"`
+}
+
+// MarshalJSON marshals a game.Archetype interface into a wrapper JSON object.
+func (m *ArchetypesMessage) UnmarshalJSON(data []byte) error {
+	var archetypes []archetypeWrapper
+	if err := json.Unmarshal(data, &archetypes); err != nil {
+		return err
+	}
+
+	for _, a := range archetypes {
+		switch a.Type {
+		case (game.CharacterArchetype{}).Type():
+			var archetype game.CharacterArchetype
+			json.Unmarshal(a.Data, &archetype)
+			m.Archetypes = append(m.Archetypes, archetype)
+		case (game.ItemArchetype{}).Type():
+			var archetype game.ItemArchetype
+			json.Unmarshal(a.Data, &archetype)
+			m.Archetypes = append(m.Archetypes, archetype)
+		case (game.WeaponArchetype{}).Type():
+			var archetype game.WeaponArchetype
+			json.Unmarshal(a.Data, &archetype)
+			m.Archetypes = append(m.Archetypes, archetype)
+		case (game.ArmorArchetype{}).Type():
+			var archetype game.ArmorArchetype
+			json.Unmarshal(a.Data, &archetype)
+			m.Archetypes = append(m.Archetypes, archetype)
+		}
+	}
+
+	return nil
+}
+
+// UnmarshalJSON unmarshals a wrapper JSON object into a game.Archetype interface.
+func (m ArchetypesMessage) MarshalJSON() ([]byte, error) {
+	var archetypes []archetypeWrapper
+	for _, a := range m.Archetypes {
+		aw, err := json.Marshal(a)
+		if err != nil {
+			panic(err)
+		}
+		archetypes = append(archetypes, archetypeWrapper{
+			Type: a.Type(),
+			Data: aw,
+		})
+	}
+	return json.Marshal(archetypes)
+}
+
 func (m ArchetypesMessage) Type() string {
 	return "archetypes"
 }
@@ -246,10 +299,10 @@ func (m LocationMessage) Type() string {
 }
 
 type TileMessage struct {
-	Result     string    `json:"r,omitempty"`
-	ResultCode int       `json:"c,omitempty"`
-	ID         id.UUID   `json:"id,omitempty"`
-	Tile       game.Tile `sjon:"t,omitempty"`
+	Result     string             `json:"r,omitempty"`
+	ResultCode int                `json:"c,omitempty"`
+	ID         id.UUID            `json:"id,omitempty"`
+	Tile       game.TileArchetype `sjon:"t,omitempty"`
 }
 
 func (m TileMessage) Type() string {

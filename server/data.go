@@ -14,25 +14,74 @@ import (
 
 type Data struct {
 	Archetypes []game.Archetype
-	Tiles      []game.Tile
 }
 
 func (d *Data) hasArchetype(uuid id.UUID) bool {
 	for _, a := range d.Archetypes {
-		if a.ID == uuid {
+		if a.GetID() == uuid {
 			return true
 		}
 	}
 	return false
 }
 
-func (d *Data) Tile(uuid id.UUID) (game.Tile, error) {
-	for _, t := range d.Tiles {
+func (d *Data) Tile(uuid id.UUID) (game.TileArchetype, error) {
+	for _, t := range d.TileArchetypes() {
 		if t.ID == uuid {
 			return t, nil
 		}
 	}
-	return game.Tile{}, errors.New("no such tile")
+	return game.TileArchetype{}, errors.New("no such tile")
+}
+
+func (d *Data) TileArchetypes() []game.TileArchetype {
+	var archetypes []game.TileArchetype
+	for _, a := range d.Archetypes {
+		if t, ok := a.(game.TileArchetype); ok {
+			archetypes = append(archetypes, t)
+		}
+	}
+	return archetypes
+}
+
+func (d *Data) CharacterArchetypes() []game.CharacterArchetype {
+	var archetypes []game.CharacterArchetype
+	for _, a := range d.Archetypes {
+		if c, ok := a.(game.CharacterArchetype); ok {
+			archetypes = append(archetypes, c)
+		}
+	}
+	return archetypes
+}
+
+func (d *Data) ItemArchetypes() []game.ItemArchetype {
+	var archetypes []game.ItemArchetype
+	for _, a := range d.Archetypes {
+		if i, ok := a.(game.ItemArchetype); ok {
+			archetypes = append(archetypes, i)
+		}
+	}
+	return archetypes
+}
+
+func (d *Data) WeaponArchetypes() []game.WeaponArchetype {
+	var archetypes []game.WeaponArchetype
+	for _, a := range d.Archetypes {
+		if w, ok := a.(game.WeaponArchetype); ok {
+			archetypes = append(archetypes, w)
+		}
+	}
+	return archetypes
+}
+
+func (d *Data) ArmorArchetypes() []game.ArmorArchetype {
+	var archetypes []game.ArmorArchetype
+	for _, a := range d.Archetypes {
+		if a, ok := a.(game.ArmorArchetype); ok {
+			archetypes = append(archetypes, a)
+		}
+	}
+	return archetypes
 }
 
 func (d *Data) loadArchetypes() error {
@@ -40,50 +89,82 @@ func (d *Data) loadArchetypes() error {
 	if err != nil {
 		return err
 	}
-	for _, entry := range entries {
-		if entry.IsDir() {
-			continue
-		}
-		if strings.HasSuffix(entry.Name(), ".json") {
-			bytes, err := os.ReadFile(filepath.Join("archetypes", entry.Name()))
-			if err != nil {
-				log.Println(err)
-				continue
-			}
-			var a game.Archetype
-			err = json.Unmarshal(bytes, &a)
-			if err != nil {
-				log.Println(err)
-				continue
-			}
-			d.Archetypes = append(d.Archetypes, a)
-		}
-	}
-	return nil
-}
 
-func (d *Data) loadTiles() error {
-	entries, err := os.ReadDir("tiles")
-	if err != nil {
-		return err
-	}
 	for _, entry := range entries {
 		if entry.IsDir() {
-			continue
-		}
-		if strings.HasSuffix(entry.Name(), ".json") {
-			bytes, err := os.ReadFile(filepath.Join("tiles", entry.Name()))
-			if err != nil {
-				log.Println(err)
+			var kind string
+			switch entry.Name() {
+			case "characters":
+				kind = "characters"
+			case "weapons":
+				kind = "weapons"
+			case "armors":
+				kind = "armors"
+			case "items":
+				kind = "items"
+			case "tiles":
+				kind = "tiles"
+			}
+			if kind == "" {
 				continue
 			}
-			var t game.Tile
-			err = json.Unmarshal(bytes, &t)
-			if err != nil {
-				log.Println(err)
-				continue
+
+			fullpath := filepath.Join("archetypes", entry.Name())
+			entries, err := os.ReadDir(fullpath)
+			if err == nil {
+				for _, entry := range entries {
+					if strings.HasSuffix(entry.Name(), ".json") {
+						bytes, err := os.ReadFile(filepath.Join(fullpath, entry.Name()))
+						if err != nil {
+							log.Println(err)
+							continue
+						}
+
+						if kind == "characters" {
+							var c game.CharacterArchetype
+							err = json.Unmarshal(bytes, &c)
+							if err != nil {
+								log.Println(err)
+								continue
+							}
+							c.PlayerOnly = true
+							d.Archetypes = append(d.Archetypes, c)
+						} else if kind == "weapons" {
+							var w game.WeaponArchetype
+							err = json.Unmarshal(bytes, &w)
+							if err != nil {
+								log.Println(err)
+								continue
+							}
+							d.Archetypes = append(d.Archetypes, w)
+						} else if kind == "armors" {
+							var a game.ArmorArchetype
+							err = json.Unmarshal(bytes, &a)
+							if err != nil {
+								log.Println(err)
+								continue
+							}
+							d.Archetypes = append(d.Archetypes, a)
+						} else if kind == "items" {
+							var i game.ItemArchetype
+							err = json.Unmarshal(bytes, &i)
+							if err != nil {
+								log.Println(err)
+								continue
+							}
+							d.Archetypes = append(d.Archetypes, i)
+						} else if kind == "tiles" {
+							var t game.TileArchetype
+							err = json.Unmarshal(bytes, &t)
+							if err != nil {
+								log.Println(err)
+								continue
+							}
+							d.Archetypes = append(d.Archetypes, t)
+						}
+					}
+				}
 			}
-			d.Tiles = append(d.Tiles, t)
 		}
 	}
 	return nil

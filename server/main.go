@@ -32,9 +32,6 @@ func run() error {
 	if err := data.loadArchetypes(); err != nil {
 		return err
 	}
-	if err := data.loadTiles(); err != nil {
-		return err
-	}
 
 	accounts, err := newAccounts("accounts")
 	if err != nil {
@@ -48,7 +45,6 @@ func run() error {
 
 	// Allow access to archetypes via archetypes subdir.
 	ps.serveMux.Handle("/archetypes/", http.StripPrefix("/archetypes/", http.FileServer(http.Dir("./archetypes"))))
-	ps.serveMux.Handle("/tiles/", http.StripPrefix("/tiles/", http.FileServer(http.Dir("./tiles"))))
 
 	ps.serveMux.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("./images"))))
 
