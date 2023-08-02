@@ -28,11 +28,12 @@ type Game struct {
 	//
 	characterWID id.WID
 	//
-	binds    clgame.Binds
-	scroller clgame.Scroller
-	grid     clgame.Grid
-	mover    clgame.Mover
-	sounds   clgame.Sounds
+	binds     clgame.Binds
+	scroller  clgame.Scroller
+	grid      clgame.Grid
+	mover     clgame.Mover
+	sounds    clgame.Sounds
+	inventory clgame.Inventory
 }
 
 // NewGame creates a new Game instance.
@@ -60,6 +61,17 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 		state.sounds.SetOffset(x, y)
 	})
 	state.grid.SetColor(color.NRGBA{255, 255, 255, 15})
+
+	inventoryContainer := widget.NewContainer(
+		widget.ContainerOpts.Layout(widget.NewRowLayout(
+			widget.RowLayoutOpts.Direction(widget.DirectionVertical),
+			widget.RowLayoutOpts.Spacing(20),
+			widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(20))),
+		),
+	)
+	state.inventory.Init(inventoryContainer)
+
+	state.ui.Container.AddChild(inventoryContainer)
 
 	return state
 }
@@ -160,6 +172,7 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 			if character := state.Character(); character != nil {
 				character.Inventory = m.Inventory
 				character.Skills = m.Skills
+				state.inventory.SetInventory(&character.Inventory)
 			}
 		default:
 			fmt.Println("TODO: Handle", m.Type())
@@ -208,6 +221,52 @@ func (state *Game) handleEvent(e game.Event) {
 		}
 	case game.EventSound:
 		state.sounds.Add(evt.Message, evt.Position, evt.FromPosition)
+	case game.EventNotice:
+		fmt.Println(evt.Message)
+	case game.EventApply:
+		if o := state.location.ObjectByWID(evt.WID); o != nil {
+			if applier := state.location.ObjectByWID(evt.Applier); applier != nil {
+				if ch, ok := applier.(*game.Character); ok {
+					ch.Apply(o)
+					if ch == state.Character() {
+						fmt.Println("You applied an item")
+						state.inventory.Refresh()
+					} else {
+						fmt.Printf("%s applied an item\n", ch.Name)
+					}
+				}
+			}
+		}
+	case game.EventPickup:
+		if o := state.location.ObjectByWID(evt.WID); o != nil {
+			if picker := state.location.ObjectByWID(evt.Picker); picker != nil {
+				o.SetPosition(game.Position{X: -1, Y: -1}) // FIXME: This feels wrong to use -1, -1 to signify hidden.
+				if ch, ok := picker.(*game.Character); ok {
+					ch.Pickup(o)
+					if ch == state.Character() {
+						fmt.Println("You picked up an item")
+						state.inventory.Refresh()
+					} else {
+						fmt.Printf("%s picked up an item\n", ch.Name)
+					}
+				}
+			}
+		}
+	case game.EventDrop:
+		if o := state.location.ObjectByWID(evt.WID); o != nil {
+			o.SetPosition(evt.Position) // Set the object's position to the dropped position.
+			if dropper := state.location.ObjectByWID(evt.Dropper); dropper != nil {
+				if ch, ok := dropper.(*game.Character); ok {
+					ch.Drop(o)
+					if ch == state.Character() {
+						fmt.Println("You dropped an item")
+						state.inventory.Refresh()
+					} else {
+						fmt.Printf("%s dropped an item\n", ch.Name)
+					}
+				}
+			}
+		}
 	}
 }
 
