@@ -34,6 +34,7 @@ type Game struct {
 	mover     clgame.Mover
 	sounds    clgame.Sounds
 	inventory clgame.Inventory
+	hotbar    clgame.Hotbar
 }
 
 // NewGame creates a new Game instance.
@@ -74,13 +75,20 @@ func (state *Game) Begin(ctx ifs.RunContext) error {
 	inventoryContainer := widget.NewContainer(
 		widget.ContainerOpts.Layout(widget.NewRowLayout(
 			widget.RowLayoutOpts.Direction(widget.DirectionVertical),
-			widget.RowLayoutOpts.Spacing(20),
-			widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(20))),
+			widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(10))),
 		),
 	)
 	state.inventory.Init(inventoryContainer, ctx)
 
+	hotbarContainer := widget.NewContainer(
+		widget.ContainerOpts.Layout(widget.NewRowLayout(
+			widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(10))),
+		),
+	)
+	state.hotbar.Init(hotbarContainer, ctx, &state.binds)
+
 	state.ui.Container.AddChild(inventoryContainer)
+	state.ui.Container.AddChild(hotbarContainer)
 
 	return nil
 }
@@ -145,6 +153,7 @@ func (state *Game) syncUIToLocation(ctx ifs.RunContext) {
 }
 
 func (state *Game) Update(ctx ifs.RunContext) error {
+	state.ui.Update()
 	select {
 	case msg := <-state.messageChan:
 		switch m := msg.(type) {
@@ -183,9 +192,9 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 	}
 	state.binds.Update(ctx)
 
-	state.ui.Update()
-
 	state.scroller.Update(ctx)
+
+	state.hotbar.Update(ctx)
 
 	state.sounds.Update()
 

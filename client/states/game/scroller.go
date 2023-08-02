@@ -30,12 +30,18 @@ func (scroller *Scroller) Init() {
 
 // Update does the bulk of things.
 func (scroller *Scroller) Update(ctx ifs.RunContext) error {
+	if ctx.Game.PreventMapInput {
+		scroller.held = false
+		return nil
+	}
+
 	scroller.maxW = ctx.UI.Width
 	scroller.maxH = ctx.UI.Height
-	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+
+	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) && !scroller.held {
 		scroller.held = true
 		scroller.moved = 0
-	} else if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
+	} else if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && scroller.held {
 		if scroller.moved > 2 {
 			input.SetCursorShape(input.CURSOR_DEFAULT)
 		}
