@@ -62,17 +62,6 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 	})
 	state.grid.SetColor(color.NRGBA{255, 255, 255, 15})
 
-	inventoryContainer := widget.NewContainer(
-		widget.ContainerOpts.Layout(widget.NewRowLayout(
-			widget.RowLayoutOpts.Direction(widget.DirectionVertical),
-			widget.RowLayoutOpts.Spacing(20),
-			widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(20))),
-		),
-	)
-	state.inventory.Init(inventoryContainer)
-
-	state.ui.Container.AddChild(inventoryContainer)
-
 	return state
 }
 
@@ -80,6 +69,19 @@ func (state *Game) Begin(ctx ifs.RunContext) error {
 	cw := int(float64(ctx.Game.CellWidth) * ctx.Game.Zoom)
 	ch := int(float64(ctx.Game.CellHeight) * ctx.Game.Zoom)
 	state.grid.SetCellSize(cw, ch)
+
+	// TODO: Hide this.
+	inventoryContainer := widget.NewContainer(
+		widget.ContainerOpts.Layout(widget.NewRowLayout(
+			widget.RowLayoutOpts.Direction(widget.DirectionVertical),
+			widget.RowLayoutOpts.Spacing(20),
+			widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(20))),
+		),
+	)
+	state.inventory.Init(inventoryContainer, ctx)
+
+	state.ui.Container.AddChild(inventoryContainer)
+
 	return nil
 }
 
