@@ -13,6 +13,7 @@ import (
 //go:embed images
 var Assets embed.FS
 
+var Icon image.Image
 var CursorDefault *ebiten.Image
 var CursorDefaultTooltip *ebiten.Image
 var CursorPointer *ebiten.Image
@@ -24,7 +25,17 @@ var CursorDeleteTooltip *ebiten.Image
 var CursorMove *ebiten.Image
 
 func Setup() {
-	f, err := Assets.Open("images/cursors.png")
+	f, err := Assets.Open("images/icon.png")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	Icon, _, err = image.Decode(f)
+	if err != nil {
+		panic(err)
+	}
+
+	f, err = Assets.Open("images/cursors.png")
 	if err != nil {
 		panic(err)
 	}

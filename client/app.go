@@ -1,6 +1,7 @@
 package main
 
 import (
+	"image"
 	"image/color"
 	"math"
 
@@ -31,8 +32,11 @@ func newApp() *app {
 
 	ebiten.SetWindowSize(1280, 720)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
+	ebiten.SetWindowTitle("morogue")
 
 	embed.Setup()
+
+	ebiten.SetWindowIcon([]image.Image{embed.Icon})
 
 	// copied and pasted from tinne example -- thx tinne! :)
 	// create text renderer, set the font and cache
