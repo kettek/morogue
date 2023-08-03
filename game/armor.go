@@ -1,6 +1,8 @@
 package game
 
 import (
+	"fmt"
+
 	"github.com/kettek/morogue/id"
 )
 
@@ -23,7 +25,7 @@ func (a ArmorType) String() string {
 	case ArmorTypeHeavy:
 		return "heavy"
 	default:
-		return "none"
+		return ""
 	}
 }
 
@@ -59,6 +61,13 @@ func (a ArmorArchetype) Type() string {
 
 func (a ArmorArchetype) GetID() id.UUID {
 	return a.ID
+}
+
+func (a ArmorArchetype) RangeString() string {
+	if a.MinArmor == 0 {
+		return fmt.Sprintf("〜%d", a.MaxArmor)
+	}
+	return fmt.Sprintf("%d〜%d", a.MinArmor, a.MaxArmor)
 }
 
 // Armor is a weapon.
