@@ -42,16 +42,9 @@ func (hb *Hotbar) Init(container *widget.Container, ctx ifs.RunContext, binds *B
 	}
 
 	hb.innerContainer = widget.NewContainer(
-		// the container will use a plain color as its background
-		widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{0x13, 0x1a, 0x22, 32})),
-		// the container will use an anchor layout to layout its single child widget
 		widget.ContainerOpts.Layout(widget.NewGridLayout(
-			//Define number of columns in the grid
 			widget.GridLayoutOpts.Columns(10),
-			//Define how far apart the rows and columns should be
 			widget.GridLayoutOpts.Spacing(2, 2),
-			//Define how to stretch the rows and columns. Note it is required to
-			//specify the Stretch for each row and column.
 			widget.GridLayoutOpts.Stretch([]bool{true, true, true, true, true, true, true, true, true, true}, nil),
 		)),
 		widget.ContainerOpts.WidgetOpts(
@@ -83,7 +76,7 @@ func (hb *Hotbar) Init(container *widget.Container, ctx ifs.RunContext, binds *B
 		hbCell := &hotbarCell{}
 
 		cell := widget.NewContainer(
-			widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{128, 128, 128, 128})),
+			widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{64, 64, 64, 128})),
 			widget.ContainerOpts.WidgetOpts(
 				widget.WidgetOpts.LayoutData(widget.GridLayoutData{
 					MaxWidth:  68,

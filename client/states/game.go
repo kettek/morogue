@@ -21,7 +21,8 @@ type Game struct {
 	connection  net.Connection
 	messageChan chan net.Message
 	//
-	ui *ebitenui.UI
+	ui             *ebitenui.UI
+	innerContainer *widget.Container
 	//
 	locations map[id.UUID]*game.Location
 	location  *game.Location // current
@@ -45,15 +46,17 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 		messageChan: msgCh,
 		ui: &ebitenui.UI{
 			Container: widget.NewContainer(
-				widget.ContainerOpts.Layout(widget.NewRowLayout(
-					widget.RowLayoutOpts.Direction(widget.DirectionVertical),
-					widget.RowLayoutOpts.Spacing(20),
-					widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(20))),
-				),
+				widget.ContainerOpts.Layout(widget.NewStackedLayout()),
 			),
 		},
 		locations: make(map[id.UUID]*game.Location),
 	}
+
+	/*state.innerContainer = widget.NewContainer(
+		widget.ContainerOpts.Layout(widget.NewRowLayout()
+		),
+	)*/
+
 	state.binds.Init()
 	state.mover.Init()
 	state.scroller.Init()
@@ -73,19 +76,42 @@ func (state *Game) Begin(ctx ifs.RunContext) error {
 
 	// TODO: Hide this.
 	inventoryContainer := widget.NewContainer(
-		widget.ContainerOpts.Layout(widget.NewRowLayout(
-			widget.RowLayoutOpts.Direction(widget.DirectionVertical),
-			widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(10))),
+		widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
+	)
+	inventoryContainerInner := widget.NewContainer(
+		widget.ContainerOpts.Layout(widget.NewAnchorLayout(
+			widget.AnchorLayoutOpts.Padding(widget.NewInsetsSimple(8)),
+		)),
+		widget.ContainerOpts.WidgetOpts(
+			widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+				StretchHorizontal:  false,
+				StretchVertical:    false,
+				HorizontalPosition: widget.AnchorLayoutPositionEnd,
+				VerticalPosition:   widget.AnchorLayoutPositionStart,
+			}),
 		),
 	)
-	state.inventory.Init(inventoryContainer, ctx)
+	inventoryContainer.AddChild(inventoryContainerInner)
+	state.inventory.Init(inventoryContainerInner, ctx)
 
 	hotbarContainer := widget.NewContainer(
-		widget.ContainerOpts.Layout(widget.NewRowLayout(
-			widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(10))),
+		widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
+	)
+	hotbarContainerInner := widget.NewContainer(
+		widget.ContainerOpts.Layout(widget.NewAnchorLayout(
+			widget.AnchorLayoutOpts.Padding(widget.NewInsetsSimple(8)),
+		)),
+		widget.ContainerOpts.WidgetOpts(
+			widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+				StretchHorizontal:  false,
+				StretchVertical:    false,
+				HorizontalPosition: widget.AnchorLayoutPositionCenter,
+				VerticalPosition:   widget.AnchorLayoutPositionEnd,
+			}),
 		),
 	)
-	state.hotbar.Init(hotbarContainer, ctx, &state.binds)
+	hotbarContainer.AddChild(hotbarContainerInner)
+	state.hotbar.Init(hotbarContainerInner, ctx, &state.binds)
 
 	state.ui.Container.AddChild(inventoryContainer)
 	state.ui.Container.AddChild(hotbarContainer)
