@@ -48,6 +48,20 @@ func (w *world) generateLocation( /*locationInfo*/ ) {
 	// TODO: Generate and add location to locations.
 }
 
+func (w *world) assignWIDs(o game.Object) {
+	o.SetWID(w.wids.Next())
+	switch o := o.(type) {
+	case *game.Character:
+		for _, o2 := range o.Inventory {
+			w.assignWIDs(o2)
+		}
+		/*case *game.Container:
+		for _, i := range o.GetItems() {
+			w.assignWIDs(i)
+		}*/
+	}
+}
+
 func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *client) {
 	w.clientRemoveChan = clientRemoveChan
 	w.addToUniverseChan = addToUniverseChan
@@ -96,7 +110,8 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 				w.addToUniverseChan <- cl
 				return
 			}
-			char.WID = w.wids.Next()
+			// Assign WIDs to character and their inventory.
+			w.assignWIDs(char)
 			cl.currentLocation = start
 			cl.currentCharacter = char
 
