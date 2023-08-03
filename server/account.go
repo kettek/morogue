@@ -33,9 +33,9 @@ func (a *Account) HasCharacter(name string) bool {
 }
 
 // CreateCharacter creates a character with the name and archetype.
-func (a *Account) CreateCharacter(name string, archetype id.UUID) error {
+func (a *Account) CreateCharacter(name string, archetype id.UUID) (*game.Character, error) {
 	if a.HasCharacter(name) {
-		return ErrCharacterExists
+		return nil, ErrCharacterExists
 	}
 
 	a.Characters = append(a.Characters, &game.Character{
@@ -43,7 +43,7 @@ func (a *Account) CreateCharacter(name string, archetype id.UUID) error {
 		Archetype: archetype,
 	})
 
-	return nil
+	return a.Characters[len(a.Characters)-1], nil
 }
 
 // DeleteCharacter deletes a given character by name.

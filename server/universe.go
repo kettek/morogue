@@ -227,12 +227,30 @@ func (u *universe) updateClient(cl *client) error {
 							ResultCode: 400,
 							Result:     ErrCharacterExists.Error(),
 						})
-					} else if err := cl.account.CreateCharacter(m.Name, m.Archetype); err != nil {
+					} else if char, err := cl.account.CreateCharacter(m.Name, m.Archetype); err != nil {
 						cl.conn.Write(net.CreateCharacterMessage{
 							ResultCode: 400,
 							Result:     err.Error(),
 						})
 					} else {
+						// Add the character's starting gear.
+						if arch, ok := u.data.Archetype(char.Archetype).(game.CharacterArchetype); ok {
+							for _, au := range arch.StartingObjects {
+								if a := u.data.Archetype(au); a != nil {
+									if o := game.CreateObjectFromArchetype(a); o != nil {
+										// Use pickup to add the object to the character's inventory.
+										char.Pickup(o)
+										// Apply armor and weapons.
+										if _, ok := o.(*game.Armor); ok {
+											char.Apply(o)
+										} else if _, ok := o.(*game.Weapon); ok {
+											char.Apply(o)
+										}
+									}
+								}
+							}
+						}
+						// Save the changes.
 						u.accounts.SaveAccount(cl.account)
 						// Let 'em know it went ok
 						cl.conn.Write(net.CreateCharacterMessage{
