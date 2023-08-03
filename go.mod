@@ -10,7 +10,6 @@ require (
 	github.com/kettek/gobl v0.1.1-0.20221216032959-8e9d1fcdf8ee
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/tinne26/etxt v0.0.9-alpha.5
-	github.com/tinne26/fonts/liberation/lbrtserif v0.0.0-20230317183620-0b634734e4ec
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	go.etcd.io/bbolt v1.3.7
 	golang.org/x/crypto v0.11.0

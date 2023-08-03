@@ -8,9 +8,10 @@ import (
 	einput "github.com/ebitenui/ebitenui/input"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"golang.org/x/image/font/sfnt"
 )
 
-//go:embed images
+//go:embed images fonts
 var Assets embed.FS
 
 var Icon image.Image
@@ -23,6 +24,7 @@ var CursorTextTooltip *ebiten.Image
 var CursorDelete *ebiten.Image
 var CursorDeleteTooltip *ebiten.Image
 var CursorMove *ebiten.Image
+var FontDefault *sfnt.Font
 
 func Setup() {
 	f, err := Assets.Open("images/icon.png")
@@ -61,4 +63,14 @@ func Setup() {
 	einput.SetCursorImage("delete", CursorDelete)
 	einput.SetCursorImage("delete-tooltip", CursorDeleteTooltip)
 	einput.SetCursorImage("move", CursorMove)
+
+	//
+	b, err := Assets.ReadFile("fonts/x12y16pxMaruMonica.ttf")
+	if err != nil {
+		panic(err)
+	}
+	FontDefault, err = sfnt.Parse(b)
+	if err != nil {
+		panic(err)
+	}
 }
