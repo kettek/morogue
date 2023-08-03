@@ -105,9 +105,15 @@ func (u *universe) checkName(name string) error {
 func (u *universe) loginClient(cl *client) {
 	cl.state = clientStateLoggedIn
 	u.loggedInAccounts = append(u.loggedInAccounts, cl.account.username)
+
+	var archetypes []game.Archetype
+	for _, a := range u.data.CharacterArchetypes() {
+		archetypes = append(archetypes, a)
+	}
+
 	// Send the available archetypes.
 	cl.conn.Write(net.ArchetypesMessage{
-		Archetypes: u.data.Archetypes,
+		Archetypes: archetypes,
 	})
 	// Send the player's characters.
 	cl.conn.Write(net.CharactersMessage{

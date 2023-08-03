@@ -1,11 +1,11 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/kettek/morogue/net"
+	"github.com/vmihailenco/msgpack/v5"
 	"nhooyr.io/websocket"
 )
 
@@ -65,7 +65,7 @@ func (s *socketServer) handleSockit(w http.ResponseWriter, r *http.Request) {
 
 		_, b, err := c.Read(r.Context())
 		if err == nil {
-			err = json.Unmarshal(b, &w)
+			err = msgpack.Unmarshal(b, &w)
 			if err != nil {
 				s.logf("failed to unmarshal with %v: %v", r.RemoteAddr, err)
 			} else if m := w.Message(); m != nil {

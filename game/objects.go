@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/vmihailenco/msgpack/v5"
+
 	"github.com/kettek/morogue/id"
 )
 
@@ -24,6 +26,47 @@ func (o *Objects) RemoveByWID(wid id.WID) Object {
 			return obj
 		}
 	}
+	return nil
+}
+
+// MarshalMsgpack returns bytes as an ObjectsWrapper.
+func (o Objects) MarshalMsgpack() ([]byte, error) {
+	var ow []ObjectWrapper
+
+	for _, obj := range o {
+		objBytes, err := msgpack.Marshal(obj)
+		if err != nil {
+			panic(err)
+		}
+		ow = append(ow, ObjectWrapper{
+			Type: obj.Type(),
+			Data: objBytes,
+		})
+	}
+	return msgpack.Marshal(ow)
+}
+
+// UnmarshalMsgpack unmarshals the given bytes as an ObjectsWrapper and
+// appends objects into the slice.
+func (o *Objects) UnmarshalMsgpack(b []byte) error {
+	var osw []ObjectWrapper
+	if err := msgpack.Unmarshal(b, &osw); err != nil {
+		return err
+	}
+
+	var errs []error
+	for _, ow := range osw {
+		if obj, err := ow.Object(); err != nil {
+			errs = append(errs, err)
+		} else {
+			*o = append(*o, obj)
+		}
+	}
+
+	if len(errs) > 0 {
+		return errors.Join(errs...)
+	}
+
 	return nil
 }
 
@@ -54,7 +97,7 @@ func (o *Objects) UnmarshalJSON(b []byte) error {
 
 	var errs []error
 	for _, ow := range osw {
-		if obj, err := ow.Object(); err != nil {
+		if obj, err := ow.ObjectJSON(); err != nil {
 			errs = append(errs, err)
 		} else {
 			*o = append(*o, obj)

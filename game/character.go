@@ -7,12 +7,12 @@ import (
 // CharacterArchetype is a structure that is used to act as a "template" for
 // creating playable characters.
 type CharacterArchetype struct {
-	Title string
-	ID    id.UUID
+	Title string  `msgpack:"t,omitempty"` // Title of the archetype. This is what is displayed to the user.
+	ID    id.UUID `msgpack:"id,omitempty"`
 
 	PlayerOnly bool // If the archetype is for players only during character creation.
 
-	Image string // Image for the archetype. Should be requested via HTTP to the resources backend.
+	Image string `msgpack:"i,omitempty"` // Image for the archetype. Should be requested via HTTP to the resources backend.
 	//
 	Swole           AttributeLevel     // Raw Strength + Health
 	Zooms           AttributeLevel     // Dex, basically
@@ -34,15 +34,15 @@ func (c CharacterArchetype) GetID() id.UUID {
 // Character represents a character. This can be a player or an NPC.
 type Character struct {
 	Position
-	Events     []Event  `json:"-"` // Events that have happened to the character. These are only sent to the owning client.
-	Desire     Desire   `json:"-"` // The current desire of the character. Used server-side.
-	LastDesire Desire   `json:"-"` // Last desire processed. Used server-side.
-	WID        id.WID   // ID assigned when entering da world.
-	Archetype  id.UUID  `json:"A,omitempty"`
-	Name       string   `json:"n,omitempty"`
-	Level      int      `json:"l,omitempty"`
-	Skills     Skills   `json:"-"`
-	Inventory  []Object `json:"-"`
+	Events     []Event `msgpack:"-" json:"-"` // Events that have happened to the character. These are only sent to the owning client.
+	Desire     Desire  `msgpack:"-" json:"-"` // The current desire of the character. Used server-side.
+	LastDesire Desire  `msgpack:"-" json:"-"` // Last desire processed. Used server-side.
+	WID        id.WID  // ID assigned when entering da world.
+	Archetype  id.UUID `msgpack:"A,omitempty"`
+	Name       string  `msgpack:"n,omitempty"`
+	Level      int     `msgpack:"l,omitempty"`
+	Skills     Skills  `msgpack:"-"`
+	Inventory  Objects `msgpack:"-"`
 }
 
 // Type returns "character"

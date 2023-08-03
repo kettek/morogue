@@ -48,10 +48,10 @@ func (a ArmorArchetype) GetID() id.UUID {
 // Armor is a weapon.
 type Armor struct {
 	Position
-	Archetype id.UUID `json:"A,omitempty"`
+	Archetype id.UUID `msgpack:"A,omitempty"`
 	WID       id.WID
-	Container id.WID `json:"c,omitempty"` // The container of the item, if any.
-	Applied   bool   `json:"a,omitempty"`
+	Container id.WID `msgpack:"c,omitempty"` // The container of the item, if any.
+	Applied   bool   `msgpack:"a,omitempty"`
 }
 
 func (a Armor) Type() ObjectType {

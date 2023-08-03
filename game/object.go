@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/kettek/morogue/id"
+	"github.com/vmihailenco/msgpack/v5"
 )
 
 // ObjectType is a key that represents an object's type. This is used
@@ -39,15 +40,65 @@ func CreateObjectFromArchetype(a Archetype) Object {
 	return nil
 }
 
-// ObjectWrapper wraps an Object interface for json marshal and unmarshal.
+type RawMessage []byte
+
+func (m RawMessage) MarshalMsgpack() ([]byte, error) {
+	return msgpack.Marshal((msgpack.RawMessage)(m))
+}
+
+func (m *RawMessage) UnmarshalMsgpack(b []byte) error {
+	return msgpack.Unmarshal(b, (*msgpack.RawMessage)(m))
+}
+
+func (m RawMessage) MarshalJSON() ([]byte, error) {
+	return json.Marshal((json.RawMessage)(m))
+}
+
+func (m *RawMessage) UnmarshalJSON(b []byte) error {
+	return json.Unmarshal(b, (*json.RawMessage)(m))
+}
+
+// ObjectWrapper wraps an Object interface for msgpack marshal and unmarshal.
 type ObjectWrapper struct {
-	Type ObjectType      `json:"t"`
-	Data json.RawMessage `json:"d"`
+	Type ObjectType `msgpack:"t"`
+	Data RawMessage `msgpack:"d"`
 }
 
 // Object returns the wrapped Object. To add additional types, they must be
-// handled here.
+// handled here and ObjectJSON.
 func (ow ObjectWrapper) Object() (Object, error) {
+	switch ow.Type {
+	case (Item{}).Type():
+		var o *Item
+		if err := msgpack.Unmarshal(ow.Data, &o); err != nil {
+			return nil, err
+		}
+		return o, nil
+	case (Character{}).Type():
+		var c *Character
+		if err := msgpack.Unmarshal(ow.Data, &c); err != nil {
+			return nil, err
+		}
+		return c, nil
+	case (Weapon{}).Type():
+		var w *Weapon
+		if err := msgpack.Unmarshal(ow.Data, &w); err != nil {
+			return nil, err
+		}
+		return w, nil
+	case (Armor{}).Type():
+		var a *Armor
+		if err := msgpack.Unmarshal(ow.Data, &a); err != nil {
+			return nil, err
+		}
+		return a, nil
+	}
+	return nil, errors.New("unknown object type: " + string(ow.Type))
+}
+
+// ObjectJSON returns the wrapped Object. To add additional types, they must be
+// handled here and Object.
+func (ow ObjectWrapper) ObjectJSON() (Object, error) {
 	switch ow.Type {
 	case (Item{}).Type():
 		var o *Item

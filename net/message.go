@@ -1,102 +1,101 @@
 package net
 
 import (
-	"encoding/json"
-
 	"github.com/kettek/morogue/game"
 	"github.com/kettek/morogue/id"
+	"github.com/vmihailenco/msgpack/v5"
 )
 
 type Wrapper struct {
-	Type string          `json:"t"`
-	Data json.RawMessage `json:"d"`
+	Type string             `msgpack:"t"`
+	Data msgpack.RawMessage `msgpack:"d"`
 }
 
 func (w *Wrapper) Message() Message {
 	switch w.Type {
 	case (PingMessage{}).Type():
 		var m PingMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (LoginMessage{}).Type():
 		var m LoginMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (RegisterMessage{}).Type():
 		var m RegisterMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (LogoutMessage{}).Type():
 		var m LogoutMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (ArchetypesMessage{}).Type():
 		var m ArchetypesMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (CharactersMessage{}).Type():
 		var m CharactersMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (CreateCharacterMessage{}).Type():
 		var m CreateCharacterMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (DeleteCharacterMessage{}).Type():
 		var m DeleteCharacterMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (JoinCharacterMessage{}).Type():
 		var m JoinCharacterMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (UnjoinCharacterMessage{}).Type():
 		var m UnjoinCharacterMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (WorldsMessage{}).Type():
 		var m WorldsMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (CreateWorldMessage{}).Type():
 		var m CreateWorldMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (JoinWorldMessage{}).Type():
 		var m JoinWorldMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (LocationMessage{}).Type():
 		var m LocationMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (TileMessage{}).Type():
 		var m TileMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (DesireMessage{}).Type():
 		var m DesireMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (OwnerMessage{}).Type():
 		var m OwnerMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (InventoryMessage{}).Type():
 		var m InventoryMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (SkillsMessage{}).Type():
 		var m SkillsMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (EventMessage{}).Type():
 		var m EventMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 	case (EventsMessage{}).Type():
 		var m EventsMessage
-		json.Unmarshal(w.Data, &m)
+		msgpack.Unmarshal(w.Data, &m)
 		return m
 
 	}
@@ -115,10 +114,10 @@ func (m PingMessage) Type() string {
 }
 
 type LoginMessage struct {
-	User       string `json:"u,omitempty"`
-	Password   string `json:"p,omitempty"`
-	Result     string `json:"r,omitempty"`
-	ResultCode int    `json:"c,omitempty"`
+	User       string `msgpack:"u,omitempty"`
+	Password   string `msgpack:"p,omitempty"`
+	Result     string `msgpack:"r,omitempty"`
+	ResultCode int    `msgpack:"c,omitempty"`
 }
 
 func (m LoginMessage) Type() string {
@@ -126,10 +125,10 @@ func (m LoginMessage) Type() string {
 }
 
 type RegisterMessage struct {
-	User       string `json:"u,omitempty"`
-	Password   string `json:"p,omitempty"`
-	Result     string `json:"r,omitempty"`
-	ResultCode int    `json:"c,omitempty"`
+	User       string `msgpack:"u,omitempty"`
+	Password   string `msgpack:"p,omitempty"`
+	Result     string `msgpack:"r,omitempty"`
+	ResultCode int    `msgpack:"c,omitempty"`
 }
 
 func (m RegisterMessage) Type() string {
@@ -137,8 +136,8 @@ func (m RegisterMessage) Type() string {
 }
 
 type LogoutMessage struct {
-	Result     string `json:"r,omitempty"`
-	ResultCode int    `json:"c,omitempty"`
+	Result     string `msgpack:"r,omitempty"`
+	ResultCode int    `msgpack:"c,omitempty"`
 }
 
 func (m LogoutMessage) Type() string {
@@ -146,19 +145,19 @@ func (m LogoutMessage) Type() string {
 }
 
 type ArchetypesMessage struct {
-	Archetypes []game.Archetype `json:"a,omitempty"`
+	Archetypes []game.Archetype `msgpack:"a,omitempty"`
 }
 
 // archetypeWrapper is used to wrap a game.Archetype interface for safe traversal.
 type archetypeWrapper struct {
-	Type string          `json:"t"`
-	Data json.RawMessage `json:"d"`
+	Type string             `msgpack:"t"`
+	Data msgpack.RawMessage `msgpack:"d"`
 }
 
-// MarshalJSON marshals a game.Archetype interface into a wrapper JSON object.
-func (m *ArchetypesMessage) UnmarshalJSON(data []byte) error {
+// UnmarshalMsgpack unmarshals a wrapper Msgpack object into a game.Archetype interface.
+func (m *ArchetypesMessage) UnmarshalMsgpack(data []byte) error {
 	var archetypes []archetypeWrapper
-	if err := json.Unmarshal(data, &archetypes); err != nil {
+	if err := msgpack.Unmarshal(data, &archetypes); err != nil {
 		return err
 	}
 
@@ -166,19 +165,27 @@ func (m *ArchetypesMessage) UnmarshalJSON(data []byte) error {
 		switch a.Type {
 		case (game.CharacterArchetype{}).Type():
 			var archetype game.CharacterArchetype
-			json.Unmarshal(a.Data, &archetype)
+			if err := msgpack.Unmarshal(a.Data, &archetype); err != nil {
+				panic(err)
+			}
 			m.Archetypes = append(m.Archetypes, archetype)
 		case (game.ItemArchetype{}).Type():
 			var archetype game.ItemArchetype
-			json.Unmarshal(a.Data, &archetype)
+			if err := msgpack.Unmarshal(a.Data, &archetype); err != nil {
+				panic(err)
+			}
 			m.Archetypes = append(m.Archetypes, archetype)
 		case (game.WeaponArchetype{}).Type():
 			var archetype game.WeaponArchetype
-			json.Unmarshal(a.Data, &archetype)
+			if err := msgpack.Unmarshal(a.Data, &archetype); err != nil {
+				panic(err)
+			}
 			m.Archetypes = append(m.Archetypes, archetype)
 		case (game.ArmorArchetype{}).Type():
 			var archetype game.ArmorArchetype
-			json.Unmarshal(a.Data, &archetype)
+			if err := msgpack.Unmarshal(a.Data, &archetype); err != nil {
+				panic(err)
+			}
 			m.Archetypes = append(m.Archetypes, archetype)
 		}
 	}
@@ -186,11 +193,11 @@ func (m *ArchetypesMessage) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// UnmarshalJSON unmarshals a wrapper JSON object into a game.Archetype interface.
-func (m ArchetypesMessage) MarshalJSON() ([]byte, error) {
+// MarshalMsgpack marshals a game.Archetype interface into a wrapper Msgpack object.
+func (m ArchetypesMessage) MarshalMsgpack() ([]byte, error) {
 	var archetypes []archetypeWrapper
 	for _, a := range m.Archetypes {
-		aw, err := json.Marshal(a)
+		aw, err := msgpack.Marshal(a)
 		if err != nil {
 			panic(err)
 		}
@@ -199,7 +206,8 @@ func (m ArchetypesMessage) MarshalJSON() ([]byte, error) {
 			Data: aw,
 		})
 	}
-	return json.Marshal(archetypes)
+
+	return msgpack.Marshal(archetypes)
 }
 
 func (m ArchetypesMessage) Type() string {
@@ -207,7 +215,7 @@ func (m ArchetypesMessage) Type() string {
 }
 
 type CharactersMessage struct {
-	Characters []*game.Character `json:"c,omitempty"`
+	Characters []*game.Character `msgpack:"c,omitempty"`
 }
 
 func (m CharactersMessage) Type() string {
@@ -215,10 +223,10 @@ func (m CharactersMessage) Type() string {
 }
 
 type CreateCharacterMessage struct {
-	Result     string  `json:"r,omitempty"`
-	ResultCode int     `json:"c,omitempty"`
-	Name       string  `json:"n,omitempty"`
-	Archetype  id.UUID `json:"a,omitempty"`
+	Result     string  `msgpack:"r,omitempty"`
+	ResultCode int     `msgpack:"c,omitempty"`
+	Name       string  `msgpack:"n,omitempty"`
+	Archetype  id.UUID `msgpack:"a,omitempty"`
 }
 
 func (m CreateCharacterMessage) Type() string {
@@ -226,9 +234,9 @@ func (m CreateCharacterMessage) Type() string {
 }
 
 type DeleteCharacterMessage struct {
-	Result     string `json:"r,omitempty"`
-	ResultCode int    `json:"c,omitempty"`
-	Name       string `json:"n,omitempty"`
+	Result     string `msgpack:"r,omitempty"`
+	ResultCode int    `msgpack:"c,omitempty"`
+	Name       string `msgpack:"n,omitempty"`
 }
 
 func (m DeleteCharacterMessage) Type() string {
@@ -236,9 +244,9 @@ func (m DeleteCharacterMessage) Type() string {
 }
 
 type JoinCharacterMessage struct {
-	Result     string `json:"r,omitempty"`
-	ResultCode int    `json:"c,omitempty"`
-	Name       string `json:"n,omitempty"`
+	Result     string `msgpack:"r,omitempty"`
+	ResultCode int    `msgpack:"c,omitempty"`
+	Name       string `msgpack:"n,omitempty"`
 }
 
 func (m JoinCharacterMessage) Type() string {
@@ -246,8 +254,8 @@ func (m JoinCharacterMessage) Type() string {
 }
 
 type UnjoinCharacterMessage struct {
-	Result     string `json:"r,omitempty"`
-	ResultCode int    `json:"c,omitempty"`
+	Result     string `msgpack:"r,omitempty"`
+	ResultCode int    `msgpack:"c,omitempty"`
 }
 
 func (m UnjoinCharacterMessage) Type() string {
@@ -255,9 +263,9 @@ func (m UnjoinCharacterMessage) Type() string {
 }
 
 type WorldsMessage struct {
-	Result     string           `json:"r,omitempty"`
-	ResultCode int              `json:"c,omitempty"`
-	Worlds     []game.WorldInfo `json:"w,omitempty"`
+	Result     string           `msgpack:"r,omitempty"`
+	ResultCode int              `msgpack:"c,omitempty"`
+	Worlds     []game.WorldInfo `msgpack:"w,omitempty"`
 }
 
 func (m WorldsMessage) Type() string {
@@ -265,10 +273,10 @@ func (m WorldsMessage) Type() string {
 }
 
 type CreateWorldMessage struct {
-	Result     string `json:"r,omitempty"`
-	ResultCode int    `json:"c,omitempty"`
-	Name       string `json:"n,omitempty"`
-	Password   string `json:"p,omitempty"`
+	Result     string `msgpack:"r,omitempty"`
+	ResultCode int    `msgpack:"c,omitempty"`
+	Name       string `msgpack:"n,omitempty"`
+	Password   string `msgpack:"p,omitempty"`
 }
 
 func (m CreateWorldMessage) Type() string {
@@ -276,10 +284,10 @@ func (m CreateWorldMessage) Type() string {
 }
 
 type JoinWorldMessage struct {
-	Result     string  `json:"r,omitempty"`
-	ResultCode int     `json:"c,omitempty"`
-	World      id.UUID `json:"w,omitempty"`
-	Password   string  `json:"p,omitempty"`
+	Result     string  `msgpack:"r,omitempty"`
+	ResultCode int     `msgpack:"c,omitempty"`
+	World      id.UUID `msgpack:"w,omitempty"`
+	Password   string  `msgpack:"p,omitempty"`
 }
 
 func (m JoinWorldMessage) Type() string {
@@ -287,11 +295,11 @@ func (m JoinWorldMessage) Type() string {
 }
 
 type LocationMessage struct {
-	Result     string       `json:"r,omitempty"`
-	ResultCode int          `json:"c,omitempty"`
-	ID         id.UUID      `json:"id,omitempty"`
-	Objects    game.Objects `json:"o,omitempty"`
-	Cells      game.Cells   `json:"g,omitempty"`
+	Result     string       `msgpack:"r,omitempty"`
+	ResultCode int          `msgpack:"c,omitempty"`
+	ID         id.UUID      `msgpack:"id,omitempty"`
+	Objects    game.Objects `msgpack:"o,omitempty"`
+	Cells      game.Cells   `msgpack:"g,omitempty"`
 }
 
 func (m LocationMessage) Type() string {
@@ -299,9 +307,9 @@ func (m LocationMessage) Type() string {
 }
 
 type TileMessage struct {
-	Result     string             `json:"r,omitempty"`
-	ResultCode int                `json:"c,omitempty"`
-	ID         id.UUID            `json:"id,omitempty"`
+	Result     string             `msgpack:"r,omitempty"`
+	ResultCode int                `msgpack:"c,omitempty"`
+	ID         id.UUID            `msgpack:"id,omitempty"`
 	Tile       game.TileArchetype `sjon:"t,omitempty"`
 }
 
@@ -310,9 +318,9 @@ func (m TileMessage) Type() string {
 }
 
 type OwnerMessage struct {
-	WID       id.WID        `json:"wid,omitempty"`
-	Inventory []game.Object `json:"i,omitempty"`
-	Skills    game.Skills   `json:"s,omitempty"`
+	WID       id.WID       `msgpack:"wid,omitempty"`
+	Inventory game.Objects `msgpack:"i,omitempty"`
+	Skills    game.Skills  `msgpack:"s,omitempty"`
 }
 
 func (m OwnerMessage) Type() string {
@@ -320,8 +328,8 @@ func (m OwnerMessage) Type() string {
 }
 
 type InventoryMessage struct {
-	WID       id.WID        `json:"wid,omitempty"`
-	Inventory []game.Object `json:"i,omitempty"`
+	WID       id.WID        `msgpack:"wid,omitempty"`
+	Inventory []game.Object `msgpack:"i,omitempty"`
 }
 
 func (m InventoryMessage) Type() string {
@@ -329,8 +337,8 @@ func (m InventoryMessage) Type() string {
 }
 
 type SkillsMessage struct {
-	WID    id.WID      `json:"wid,omitempty"`
-	Skills game.Skills `json:"s,omitempty"`
+	WID    id.WID      `msgpack:"wid,omitempty"`
+	Skills game.Skills `msgpack:"s,omitempty"`
 }
 
 func (m SkillsMessage) Type() string {
@@ -338,10 +346,10 @@ func (m SkillsMessage) Type() string {
 }
 
 type DesireMessage struct {
-	Result     string             `json:"r,omitempty"`
-	ResultCode int                `json:"c,omitempty"`
-	WID        id.WID             `json:"wid,omitempty"`
-	Desire     game.DesireWrapper `json:"d,omitempty"`
+	Result     string             `msgpack:"r,omitempty"`
+	ResultCode int                `msgpack:"c,omitempty"`
+	WID        id.WID             `msgpack:"wid,omitempty"`
+	Desire     game.DesireWrapper `msgpack:"d,omitempty"`
 }
 
 func (m DesireMessage) Type() string {
@@ -349,7 +357,7 @@ func (m DesireMessage) Type() string {
 }
 
 type EventMessage struct {
-	Event game.EventWrapper `json:"e,omitempty"`
+	Event game.EventWrapper `msgpack:"e,omitempty"`
 }
 
 func (m EventMessage) Type() string {
@@ -357,7 +365,7 @@ func (m EventMessage) Type() string {
 }
 
 type EventsMessage struct {
-	Events []game.EventWrapper `json:"e,omitempty"`
+	Events []game.EventWrapper `msgpack:"e,omitempty"`
 }
 
 func (m EventsMessage) Type() string {

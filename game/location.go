@@ -3,9 +3,9 @@ package game
 import "github.com/kettek/morogue/id"
 
 type Location struct {
-	ID      id.UUID `json:"id,omitempty"`
-	Cells   Cells   `json:"c,omitempty"`
-	Objects Objects `json:"o,omitempty"`
+	ID      id.UUID `msgpack:"id,omitempty"`
+	Cells   Cells   `msgpack:"c,omitempty"`
+	Objects Objects `msgpack:"o,omitempty"`
 }
 
 func (l *Location) Character(wid id.WID) *Character {

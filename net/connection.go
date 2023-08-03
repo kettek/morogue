@@ -2,12 +2,11 @@ package net
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"time"
 
+	"github.com/vmihailenco/msgpack/v5"
 	"nhooyr.io/websocket"
-	"nhooyr.io/websocket/wsjson"
 )
 
 type Connection struct {
@@ -58,7 +57,12 @@ func (conn *Connection) Loop() (chan Message, chan error) {
 	go func() {
 		for {
 			var w Wrapper
-			if err := wsjson.Read(context.TODO(), conn.c, &w); err != nil {
+			_, b, err := conn.c.Read(context.TODO())
+			if err != nil {
+				ech <- err
+				return
+			}
+			if err := msgpack.Unmarshal(b, &w); err != nil {
 				ech <- err
 				return
 			} else {
@@ -72,7 +76,7 @@ func (conn *Connection) Loop() (chan Message, chan error) {
 }
 
 func (conn *Connection) Write(m Message) error {
-	p, err := json.Marshal(m)
+	p, err := msgpack.Marshal(m)
 	if err != nil {
 		return err
 	}
@@ -82,5 +86,10 @@ func (conn *Connection) Write(m Message) error {
 		Data: p,
 	}
 
-	return wsjson.Write(context.TODO(), conn.c, w)
+	p, err = msgpack.Marshal(w)
+	if err != nil {
+		return err
+	}
+
+	return conn.c.Write(context.TODO(), websocket.MessageText, p)
 }

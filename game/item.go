@@ -5,8 +5,8 @@ import "github.com/kettek/morogue/id"
 // ItemArchetype is effectively a blueprint for an item.
 type ItemArchetype struct {
 	ID    id.UUID
-	Title string `json:"T,omitempty"`
-	Image string `json:"i,omitempty"`
+	Title string `msgpack:"T,omitempty"`
+	Image string `msgpack:"i,omitempty"`
 }
 
 func (a ItemArchetype) Type() string {
@@ -20,11 +20,11 @@ func (a ItemArchetype) GetID() id.UUID {
 // Item represents a generic item in the world.
 type Item struct {
 	Position
-	Archetype id.UUID `json:"A,omitempty"`
+	Archetype id.UUID `msgpack:"A,omitempty"`
 	WID       id.WID  // ID assigned when entering da world.
-	Container id.WID  `json:"c,omitempty"` // The container of the item, if any.
-	ID        id.UUID `json:"id,omitempty"`
-	Name      string  `json:"n,omitempty"`
+	Container id.WID  `msgpack:"c,omitempty"` // The container of the item, if any.
+	ID        id.UUID `msgpack:"id,omitempty"`
+	Name      string  `msgpack:"n,omitempty"`
 }
 
 // Type returns "item"

@@ -1,7 +1,6 @@
 package states
 
 import (
-	"encoding/json"
 	"fmt"
 	"image/color"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/kettek/morogue/game"
 	"github.com/kettek/morogue/id"
 	"github.com/kettek/morogue/net"
+	"github.com/vmihailenco/msgpack/v5"
 )
 
 // Game represents the running game in the world.
@@ -308,7 +308,7 @@ func (state *Game) handleEvent(e game.Event) {
 }
 
 func (state *Game) sendDesire(wid id.WID, d game.Desire) error {
-	b, err := json.Marshal(d)
+	b, err := msgpack.Marshal(d)
 	if err != nil {
 		return err
 	}

@@ -15,7 +15,7 @@ import (
 )
 
 type Inventory struct {
-	inventory      *[]game.Object
+	inventory      *game.Objects
 	container      *widget.Container
 	innerContainer *widget.Container
 	cells          []*inventoryCell
@@ -129,10 +129,11 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 	inv.container.AddChild(inv.innerContainer)
 }
 
-func (inv *Inventory) SetInventory(inventory *[]game.Object) {
+func (inv *Inventory) SetInventory(inventory *game.Objects) {
 	inv.inventory = inventory
+	inv.Refresh()
 }
 
 func (inv *Inventory) Refresh() {
-	// TODO: Refresh inventory
+	fmt.Println("TODO: Refresh inventory", inv.inventory)
 }

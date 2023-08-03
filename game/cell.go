@@ -8,12 +8,12 @@ import (
 )
 
 type Cell struct {
-	TileID  *id.UUID     `json:"id,omitempty"` // The Tile ID of the cell.
-	Blocks  MovementType `json:"b,omitempty"`  // Whether the cell blocks. This should be generated from the TileID and the contained Objects.
-	Objects Objects      `json:"o,omitempty"`  // Non-thinking/active objects. These will generally be weapons, armor, gold, food, etc.
+	TileID  *id.UUID     `msgpack:"id,omitempty"` // The Tile ID of the cell.
+	Blocks  MovementType `msgpack:"b,omitempty"`  // Whether the cell blocks. This should be generated from the TileID and the contained Objects.
+	Objects Objects      `msgpack:"o,omitempty"`  // Non-thinking/active objects. These will generally be weapons, armor, gold, food, etc.
 	//
-	value int       `json:"-"`
-	flags gen.Flags `json:"-"`
+	value int       `msgpack:"-"`
+	flags gen.Flags `msgpack:"-"`
 }
 
 func (t *Cell) Value() int {
