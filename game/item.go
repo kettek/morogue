@@ -51,3 +51,7 @@ func (o Item) GetPosition() Position {
 func (o *Item) SetPosition(p Position) {
 	o.Position = p
 }
+
+func (o *Item) GetArchetype() id.UUID {
+	return o.Archetype
+}

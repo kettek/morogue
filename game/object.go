@@ -20,6 +20,7 @@ type Object interface {
 	GetWID() id.WID
 	SetPosition(Position)
 	GetPosition() Position
+	GetArchetype() id.UUID
 }
 
 func CreateObjectFromArchetype(a Archetype) Object {

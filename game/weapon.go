@@ -60,3 +60,7 @@ func (w Weapon) GetPosition() Position {
 func (w *Weapon) SetPosition(p Position) {
 	w.Position = p
 }
+
+func (w *Weapon) GetArchetype() id.UUID {
+	return w.Archetype
+}

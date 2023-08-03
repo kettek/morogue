@@ -73,3 +73,7 @@ func (a Armor) GetPosition() Position {
 func (a *Armor) SetPosition(p Position) {
 	a.Position = p
 }
+
+func (a *Armor) GetArchetype() id.UUID {
+	return a.Archetype
+}

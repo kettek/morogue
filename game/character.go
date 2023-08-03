@@ -70,6 +70,11 @@ func (c *Character) SetPosition(p Position) {
 	c.Position = p
 }
 
+// GetArchetype returns the archetype.
+func (c *Character) GetArchetype() id.UUID {
+	return c.Archetype
+}
+
 // InInventory returns true if the character has the object in their inventory.
 func (c *Character) InInventory(wid id.WID) bool {
 	for _, i := range c.Inventory {
