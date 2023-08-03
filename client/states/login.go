@@ -44,7 +44,7 @@ func NewLogin(connection net.Connection, msgCh chan net.Message) *Login {
 }
 
 func (state *Login) Begin(ctx ifs.RunContext) error {
-	state.connection.Write(&net.PingMessage{})
+	state.connection.Write(net.PingMessage{})
 
 	state.usernameInput = widget.NewTextInput(
 		widget.TextInputOpts.WidgetOpts(

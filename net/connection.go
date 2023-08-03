@@ -91,5 +91,5 @@ func (conn *Connection) Write(m Message) error {
 		return err
 	}
 
-	return conn.c.Write(context.TODO(), websocket.MessageText, p)
+	return conn.c.Write(context.TODO(), websocket.MessageBinary, p)
 }
