@@ -29,6 +29,10 @@ func (w *Wrapper) Message() Message {
 		var m LogoutMessage
 		msgpack.Unmarshal(w.Data, &m)
 		return m
+	case (ArchetypeMessage{}).Type():
+		var m ArchetypeMessage
+		msgpack.Unmarshal(w.Data, &m)
+		return m
 	case (ArchetypesMessage{}).Type():
 		var m ArchetypesMessage
 		msgpack.Unmarshal(w.Data, &m)
@@ -144,8 +148,24 @@ func (m LogoutMessage) Type() string {
 	return "logout"
 }
 
+type ArchetypeMessage struct {
+	Result     string  `msgpack:"r,omitempty"`
+	ResultCode int     `msgpack:"c,omitempty"`
+	ID         id.UUID `msgpack:"i,omitempty"`
+}
+
+func (m ArchetypeMessage) Type() string {
+	return "archetype"
+}
+
 type ArchetypesMessage struct {
 	Archetypes []game.Archetype `msgpack:"a,omitempty"`
+	IDs        []id.UUID        `msgpack:"i,omitempty"`
+}
+
+type archetypesMessage struct {
+	Archetypes []archetypeWrapper `msgpack:"a,omitempty"`
+	IDs        []id.UUID          `msgpack:"i,omitempty"`
 }
 
 // archetypeWrapper is used to wrap a game.Archetype interface for safe traversal.
@@ -156,12 +176,14 @@ type archetypeWrapper struct {
 
 // UnmarshalMsgpack unmarshals a wrapper Msgpack object into a game.Archetype interface.
 func (m *ArchetypesMessage) UnmarshalMsgpack(data []byte) error {
-	var archetypes []archetypeWrapper
-	if err := msgpack.Unmarshal(data, &archetypes); err != nil {
+	var msg archetypesMessage
+	if err := msgpack.Unmarshal(data, &msg); err != nil {
 		return err
 	}
 
-	for _, a := range archetypes {
+	m.IDs = msg.IDs
+
+	for _, a := range msg.Archetypes {
 		switch a.Type {
 		case (game.CharacterArchetype{}).Type():
 			var archetype game.CharacterArchetype
@@ -207,7 +229,10 @@ func (m ArchetypesMessage) MarshalMsgpack() ([]byte, error) {
 		})
 	}
 
-	return msgpack.Marshal(archetypes)
+	return msgpack.Marshal(archetypesMessage{
+		Archetypes: archetypes,
+		IDs:        m.IDs,
+	})
 }
 
 func (m ArchetypesMessage) Type() string {
