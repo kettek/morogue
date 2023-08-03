@@ -21,6 +21,24 @@ type Object interface {
 	GetPosition() Position
 }
 
+func CreateObjectFromArchetype(a Archetype) Object {
+	switch a.(type) {
+	case CharacterArchetype:
+		return &Character{
+			Archetype: a.GetID(),
+		}
+	case WeaponArchetype:
+		return &Weapon{
+			Archetype: a.GetID(),
+		}
+	case ArmorArchetype:
+		return &Armor{
+			Archetype: a.GetID(),
+		}
+	}
+	return nil
+}
+
 // ObjectWrapper wraps an Object interface for json marshal and unmarshal.
 type ObjectWrapper struct {
 	Type ObjectType      `json:"t"`
