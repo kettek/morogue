@@ -15,6 +15,7 @@ import (
 )
 
 type Inventory struct {
+	Data           Data
 	inventory      *game.Objects
 	container      *widget.Container
 	innerContainer *widget.Container
@@ -75,6 +76,7 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 
 			cell := widget.NewContainer(
 				widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{128, 128, 128, 128})),
+				widget.ContainerOpts.Layout(widget.NewStackedLayout()),
 				widget.ContainerOpts.WidgetOpts(
 					widget.WidgetOpts.LayoutData(widget.GridLayoutData{
 						MaxWidth:  34,
@@ -135,5 +137,16 @@ func (inv *Inventory) SetInventory(inventory *game.Objects) {
 }
 
 func (inv *Inventory) Refresh() {
+	// TODO: Potentially destroy previous cells...
 	fmt.Println("TODO: Refresh inventory", inv.inventory)
+	for i, o := range *inv.inventory {
+		img := inv.Data.ArchetypeImage(o.GetArchetype())
+		inv.cells[i].graphic.Image = img
+		inv.cells[i].tooltip.Offset = image.Pt(0, 0)
+
+		//arch := inv.Data.Archetype(o.GetArchetype())
+		/*switch a := arch.(type) {
+			case *game.WeaponArchetype:
+		}*/
+	}
 }

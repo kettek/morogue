@@ -66,6 +66,8 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 	})
 	state.grid.SetColor(color.NRGBA{255, 255, 255, 15})
 
+	state.inventory.Data = data
+
 	return state
 }
 
@@ -207,7 +209,7 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 				state.data.tiles[m.Tile.ID] = m.Tile
 				if _, ok := state.data.tileImages[m.Tile.ID]; !ok {
 					src := "archetypes/" + m.Tile.Image
-					if img, err := state.data.loadImage(src, ctx.Game.Zoom); err == nil {
+					if img, err := state.data.LoadImage(src, ctx.Game.Zoom); err == nil {
 						state.data.tileImages[m.Tile.ID] = img
 					}
 				}
@@ -215,10 +217,12 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 		case net.ArchetypesMessage:
 			for _, a := range m.Archetypes {
 				state.data.archetypes[a.GetID()] = a
-				if _, err := state.data.ensureImage(a, ctx.Game.Zoom); err != nil {
+				if _, err := state.data.EnsureImage(a, ctx.Game.Zoom); err != nil {
 					fmt.Println("Error loading archetype image:", err)
 				}
 			}
+			// This isn't exactly efficient.
+			state.inventory.Refresh()
 		case net.EventsMessage:
 			for _, evt := range m.Events {
 				state.handleEvent(evt.Event())

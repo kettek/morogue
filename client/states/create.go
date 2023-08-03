@@ -91,32 +91,32 @@ func NewCreate(connection net.Connection, msgCh chan net.Message) *Create {
 
 func (state *Create) Begin(ctx ifs.RunContext) error {
 	// Load attributes images.
-	if img, err := state.data.loadImage("images/swole.png", ctx.Game.Zoom); err != nil {
+	if img, err := state.data.LoadImage("images/swole.png", ctx.Game.Zoom); err != nil {
 		return err
 	} else {
 		state.swoleImage = img
 	}
-	if img, err := state.data.loadImage("images/zooms.png", ctx.Game.Zoom); err != nil {
+	if img, err := state.data.LoadImage("images/zooms.png", ctx.Game.Zoom); err != nil {
 		return err
 	} else {
 		state.zoomsImage = img
 	}
-	if img, err := state.data.loadImage("images/brains.png", ctx.Game.Zoom); err != nil {
+	if img, err := state.data.LoadImage("images/brains.png", ctx.Game.Zoom); err != nil {
 		return err
 	} else {
 		state.brainsImage = img
 	}
-	if img, err := state.data.loadImage("images/funk.png", ctx.Game.Zoom); err != nil {
+	if img, err := state.data.LoadImage("images/funk.png", ctx.Game.Zoom); err != nil {
 		return err
 	} else {
 		state.funkImage = img
 	}
-	if img, err := state.data.loadImage("images/traits.png", ctx.Game.Zoom); err != nil {
+	if img, err := state.data.LoadImage("images/traits.png", ctx.Game.Zoom); err != nil {
 		return err
 	} else {
 		state.traitsImage = img
 	}
-	if img, err := state.data.loadImage("images/archetype.png", ctx.Game.Zoom); err != nil {
+	if img, err := state.data.LoadImage("images/archetype.png", ctx.Game.Zoom); err != nil {
 		return err
 	} else {
 		state.archetypeImage = img
@@ -505,7 +505,7 @@ func (state *Create) acquireArchetypes(ctx ifs.RunContext, archetypes []game.Arc
 				state.archetypes = append(state.archetypes, arche)
 			}()
 
-			img, err := state.data.loadImage("archetypes/"+arch.Image, ctx.Game.Zoom)
+			img, err := state.data.LoadImage("archetypes/"+arch.Image, ctx.Game.Zoom)
 			if err != nil {
 				// TODO: Show error image
 				continue

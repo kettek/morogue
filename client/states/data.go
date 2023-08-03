@@ -32,35 +32,43 @@ func NewData() *Data {
 	}
 }
 
-func (d *Data) ensureImage(archetype game.Archetype, zoom float64) (*ebiten.Image, error) {
+func (d *Data) Archetype(id id.UUID) game.Archetype {
+	return d.archetypes[id]
+}
+
+func (d *Data) ArchetypeImage(id id.UUID) *ebiten.Image {
+	return d.archetypeImages[id]
+}
+
+func (d *Data) EnsureImage(archetype game.Archetype, zoom float64) (*ebiten.Image, error) {
 	if img, ok := d.archetypeImages[archetype.GetID()]; ok {
 		return img, nil
 	}
 
 	switch a := archetype.(type) {
 	case game.CharacterArchetype:
-		if img, err := d.loadImage("archetypes/"+a.Image, zoom); err == nil {
+		if img, err := d.LoadImage("archetypes/"+a.Image, zoom); err == nil {
 			d.archetypeImages[a.GetID()] = img
 			return img, nil
 		} else {
 			return nil, err
 		}
 	case game.ItemArchetype:
-		if img, err := d.loadImage("archetypes/"+a.Image, zoom); err == nil {
+		if img, err := d.LoadImage("archetypes/"+a.Image, zoom); err == nil {
 			d.archetypeImages[a.GetID()] = img
 			return img, nil
 		} else {
 			return nil, err
 		}
 	case game.WeaponArchetype:
-		if img, err := d.loadImage("archetypes/"+a.Image, zoom); err == nil {
+		if img, err := d.LoadImage("archetypes/"+a.Image, zoom); err == nil {
 			d.archetypeImages[a.GetID()] = img
 			return img, nil
 		} else {
 			return nil, err
 		}
 	case game.ArmorArchetype:
-		if img, err := d.loadImage("archetypes/"+a.Image, zoom); err == nil {
+		if img, err := d.LoadImage("archetypes/"+a.Image, zoom); err == nil {
 			d.archetypeImages[a.GetID()] = img
 			return img, nil
 		} else {
@@ -71,7 +79,7 @@ func (d *Data) ensureImage(archetype game.Archetype, zoom float64) (*ebiten.Imag
 	}
 }
 
-func (d *Data) loadImage(src string, scale float64) (*ebiten.Image, error) {
+func (d *Data) LoadImage(src string, scale float64) (*ebiten.Image, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*5)
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost:8080/"+src, nil)
