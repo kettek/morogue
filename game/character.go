@@ -161,6 +161,9 @@ func (c *Character) unapplyArmor(a *Armor) Event {
 func (c *Character) Pickup(o Object) Event {
 	c.Inventory = append(c.Inventory, o)
 
+	// It's a bit cheesy, but we use -1/-1 to signify off the map.
+	o.SetPosition(Position{-1, -1})
+
 	return EventPickup{
 		Picker: c.WID,
 		WID:    o.GetWID(),
@@ -176,6 +179,22 @@ func (c *Character) Drop(o Object) Event {
 	}
 
 	// TODO: Here is where we could check for items that cannot be dropped, such as cursed items.
+
+	// Unapply it, for obvious reasons.
+	switch o := o.(type) {
+	case *Weapon:
+		c.unapplyWeapon(o)
+	case *Armor:
+		c.unapplyArmor(o)
+	}
+
+	// Remove from the inventory.
+	for i, item := range c.Inventory {
+		if item.GetWID() == o.GetWID() {
+			c.Inventory = append(c.Inventory[:i], c.Inventory[i+1:]...)
+			break
+		}
+	}
 
 	return EventDrop{
 		Dropper:  c.WID,

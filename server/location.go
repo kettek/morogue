@@ -18,6 +18,19 @@ type location struct {
 	emptySince time.Time
 }
 
+func (l *location) addObject(o game.Object) {
+	l.Objects = append(l.Objects, o)
+}
+
+func (l *location) removeObject(o game.Object) {
+	for i, o2 := range l.Objects {
+		if o2.GetWID() == o.GetWID() {
+			l.Objects = append(l.Objects[:i], l.Objects[i+1:]...)
+			return
+		}
+	}
+}
+
 func (l *location) addCharacter(character *game.Character) error {
 	if l.Character(character.WID) != nil {
 		return ErrCharacterAlreadyInLocation
@@ -35,7 +48,13 @@ func (l *location) addCharacter(character *game.Character) error {
 	spawnCell := openCells[rand.Intn(len(openCells)-1)]
 	character.X = spawnCell.X
 	character.Y = spawnCell.Y
-	l.Objects = append(l.Objects, character)
+
+	l.addObject(character)
+
+	// Add the character's inventory.
+	for _, o := range character.Inventory {
+		l.addObject(o)
+	}
 
 	l.active = true
 
@@ -46,6 +65,11 @@ func (l *location) removeCharacter(wid id.WID) error {
 	for i, o := range l.Objects {
 		if char, ok := o.(*game.Character); ok && char.WID == wid {
 			l.Objects = append(l.Objects[:i], l.Objects[i+1:]...)
+
+			// Remove the character's inventory.
+			for _, o := range char.Inventory {
+				l.removeObject(o)
+			}
 
 			if len(l.Characters()) == 0 {
 				l.active = false

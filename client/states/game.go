@@ -67,6 +67,17 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 	state.grid.SetColor(color.NRGBA{255, 255, 255, 15})
 
 	state.inventory.Data = data
+	state.inventory.DropItem = func(wid id.WID) {
+		state.sendDesire(state.characterWID, game.DesireDrop{
+			WID: wid,
+		})
+	}
+	state.inventory.ApplyItem = func(wid id.WID, apply bool) {
+		state.sendDesire(state.characterWID, game.DesireApply{
+			WID:   wid,
+			Apply: apply,
+		})
+	}
 
 	return state
 }
@@ -222,7 +233,7 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 				}
 			}
 			// This isn't exactly efficient.
-			state.inventory.Refresh(ctx)
+			state.refreshInventory(ctx)
 		case net.EventsMessage:
 			for _, evt := range m.Events {
 				state.handleEvent(evt.Event(), ctx)
@@ -232,19 +243,29 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 		case net.InventoryMessage:
 			if character := state.Character(); character != nil {
 				state.ensureObjects(m.Inventory)
+
 				character.Inventory = m.Inventory
-				state.inventory.SetInventory(&character.Inventory)
-				state.inventory.Refresh(ctx)
+				// Transform the inventory to reference our local objects.
+				for i, o := range character.Inventory {
+					realObj := state.location.ObjectByWID(o.GetWID())
+					character.Inventory[i] = realObj
+				}
+				state.refreshInventory(ctx)
 			}
 		case net.OwnerMessage:
 			state.characterWID = m.WID
 			if character := state.Character(); character != nil {
 				state.ensureObjects(m.Inventory)
+
 				character.Inventory = m.Inventory
+				// Transform the inventory to reference our local objects.
+				for i, o := range character.Inventory {
+					realObj := state.location.ObjectByWID(o.GetWID())
+					character.Inventory[i] = realObj
+				}
+				state.refreshInventory(ctx)
 
 				character.Skills = m.Skills
-				state.inventory.SetInventory(&character.Inventory)
-				state.inventory.Refresh(ctx)
 			}
 		default:
 			fmt.Println("TODO: Handle", m.Type())
@@ -299,12 +320,22 @@ func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 		if o := state.location.ObjectByWID(evt.WID); o != nil {
 			if applier := state.location.ObjectByWID(evt.Applier); applier != nil {
 				if ch, ok := applier.(*game.Character); ok {
-					ch.Apply(o)
-					if ch == state.Character() {
-						fmt.Println("You applied an item")
-						state.inventory.Refresh(ctx)
+					if evt.Applied {
+						ch.Apply(o)
+						if ch == state.Character() {
+							fmt.Println("You applied an item")
+							state.refreshInventory(ctx)
+						} else {
+							fmt.Printf("%s applied an item\n", ch.Name)
+						}
 					} else {
-						fmt.Printf("%s applied an item\n", ch.Name)
+						ch.Unapply(o)
+						if ch == state.Character() {
+							fmt.Println("You unapplied an item")
+							state.refreshInventory(ctx)
+						} else {
+							fmt.Printf("%s unapplied an item\n", ch.Name)
+						}
 					}
 				}
 			}
@@ -312,12 +343,11 @@ func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 	case game.EventPickup:
 		if o := state.location.ObjectByWID(evt.WID); o != nil {
 			if picker := state.location.ObjectByWID(evt.Picker); picker != nil {
-				o.SetPosition(game.Position{X: -1, Y: -1}) // FIXME: This feels wrong to use -1, -1 to signify hidden.
 				if ch, ok := picker.(*game.Character); ok {
 					ch.Pickup(o)
 					if ch == state.Character() {
 						fmt.Println("You picked up an item")
-						state.inventory.Refresh(ctx)
+						state.refreshInventory(ctx)
 					} else {
 						fmt.Printf("%s picked up an item\n", ch.Name)
 					}
@@ -332,7 +362,7 @@ func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 					ch.Drop(o)
 					if ch == state.Character() {
 						fmt.Println("You dropped an item")
-						state.inventory.Refresh(ctx)
+						state.refreshInventory(ctx)
 					} else {
 						fmt.Printf("%s dropped an item\n", ch.Name)
 					}
@@ -365,6 +395,10 @@ func (state *Game) Character() *game.Character {
 		}
 	}
 	return nil
+}
+
+func (state *Game) refreshInventory(ctx ifs.RunContext) {
+	state.inventory.Refresh(ctx, state.Character().Inventory)
 }
 
 func (state *Game) Draw(ctx ifs.DrawContext) {
@@ -400,10 +434,15 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 			}
 		}
 		// Draw characters
-		for _, char := range state.location.Characters() {
-			if img := state.data.archetypeImages[char.Archetype]; img != nil {
-				px := char.X * cw
-				py := char.Y * ch
+		for _, o := range state.location.Objects {
+			// Ignore out of bounds objects.
+			pos := o.GetPosition()
+			if pos.X < 0 || pos.Y < 0 {
+				continue
+			}
+			if img := state.data.archetypeImages[o.GetArchetype()]; img != nil {
+				px := pos.X * cw
+				py := pos.Y * ch
 				opts := ebiten.DrawImageOptions{}
 				opts.GeoM.Concat(scrollOpts)
 				opts.GeoM.Translate(float64(px), float64(py))

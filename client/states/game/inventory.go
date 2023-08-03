@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"time"
 
 	eimage "github.com/ebitenui/ebitenui/image"
 	"github.com/ebitenui/ebitenui/widget"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/kettek/morogue/client/embed"
 	"github.com/kettek/morogue/client/ifs"
 	"github.com/kettek/morogue/game"
 	"github.com/kettek/morogue/id"
@@ -15,10 +17,11 @@ import (
 
 type Inventory struct {
 	Data           Data
-	inventory      *game.Objects
 	container      *widget.Container
 	innerContainer *widget.Container
 	cells          []*inventoryCell
+	ApplyItem      func(wid id.WID, apply bool)
+	DropItem       func(wid id.WID)
 }
 
 type inventoryCell struct {
@@ -26,7 +29,10 @@ type inventoryCell struct {
 	tooltip        *widget.ToolTip
 	tooltipContent *widget.Container
 	graphic        *widget.Graphic
+	indicator      *widget.Graphic
 	WID            id.WID
+	//
+	applied bool
 }
 
 func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
@@ -57,6 +63,8 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 
 	for i := 0; i < 5; i++ {
 		for j := 0; j < 5; j++ {
+			clickCount := 0
+			lastTime := time.Now()
 
 			tooltipContent := widget.NewContainer(
 				widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{R: 20, G: 20, B: 20, A: 255})),
@@ -85,6 +93,10 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 				),
 			)
 
+			indicator := widget.NewGraphic(
+				widget.GraphicOpts.Image(nil),
+			)
+
 			invCell := &inventoryCell{}
 
 			cell := widget.NewContainer(
@@ -92,8 +104,10 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 				widget.ContainerOpts.Layout(widget.NewStackedLayout()),
 				widget.ContainerOpts.WidgetOpts(
 					widget.WidgetOpts.LayoutData(widget.GridLayoutData{
-						MaxWidth:  34,
-						MaxHeight: 34,
+						MaxWidth:           34,
+						MaxHeight:          34,
+						HorizontalPosition: widget.GridLayoutPositionEnd,
+						VerticalPosition:   widget.GridLayoutPositionStart,
 					}),
 					widget.WidgetOpts.ToolTip(tool),
 					widget.WidgetOpts.EnableDragAndDrop(
@@ -119,6 +133,32 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 						}
 					}),
 					widget.WidgetOpts.MouseButtonReleasedHandler(func(args *widget.WidgetMouseButtonReleasedEventArgs) {
+						if args.Inside {
+							if args.Button == ebiten.MouseButtonLeft {
+								if time.Since(lastTime) > 500*time.Millisecond {
+									clickCount = 0
+									lastTime = time.Now()
+								}
+								clickCount++
+								if clickCount == 2 {
+									inv.ApplyItem(invCell.WID, !invCell.applied)
+									clickCount = 0
+									return
+								}
+							} else if args.Button == ebiten.MouseButtonRight {
+								if time.Since(lastTime) > 500*time.Millisecond {
+									clickCount = 0
+									lastTime = time.Now()
+								}
+								clickCount++
+								if clickCount == 2 {
+									inv.DropItem(invCell.WID)
+									clickCount = 0
+									return
+								}
+							}
+						}
+
 						if args.Inside && args.Button == ebiten.MouseButtonLeft && ebiten.IsKeyPressed(ebiten.KeyControl) {
 							args.Widget.DragAndDrop.StartDrag()
 						}
@@ -130,11 +170,13 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 			)
 
 			cell.AddChild(graphic)
+			cell.AddChild(indicator)
 
 			invCell.cell = cell
 			invCell.tooltip = tool
 			invCell.tooltipContent = tooltipContent
 			invCell.graphic = graphic
+			invCell.indicator = indicator
 
 			inv.cells = append(inv.cells, invCell)
 
@@ -145,22 +187,33 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 	inv.container.AddChild(inv.innerContainer)
 }
 
-func (inv *Inventory) SetInventory(inventory *game.Objects) {
-	inv.inventory = inventory
-}
-
-func (inv *Inventory) Refresh(ctx ifs.RunContext) {
+func (inv *Inventory) Refresh(ctx ifs.RunContext, objects game.Objects) {
 	noneColor := color.NRGBA{R: 200, G: 200, B: 200, A: 255}
 	lightColor := color.NRGBA{R: 100, G: 100, B: 200, A: 255}
 	mediumColor := color.NRGBA{R: 200, G: 200, B: 100, A: 255}
 	heavyColor := color.NRGBA{R: 200, G: 100, B: 100, A: 255}
 
-	// TODO: Potentially destroy previous cells...
-	fmt.Println("TODO: Refresh inventory", inv.inventory)
-	for i, o := range *inv.inventory {
+	// TODO: Don't clear cells that have remained the same.
+
+	// Clear old cells.
+	for _, cell := range inv.cells {
+		if cell.WID == 0 {
+			continue
+		}
+		cell.tooltip.Offset = image.Pt(-1000, -1000)
+		cell.graphic.Image = nil
+		cell.indicator.Image = nil
+		cell.tooltipContent.RemoveChildren()
+		cell.applied = false
+		cell.WID = 0
+	}
+
+	// Refresh it.
+	for i, o := range objects {
 		img := inv.Data.ArchetypeImage(o.GetArchetype())
+		inv.cells[i].WID = o.GetWID()
 		inv.cells[i].graphic.Image = img
-		inv.cells[i].tooltip.Offset = image.Pt(0, 0)
+		inv.cells[i].tooltip.Offset = image.Pt(2, 2)
 
 		arch := inv.Data.Archetype(o.GetArchetype())
 		switch a := arch.(type) {
@@ -184,9 +237,22 @@ func (inv *Inventory) Refresh(ctx ifs.RunContext) {
 			inv.cells[i].tooltipContent.AddChild(title)
 			inv.cells[i].tooltipContent.AddChild(values)
 			inv.cells[i].tooltipContent.AddChild(desc)
-
 		case game.ItemArchetype:
 			// TODO
+		}
+
+		inv.cells[i].indicator.Image = nil
+		switch o := o.(type) {
+		case *game.Weapon:
+			if o.Applied {
+				inv.cells[i].indicator.Image = embed.IndicatorApplied
+				inv.cells[i].applied = true
+			}
+		case *game.Armor:
+			if o.Applied {
+				inv.cells[i].indicator.Image = embed.IndicatorApplied
+				inv.cells[i].applied = true
+			}
 		}
 	}
 }

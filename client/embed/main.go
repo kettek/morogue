@@ -26,6 +26,10 @@ var CursorDeleteTooltip *ebiten.Image
 var CursorMove *ebiten.Image
 var FontDefault *sfnt.Font
 
+var IndicatorImage *ebiten.Image
+var IndicatorApplied *ebiten.Image
+var IndicatorCursed *ebiten.Image
+
 func Setup() {
 	f, err := Assets.Open("images/icon.png")
 	if err != nil {
@@ -63,6 +67,16 @@ func Setup() {
 	einput.SetCursorImage("delete", CursorDelete)
 	einput.SetCursorImage("delete-tooltip", CursorDeleteTooltip)
 	einput.SetCursorImage("move", CursorMove)
+
+	//
+	f, err = Assets.Open("images/indicators.png")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	IndicatorImage, _, _ = ebitenutil.NewImageFromReader(f)
+	IndicatorApplied = ebiten.NewImageFromImage(IndicatorImage.SubImage(image.Rect(0, 0, 8, 8)))
+	IndicatorCursed = ebiten.NewImageFromImage(IndicatorImage.SubImage(image.Rect(8, 0, 16, 8)))
 
 	//
 	b, err := Assets.ReadFile("fonts/x12y16pxMaruMonica.ttf")

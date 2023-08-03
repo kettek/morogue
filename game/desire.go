@@ -27,6 +27,14 @@ func (w *DesireWrapper) Desire() Desire {
 		var d DesireApply
 		msgpack.Unmarshal(w.Data, &d)
 		return d
+	case (DesirePickup{}).Type():
+		var d DesirePickup
+		msgpack.Unmarshal(w.Data, &d)
+		return d
+	case (DesireDrop{}).Type():
+		var d DesireDrop
+		msgpack.Unmarshal(w.Data, &d)
+		return d
 	}
 	return nil
 }

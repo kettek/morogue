@@ -1,6 +1,8 @@
 package game
 
-import "github.com/kettek/morogue/id"
+import (
+	"github.com/kettek/morogue/id"
+)
 
 type Location struct {
 	ID      id.UUID `msgpack:"id,omitempty"`
