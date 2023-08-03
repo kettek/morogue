@@ -25,6 +25,15 @@ func (d *Data) hasArchetype(uuid id.UUID) bool {
 	return false
 }
 
+func (d *Data) Archetype(uuid id.UUID) game.Archetype {
+	for _, a := range d.Archetypes {
+		if a.GetID() == uuid {
+			return a
+		}
+	}
+	return nil
+}
+
 func (d *Data) Tile(uuid id.UUID) (game.TileArchetype, error) {
 	for _, t := range d.TileArchetypes() {
 		if t.ID == uuid {
