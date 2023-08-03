@@ -4,6 +4,6 @@
   "image": "han-xie.png",
   "description": "A pair of cloth shoes.",
   "armorType": "light",
-  "minArmor": 1,
-  "maxArmor": 2
+  "minArmor": 0,
+  "maxArmor": 1
 }

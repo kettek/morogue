@@ -4,6 +4,6 @@
   "image": "han-ku.png",
   "description": "A light armor made of cloth worn by a Master",
   "armorType": "light",
-  "minArmor": 1,
-  "maxArmor": 2
+  "minArmor": 0,
+  "maxArmor": 1
 }
