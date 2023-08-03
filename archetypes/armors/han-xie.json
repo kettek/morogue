@@ -1,0 +1,9 @@
+{
+  "id": "morogue:armor:han-xie",
+  "title": "Han-xie",
+  "image": "han-xie.png",
+  "description": "A pair of cloth shoes.",
+  "armorType": "light",
+  "minArmor": 1,
+  "maxArmor": 2
+}

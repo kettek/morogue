@@ -1,0 +1,9 @@
+{
+  "id": "morogue:armor:han-fu",
+  "title": "Han-fu",
+  "image": "han-fu.png",
+  "description": "A traditional clothing worn by a Master.",
+  "armorType": "light",
+  "minArmor": 1,
+  "maxArmor": 2
+}

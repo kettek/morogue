@@ -1,0 +1,9 @@
+{
+  "id": "morogue:armor:handwraps",
+  "title": "Handwraps",
+  "image": "handwraps.png",
+  "description": "Handwraps are a type of armor that covers the hands of the wearer.",
+  "armorType": "light",
+  "minArmor": 1,
+  "maxArmor": 1
+}

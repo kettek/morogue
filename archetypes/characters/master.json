@@ -1,10 +1,11 @@
 {
-  "id": "morogue:archetype:master",
+  "id": "morogue:character:master",
   "title": "Master",
   "image": "master.png",
   "swole": 2,
   "zooms": 4,
   "brains": 1,
   "funk": 2,
-  "traits": ["unarmed x2 damage"]
+  "traits": ["unarmed x2 damage"],
+  "startingObjects": ["morogue:armor:handwraps", "morogue:armor:han-fu", "morogue:armor:han-ku", "morogue:armor:han-xie"]
 }

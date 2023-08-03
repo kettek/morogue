@@ -1,0 +1,9 @@
+{
+  "id": "morogue:armor:han-ku",
+  "title": "Han-ku",
+  "image": "han-ku.png",
+  "description": "A light armor made of cloth worn by a Master",
+  "armorType": "light",
+  "minArmor": 1,
+  "maxArmor": 2
+}
