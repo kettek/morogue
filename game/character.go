@@ -55,6 +55,11 @@ func (c Character) GetWID() id.WID {
 	return c.WID
 }
 
+// SetWID sets the WID.
+func (c *Character) SetWID(wid id.WID) {
+	c.WID = wid
+}
+
 // GetPosition returns the position.
 func (c Character) GetPosition() Position {
 	return c.Position

@@ -47,6 +47,10 @@ func (w Weapon) GetWID() id.WID {
 	return w.WID
 }
 
+func (w *Weapon) SetWID(wid id.WID) {
+	w.WID = wid
+}
+
 // GetPosition returns the position of the item.
 func (w Weapon) GetPosition() Position {
 	return w.Position

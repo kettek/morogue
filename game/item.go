@@ -37,6 +37,11 @@ func (o Item) GetWID() id.WID {
 	return o.WID
 }
 
+// SetWID sets the world ID of the item.
+func (o *Item) SetWID(wid id.WID) {
+	o.WID = wid
+}
+
 // GetPosition returns the position of the item.
 func (o Item) GetPosition() Position {
 	return o.Position

@@ -15,6 +15,7 @@ type ObjectType string
 // players, items, and enemies.
 type Object interface {
 	Type() ObjectType
+	SetWID(id.WID) // SetWID should only be called by the world.
 	GetWID() id.WID
 	SetPosition(Position)
 	GetPosition() Position
@@ -42,6 +43,18 @@ func (ow ObjectWrapper) Object() (Object, error) {
 			return nil, err
 		}
 		return c, nil
+	case (Weapon{}).Type():
+		var w *Weapon
+		if err := json.Unmarshal(ow.Data, &w); err != nil {
+			return nil, err
+		}
+		return w, nil
+	case (Armor{}).Type():
+		var a *Armor
+		if err := json.Unmarshal(ow.Data, &a); err != nil {
+			return nil, err
+		}
+		return a, nil
 	}
 	return nil, errors.New("unknown object type: " + string(ow.Type))
 }

@@ -12,15 +12,29 @@ const (
 	ArmorTypeHeavy
 )
 
+func (a *ArmorType) UnmarshalJSON(b []byte) error {
+	switch string(b) {
+	case `light`:
+		*a = ArmorTypeLight
+	case `medium`:
+		*a = ArmorTypeMedium
+	case `heavy`:
+		*a = ArmorTypeHeavy
+	default:
+		*a = ArmorTypeNone
+	}
+	return nil
+}
+
 // ArmorArchetype is effectively a blueprint for armour.
 type ArmorArchetype struct {
 	ID           id.UUID
-	Title        string    `json:"T,omitempty"`
-	Image        string    `json:"i,omitempty"`
-	ArmorType    ArmorType `json:"t,omitempty"`
-	MinArmor     int       `json:"m,omitempty"` // Character proficiency with a weapon increases min up to max.
-	MaxArmor     int       `json:"M,omitempty"`
-	ArmorPenalty int       `json:"p,omitempty"` // Penalty to movement speed.
+	Title        string
+	Image        string
+	ArmorType    ArmorType
+	MinArmor     int // Character proficiency with a weapon increases min up to max.
+	MaxArmor     int
+	ArmorPenalty int // Penalty to movement speed.
 }
 
 func (a ArmorArchetype) Type() string {
@@ -46,6 +60,10 @@ func (a Armor) Type() ObjectType {
 
 func (a Armor) GetWID() id.WID {
 	return a.WID
+}
+
+func (a *Armor) SetWID(wid id.WID) {
+	a.WID = wid
 }
 
 func (a Armor) GetPosition() Position {
