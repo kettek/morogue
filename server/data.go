@@ -137,6 +137,7 @@ func (d *Data) loadArchetypes() error {
 								continue
 							}
 							c.PlayerOnly = true
+							c.Image = "characters/" + c.Image
 							d.Archetypes = append(d.Archetypes, c)
 						} else if kind == "weapons" {
 							var w game.WeaponArchetype
@@ -145,6 +146,7 @@ func (d *Data) loadArchetypes() error {
 								log.Println(err)
 								continue
 							}
+							w.Image = "weapons/" + w.Image
 							d.Archetypes = append(d.Archetypes, w)
 						} else if kind == "armors" {
 							var a game.ArmorArchetype
@@ -153,6 +155,7 @@ func (d *Data) loadArchetypes() error {
 								log.Println(err)
 								continue
 							}
+							a.Image = "armors/" + a.Image
 							d.Archetypes = append(d.Archetypes, a)
 						} else if kind == "items" {
 							var i game.ItemArchetype
@@ -161,6 +164,7 @@ func (d *Data) loadArchetypes() error {
 								log.Println(err)
 								continue
 							}
+							i.Image = "items/" + i.Image
 							d.Archetypes = append(d.Archetypes, i)
 						} else if kind == "tiles" {
 							var t game.TileArchetype
@@ -169,6 +173,7 @@ func (d *Data) loadArchetypes() error {
 								log.Println(err)
 								continue
 							}
+							t.Image = "tiles/" + t.Image
 							d.Archetypes = append(d.Archetypes, t)
 						}
 					}

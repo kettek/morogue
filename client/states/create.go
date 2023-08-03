@@ -505,7 +505,7 @@ func (state *Create) acquireArchetypes(ctx ifs.RunContext, archetypes []game.Arc
 				state.archetypes = append(state.archetypes, arche)
 			}()
 
-			img, err := state.data.loadImage("archetypes/characters/"+arch.Image, ctx.Game.Zoom)
+			img, err := state.data.loadImage("archetypes/"+arch.Image, ctx.Game.Zoom)
 			if err != nil {
 				// TODO: Show error image
 				continue

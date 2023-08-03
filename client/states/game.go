@@ -192,7 +192,7 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 				// Store the tile and request the image.
 				state.data.tiles[m.Tile.ID] = m.Tile
 				if _, ok := state.data.tileImages[m.Tile.ID]; !ok {
-					src := "archetypes/tiles/" + m.Tile.Image
+					src := "archetypes/" + m.Tile.Image
 					if img, err := state.data.loadImage(src, ctx.Game.Zoom); err == nil {
 						state.data.tileImages[m.Tile.ID] = img
 					}
