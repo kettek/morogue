@@ -7,17 +7,21 @@ import (
 )
 
 const (
-	KeyArchetype = "morogue:archetype"
+	KeyCharacter = "morogue:character"
 	KeyTile      = "morogue:tile"
 	KeyMob       = "morogue:mob"
 	KeyItem      = "morogue:item"
+	KeyWeapon    = "morogue:weapon"
+	KeyArmor     = "morogue:armor"
 )
 
 var (
-	Archetype UUID
+	Character UUID
 	Tile      UUID
 	Mob       UUID
 	Item      UUID
+	Weapon    UUID
+	Armor     UUID
 )
 
 // NamespaceToKey provides a mapping of morogue's UUIDv5s to their string keys.
@@ -29,12 +33,12 @@ func init() {
 	KeyToNamespace = make(map[string]UUID)
 	{
 		hasher := sha1.New()
-		hasher.Write([]byte(KeyArchetype))
+		hasher.Write([]byte(KeyCharacter))
 		sha := hasher.Sum(nil)
 
-		Archetype = UUID(uuid.Must(uuid.FromBytes(sha[:16])))
-		NamespaceToKey[Archetype] = KeyArchetype
-		KeyToNamespace[KeyArchetype] = Archetype
+		Character = UUID(uuid.Must(uuid.FromBytes(sha[:16])))
+		NamespaceToKey[Character] = KeyCharacter
+		KeyToNamespace[KeyCharacter] = Character
 	}
 	{
 		hasher := sha1.New()
@@ -62,5 +66,23 @@ func init() {
 		Item = UUID(uuid.Must(uuid.FromBytes(sha[:16])))
 		NamespaceToKey[Item] = KeyItem
 		KeyToNamespace[KeyItem] = Item
+	}
+	{
+		hasher := sha1.New()
+		hasher.Write([]byte(KeyWeapon))
+		sha := hasher.Sum(nil)
+
+		Weapon = UUID(uuid.Must(uuid.FromBytes(sha[:16])))
+		NamespaceToKey[Weapon] = KeyWeapon
+		KeyToNamespace[KeyWeapon] = Weapon
+	}
+	{
+		hasher := sha1.New()
+		hasher.Write([]byte(KeyArmor))
+		sha := hasher.Sum(nil)
+
+		Armor = UUID(uuid.Must(uuid.FromBytes(sha[:16])))
+		NamespaceToKey[Armor] = KeyArmor
+		KeyToNamespace[KeyArmor] = Armor
 	}
 }

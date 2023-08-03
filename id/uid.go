@@ -48,6 +48,7 @@ func (u *UUID) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// IsNil returns true if the UUID is nil.
 func (u UUID) IsNil() bool {
 	return uuid.UUID(u).IsNil()
 }
@@ -57,13 +58,14 @@ func (u UUID) Bytes() []byte {
 	return u[:]
 }
 
+// String returns a string representation of the UUID.
 func (u UUID) String() string {
 	return uuid.UUID(u).String()
 }
 
 // UID generates a unique identifier for the given name in the given morogue namespace. The namespace must be NSArchetype, NSMob, or NSItem.
 func UID(ns UUID, name string) (UUID, error) {
-	if ns != Archetype && ns != Tile && ns != Mob && ns != Item {
+	if ns != Character && ns != Tile && ns != Mob && ns != Item && ns != Weapon && ns != Armor {
 		return UUID{}, errors.New("namespace not morogue")
 	}
 	return UUID(uuid.NewV5(uuid.UUID(ns), name)), nil
