@@ -3,6 +3,7 @@ package states
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"image"
 	"io/ioutil"
 	"log"
@@ -28,6 +29,45 @@ func NewData() *Data {
 		archetypeImages: make(map[id.UUID]*ebiten.Image),
 		tiles:           make(map[id.UUID]game.TileArchetype),
 		tileImages:      make(map[id.UUID]*ebiten.Image),
+	}
+}
+
+func (d *Data) ensureImage(archetype game.Archetype, zoom float64) (*ebiten.Image, error) {
+	if img, ok := d.archetypeImages[archetype.GetID()]; ok {
+		return img, nil
+	}
+
+	switch a := archetype.(type) {
+	case game.CharacterArchetype:
+		if img, err := d.loadImage("archetypes/"+a.Image, zoom); err == nil {
+			d.archetypeImages[a.GetID()] = img
+			return img, nil
+		} else {
+			return nil, err
+		}
+	case game.ItemArchetype:
+		if img, err := d.loadImage("archetypes/"+a.Image, zoom); err == nil {
+			d.archetypeImages[a.GetID()] = img
+			return img, nil
+		} else {
+			return nil, err
+		}
+	case game.WeaponArchetype:
+		if img, err := d.loadImage("archetypes/"+a.Image, zoom); err == nil {
+			d.archetypeImages[a.GetID()] = img
+			return img, nil
+		} else {
+			return nil, err
+		}
+	case game.ArmorArchetype:
+		if img, err := d.loadImage("archetypes/"+a.Image, zoom); err == nil {
+			d.archetypeImages[a.GetID()] = img
+			return img, nil
+		} else {
+			return nil, err
+		}
+	default:
+		return nil, fmt.Errorf("unknown archetype type: %T", archetype)
 	}
 }
 
