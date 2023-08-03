@@ -1,6 +1,8 @@
 package game
 
-import "github.com/kettek/morogue/id"
+import (
+	"github.com/kettek/morogue/id"
+)
 
 // ArmorType is the type the armor is considered as.
 type ArmorType uint8
@@ -12,13 +14,26 @@ const (
 	ArmorTypeHeavy
 )
 
+func (a ArmorType) String() string {
+	switch a {
+	case ArmorTypeLight:
+		return "light"
+	case ArmorTypeMedium:
+		return "medium"
+	case ArmorTypeHeavy:
+		return "heavy"
+	default:
+		return "none"
+	}
+}
+
 func (a *ArmorType) UnmarshalJSON(b []byte) error {
 	switch string(b) {
-	case `light`:
+	case `"light"`:
 		*a = ArmorTypeLight
-	case `medium`:
+	case `"medium"`:
 		*a = ArmorTypeMedium
-	case `heavy`:
+	case `"heavy"`:
 		*a = ArmorTypeHeavy
 	default:
 		*a = ArmorTypeNone
@@ -31,6 +46,7 @@ type ArmorArchetype struct {
 	ID           id.UUID
 	Title        string
 	Image        string
+	Description  string
 	ArmorType    ArmorType
 	MinArmor     int // Character proficiency with a weapon increases min up to max.
 	MaxArmor     int
