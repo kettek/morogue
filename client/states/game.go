@@ -178,6 +178,20 @@ func (state *Game) syncUIToLocation(ctx ifs.RunContext) {
 	state.grid.SetSize(w, h)
 }
 
+func (state *Game) ensureObjects(objects game.Objects) {
+	var missingArchetypes []id.UUID
+	for _, obj := range objects {
+		if _, ok := state.data.archetypes[obj.GetArchetype()]; !ok {
+			missingArchetypes = append(missingArchetypes, obj.GetArchetype())
+		}
+	}
+	if len(missingArchetypes) > 0 {
+		state.connection.Write(net.ArchetypesMessage{
+			IDs: missingArchetypes,
+		})
+	}
+}
+
 func (state *Game) Update(ctx ifs.RunContext) error {
 	state.ui.Update()
 	select {
@@ -198,16 +212,31 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 					}
 				}
 			}
+		case net.ArchetypesMessage:
+			for _, a := range m.Archetypes {
+				state.data.archetypes[a.GetID()] = a
+				if _, err := state.data.ensureImage(a, ctx.Game.Zoom); err != nil {
+					fmt.Println("Error loading archetype image:", err)
+				}
+			}
 		case net.EventsMessage:
 			for _, evt := range m.Events {
 				state.handleEvent(evt.Event())
 			}
 		case net.EventMessage:
 			state.handleEvent(m.Event.Event())
+		case net.InventoryMessage:
+			if character := state.Character(); character != nil {
+				state.ensureObjects(m.Inventory)
+				character.Inventory = m.Inventory
+				state.inventory.SetInventory(&character.Inventory)
+			}
 		case net.OwnerMessage:
 			state.characterWID = m.WID
 			if character := state.Character(); character != nil {
+				state.ensureObjects(m.Inventory)
 				character.Inventory = m.Inventory
+
 				character.Skills = m.Skills
 				state.inventory.SetInventory(&character.Inventory)
 			}
