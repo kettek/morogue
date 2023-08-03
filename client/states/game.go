@@ -222,18 +222,19 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 				}
 			}
 			// This isn't exactly efficient.
-			state.inventory.Refresh()
+			state.inventory.Refresh(ctx)
 		case net.EventsMessage:
 			for _, evt := range m.Events {
-				state.handleEvent(evt.Event())
+				state.handleEvent(evt.Event(), ctx)
 			}
 		case net.EventMessage:
-			state.handleEvent(m.Event.Event())
+			state.handleEvent(m.Event.Event(), ctx)
 		case net.InventoryMessage:
 			if character := state.Character(); character != nil {
 				state.ensureObjects(m.Inventory)
 				character.Inventory = m.Inventory
 				state.inventory.SetInventory(&character.Inventory)
+				state.inventory.Refresh(ctx)
 			}
 		case net.OwnerMessage:
 			state.characterWID = m.WID
@@ -243,6 +244,7 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 
 				character.Skills = m.Skills
 				state.inventory.SetInventory(&character.Inventory)
+				state.inventory.Refresh(ctx)
 			}
 		default:
 			fmt.Println("TODO: Handle", m.Type())
@@ -270,7 +272,7 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 	return nil
 }
 
-func (state *Game) handleEvent(e game.Event) {
+func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 	if state.location == nil {
 		return
 	}
@@ -300,7 +302,7 @@ func (state *Game) handleEvent(e game.Event) {
 					ch.Apply(o)
 					if ch == state.Character() {
 						fmt.Println("You applied an item")
-						state.inventory.Refresh()
+						state.inventory.Refresh(ctx)
 					} else {
 						fmt.Printf("%s applied an item\n", ch.Name)
 					}
@@ -315,7 +317,7 @@ func (state *Game) handleEvent(e game.Event) {
 					ch.Pickup(o)
 					if ch == state.Character() {
 						fmt.Println("You picked up an item")
-						state.inventory.Refresh()
+						state.inventory.Refresh(ctx)
 					} else {
 						fmt.Printf("%s picked up an item\n", ch.Name)
 					}
@@ -330,7 +332,7 @@ func (state *Game) handleEvent(e game.Event) {
 					ch.Drop(o)
 					if ch == state.Character() {
 						fmt.Println("You dropped an item")
-						state.inventory.Refresh()
+						state.inventory.Refresh(ctx)
 					} else {
 						fmt.Printf("%s dropped an item\n", ch.Name)
 					}

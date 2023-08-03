@@ -22,11 +22,11 @@ type Inventory struct {
 }
 
 type inventoryCell struct {
-	cell        *widget.Container
-	tooltip     *widget.ToolTip
-	tooltipText *widget.Text
-	graphic     *widget.Graphic
-	WID         id.WID
+	cell           *widget.Container
+	tooltip        *widget.ToolTip
+	tooltipContent *widget.Container
+	graphic        *widget.Graphic
+	WID            id.WID
 }
 
 func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
@@ -59,19 +59,13 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 		for j := 0; j < 5; j++ {
 
 			tooltipContent := widget.NewContainer(
-				widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{R: 50, G: 50, B: 50, A: 255})),
+				widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{R: 20, G: 20, B: 20, A: 255})),
 				widget.ContainerOpts.AutoDisableChildren(),
-				widget.ContainerOpts.Layout(widget.NewAnchorLayout(widget.AnchorLayoutOpts.Padding(widget.Insets{
-					Top:    5,
-					Bottom: 5,
-					Left:   10,
-					Right:  10,
-				}))),
+				widget.ContainerOpts.Layout(widget.NewRowLayout(
+					widget.RowLayoutOpts.Direction(widget.DirectionVertical),
+					widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(8)),
+				)),
 			)
-
-			tooltipText := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text("", ctx.UI.BodyCopyFace, color.White))
-
-			tooltipContent.AddChild(tooltipText)
 
 			tool := widget.NewToolTip(
 				widget.ToolTipOpts.Content(tooltipContent),
@@ -94,7 +88,7 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 			invCell := &inventoryCell{}
 
 			cell := widget.NewContainer(
-				widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{128, 128, 128, 128})),
+				widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{32, 32, 32, 128})),
 				widget.ContainerOpts.Layout(widget.NewStackedLayout()),
 				widget.ContainerOpts.WidgetOpts(
 					widget.WidgetOpts.LayoutData(widget.GridLayoutData{
@@ -139,7 +133,7 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 
 			invCell.cell = cell
 			invCell.tooltip = tool
-			invCell.tooltipText = tooltipText
+			invCell.tooltipContent = tooltipContent
 			invCell.graphic = graphic
 
 			inv.cells = append(inv.cells, invCell)
@@ -153,10 +147,14 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 
 func (inv *Inventory) SetInventory(inventory *game.Objects) {
 	inv.inventory = inventory
-	inv.Refresh()
 }
 
-func (inv *Inventory) Refresh() {
+func (inv *Inventory) Refresh(ctx ifs.RunContext) {
+	noneColor := color.NRGBA{R: 200, G: 200, B: 200, A: 255}
+	lightColor := color.NRGBA{R: 100, G: 100, B: 200, A: 255}
+	mediumColor := color.NRGBA{R: 200, G: 200, B: 100, A: 255}
+	heavyColor := color.NRGBA{R: 200, G: 100, B: 100, A: 255}
+
 	// TODO: Potentially destroy previous cells...
 	fmt.Println("TODO: Refresh inventory", inv.inventory)
 	for i, o := range *inv.inventory {
@@ -167,11 +165,28 @@ func (inv *Inventory) Refresh() {
 		arch := inv.Data.Archetype(o.GetArchetype())
 		switch a := arch.(type) {
 		case game.WeaponArchetype:
-			inv.cells[i].tooltipText.Label = a.Title
+			// TODO
 		case game.ArmorArchetype:
-			inv.cells[i].tooltipText.Label = fmt.Sprintf("%s (%s) %d~%d\n%s", a.Title, a.ArmorType, a.MinArmor, a.MaxArmor, a.Description)
+			inv.cells[i].tooltipContent.RemoveChildren()
+
+			armorColor := noneColor
+			if a.ArmorType == game.ArmorTypeLight {
+				armorColor = lightColor
+			} else if a.ArmorType == game.ArmorTypeMedium {
+				armorColor = mediumColor
+			} else if a.ArmorType == game.ArmorTypeHeavy {
+				armorColor = heavyColor
+			}
+
+			title := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s", a.Title), ctx.UI.BodyCopyFace, color.White))
+			values := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s %s", a.RangeString(), a.ArmorType), ctx.UI.BodyCopyFace, armorColor))
+			desc := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(a.Description, ctx.UI.BodyCopyFace, color.NRGBA{128, 128, 128, 255}))
+			inv.cells[i].tooltipContent.AddChild(title)
+			inv.cells[i].tooltipContent.AddChild(values)
+			inv.cells[i].tooltipContent.AddChild(desc)
+
 		case game.ItemArchetype:
-			inv.cells[i].tooltipText.Label = a.Title
+			// TODO
 		}
 	}
 }
