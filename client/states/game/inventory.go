@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"time"
 
 	eimage "github.com/ebitenui/ebitenui/image"
 	"github.com/ebitenui/ebitenui/widget"
@@ -23,10 +22,11 @@ type Inventory struct {
 }
 
 type inventoryCell struct {
-	cell    *widget.Container
-	tooltip *widget.ToolTip
-	graphic *widget.Graphic
-	WID     id.WID
+	cell        *widget.Container
+	tooltip     *widget.ToolTip
+	tooltipText *widget.Text
+	graphic     *widget.Graphic
+	WID         id.WID
 }
 
 func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
@@ -57,11 +57,30 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 
 	for i := 0; i < 5; i++ {
 		for j := 0; j < 5; j++ {
-			tool := widget.NewTextToolTip("", ctx.UI.BodyCopyFace, color.White, eimage.NewNineSliceColor(color.NRGBA{R: 50, G: 50, B: 50, A: 255}))
+
+			tooltipContent := widget.NewContainer(
+				widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{R: 50, G: 50, B: 50, A: 255})),
+				widget.ContainerOpts.AutoDisableChildren(),
+				widget.ContainerOpts.Layout(widget.NewAnchorLayout(widget.AnchorLayoutOpts.Padding(widget.Insets{
+					Top:    5,
+					Bottom: 5,
+					Left:   10,
+					Right:  10,
+				}))),
+			)
+
+			tooltipText := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text("", ctx.UI.BodyCopyFace, color.White))
+
+			tooltipContent.AddChild(tooltipText)
+
+			tool := widget.NewToolTip(
+				widget.ToolTipOpts.Content(tooltipContent),
+				widget.ToolTipOpts.Delay(0),
+				widget.ToolTipOpts.Offset(image.Point{-1000, -1000}),
+				widget.ToolTipOpts.ContentOriginHorizontal(widget.TOOLTIP_ANCHOR_START),
+				widget.ToolTipOpts.ContentOriginVertical(widget.TOOLTIP_ANCHOR_START),
+			)
 			tool.Position = widget.TOOLTIP_POS_CURSOR_STICKY
-			tool.Delay = time.Duration(time.Millisecond * 200)
-			// Set to -1000 to hide it for the time being.
-			tool.Offset = image.Pt(-1000, -1000)
 
 			graphic := widget.NewGraphic(
 				widget.GraphicOpts.Image(nil),
@@ -120,6 +139,7 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 
 			invCell.cell = cell
 			invCell.tooltip = tool
+			invCell.tooltipText = tooltipText
 			invCell.graphic = graphic
 
 			inv.cells = append(inv.cells, invCell)
@@ -144,9 +164,14 @@ func (inv *Inventory) Refresh() {
 		inv.cells[i].graphic.Image = img
 		inv.cells[i].tooltip.Offset = image.Pt(0, 0)
 
-		//arch := inv.Data.Archetype(o.GetArchetype())
-		/*switch a := arch.(type) {
-			case *game.WeaponArchetype:
-		}*/
+		arch := inv.Data.Archetype(o.GetArchetype())
+		switch a := arch.(type) {
+		case game.WeaponArchetype:
+			inv.cells[i].tooltipText.Label = a.Title
+		case game.ArmorArchetype:
+			inv.cells[i].tooltipText.Label = fmt.Sprintf("%s (%s) %d~%d\n%s", a.Title, a.ArmorType, a.MinArmor, a.MaxArmor, a.Description)
+		case game.ItemArchetype:
+			inv.cells[i].tooltipText.Label = a.Title
+		}
 	}
 }
