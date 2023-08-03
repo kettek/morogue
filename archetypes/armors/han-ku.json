@@ -3,7 +3,6 @@
   "title": "Han-ku",
   "image": "han-ku.png",
   "description": "A light armor made of cloth worn by a Master",
-  "armorType": "light",
   "minArmor": 0,
   "maxArmor": 1
 }

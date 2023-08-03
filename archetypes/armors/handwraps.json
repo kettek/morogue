@@ -3,7 +3,6 @@
   "title": "Handwraps",
   "image": "handwraps.png",
   "description": "Handwraps are a type of armor that covers the hands of the wearer.",
-  "armorType": "none",
   "minArmor": 0,
   "maxArmor": 1
 }

@@ -3,7 +3,6 @@
   "title": "Han-fu",
   "image": "han-fu.png",
   "description": "A traditional clothing worn by a Master.",
-  "armorType": "light",
   "minArmor": 0,
   "maxArmor": 1
 }
