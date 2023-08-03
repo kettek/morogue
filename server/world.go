@@ -48,6 +48,7 @@ func (w *world) generateLocation( /*locationInfo*/ ) {
 	// TODO: Generate and add location to locations.
 }
 
+// assignWIDs assigns a WID to an object and all of its children. This is done when any object is added to the world.
 func (w *world) assignWIDs(o game.Object) {
 	o.SetWID(w.wids.Next())
 	switch o := o.(type) {
