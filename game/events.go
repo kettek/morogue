@@ -181,13 +181,56 @@ func (e EventPickup) Type() string {
 // EventDrop notifies the client that the given item was dropped.
 type EventDrop struct {
 	Dropper  id.WID `msgpack:"d,omitempty"`
-	WID      id.WID
 	Position Position
+	Object   Object
 }
 
 // Type returns "drop"
 func (e EventDrop) Type() string {
 	return "drop"
+}
+
+type eventDrop struct {
+	Dropper  id.WID `msgpack:"d,omitempty"`
+	Position Position
+	Object   ObjectWrapper `msgpack:"o,omitempty"`
+}
+
+// MarshalMsgpack marshals EventDrop into eventDrop.
+func (e EventDrop) MarshalMsgpack() ([]byte, error) {
+	b, err := msgpack.Marshal(e.Object)
+	if err != nil {
+		return nil, err
+	}
+
+	e2 := eventDrop{
+		Dropper:  e.Dropper,
+		Position: e.Position,
+		Object: ObjectWrapper{
+			Type: e.Object.Type(),
+			Data: b,
+		},
+	}
+
+	return msgpack.Marshal(e2)
+}
+
+// UnmarshalMsgpack unmarshals EventDrop from eventDrop.
+func (e *EventDrop) UnmarshalMsgpack(b []byte) error {
+	var e2 eventDrop
+
+	if err := msgpack.Unmarshal(b, &e2); err != nil {
+		return err
+	}
+	o, err := e2.Object.Object()
+	if err != nil {
+		return err
+	}
+	e.Object = o
+	e.Dropper = e2.Dropper
+	e.Position = e2.Position
+
+	return nil
 }
 
 // EventNotice notifies the client of a generic notice.

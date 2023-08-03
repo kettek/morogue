@@ -198,7 +198,7 @@ func (c *Character) Drop(o Object) Event {
 
 	return EventDrop{
 		Dropper:  c.WID,
-		WID:      o.GetWID(),
+		Object:   o,
 		Position: c.GetPosition(),
 	}
 }

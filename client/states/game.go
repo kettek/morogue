@@ -400,17 +400,23 @@ func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 			}
 		}
 	case game.EventDrop:
-		if o := state.location.ObjectByWID(evt.WID); o != nil {
-			o.SetPosition(evt.Position) // Set the object's position to the dropped position.
-			if dropper := state.location.ObjectByWID(evt.Dropper); dropper != nil {
-				if ch, ok := dropper.(*game.Character); ok {
-					ch.Drop(o)
-					if ch == state.Character() {
-						fmt.Println("You dropped an item")
-						state.refreshInventory(ctx)
-					} else {
-						fmt.Printf("%s dropped an item\n", ch.Name)
-					}
+		if o := state.location.ObjectByWID(evt.Object.GetWID()); o == nil {
+			state.location.Objects.Add(evt.Object)
+		} else {
+			state.location.Objects.RemoveByWID(evt.Object.GetWID())
+			state.location.Objects.Add(evt.Object)
+		}
+
+		o := state.location.ObjectByWID(evt.Object.GetWID())
+		o.SetPosition(evt.Position) // Set the object's position to the dropped position.
+		if dropper := state.location.ObjectByWID(evt.Dropper); dropper != nil {
+			if ch, ok := dropper.(*game.Character); ok {
+				ch.Drop(o)
+				if ch == state.Character() {
+					fmt.Println("You dropped an item")
+					state.refreshInventory(ctx)
+				} else {
+					fmt.Printf("%s dropped an item\n", ch.Name)
 				}
 			}
 		}
