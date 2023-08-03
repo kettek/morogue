@@ -227,6 +227,23 @@ func (w *world) updateClient(cl *client) error {
 					Tile:       t,
 				})
 			}
+		case net.ArchetypesMessage:
+			var archetypes []game.Archetype
+			for _, uuid := range m.IDs {
+				if a := w.data.Archetype(uuid); a == nil {
+					cl.conn.Write(net.ArchetypeMessage{
+						ResultCode: 404,
+						ID:         uuid,
+					})
+				} else {
+					archetypes = append(archetypes, a)
+				}
+			}
+			if len(archetypes) > 0 {
+				cl.conn.Write(net.ArchetypesMessage{
+					Archetypes: archetypes,
+				})
+			}
 		default:
 			// For all other messages, pass off handling to client's current location.
 			if cl.currentLocation != nil {
