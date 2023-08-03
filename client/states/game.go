@@ -29,12 +29,14 @@ type Game struct {
 	//
 	characterWID id.WID
 	//
-	binds     clgame.Binds
-	scroller  clgame.Scroller
-	grid      clgame.Grid
-	mover     clgame.Mover
-	sounds    clgame.Sounds
+	binds    clgame.Binds
+	scroller clgame.Scroller
+	grid     clgame.Grid
+	mover    clgame.Mover
+	sounds   clgame.Sounds
+	//
 	inventory clgame.Inventory
+	below     clgame.Below
 	hotbar    clgame.Hotbar
 }
 
@@ -79,6 +81,18 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 		})
 	}
 
+	state.below.Data = data
+	state.below.PickupItem = func(wid id.WID) {
+		state.sendDesire(state.characterWID, game.DesirePickup{
+			WID: wid,
+		})
+	}
+	state.below.ApplyItem = func(wid id.WID) {
+		state.sendDesire(state.characterWID, game.DesireApply{
+			WID: wid,
+		})
+	}
+
 	return state
 }
 
@@ -107,6 +121,25 @@ func (state *Game) Begin(ctx ifs.RunContext) error {
 	inventoryContainer.AddChild(inventoryContainerInner)
 	state.inventory.Init(inventoryContainerInner, ctx)
 
+	belowContainer := widget.NewContainer(
+		widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
+	)
+	belowContainerInner := widget.NewContainer(
+		widget.ContainerOpts.Layout(widget.NewAnchorLayout(
+			widget.AnchorLayoutOpts.Padding(widget.NewInsetsSimple(8)),
+		)),
+		widget.ContainerOpts.WidgetOpts(
+			widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+				StretchHorizontal:  false,
+				StretchVertical:    false,
+				HorizontalPosition: widget.AnchorLayoutPositionEnd,
+				VerticalPosition:   widget.AnchorLayoutPositionEnd,
+			}),
+		),
+	)
+	belowContainer.AddChild(belowContainerInner)
+	state.below.Init(belowContainerInner, ctx)
+
 	hotbarContainer := widget.NewContainer(
 		widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
 	)
@@ -127,6 +160,7 @@ func (state *Game) Begin(ctx ifs.RunContext) error {
 	state.hotbar.Init(hotbarContainerInner, ctx, &state.binds)
 
 	state.ui.Container.AddChild(inventoryContainer)
+	state.ui.Container.AddChild(belowContainer)
 	state.ui.Container.AddChild(hotbarContainer)
 
 	return nil
@@ -287,6 +321,17 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 					Direction: dir,
 				})
 			}
+			// This isn't great, but whatever.
+			var belowObjects game.Objects
+			for _, o := range state.location.Objects {
+				if o == character {
+					continue
+				}
+				if o.GetPosition() == character.GetPosition() {
+					belowObjects = append(belowObjects, o)
+				}
+			}
+			state.below.Refresh(ctx, belowObjects)
 		}
 	}
 
