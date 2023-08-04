@@ -116,7 +116,7 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 							widget.DragAndDropOpts.MinDragStartDistance(8),
 							widget.DragAndDropOpts.ContentsOriginVertical(widget.DND_ANCHOR_END),
 							widget.DragAndDropOpts.ContentsOriginHorizontal(widget.DND_ANCHOR_END),
-							widget.DragAndDropOpts.Offset(image.Point{-5, -5}),
+							widget.DragAndDropOpts.Offset(image.Point{16, 16}),
 						),
 					),
 					widget.WidgetOpts.CanDrop(func(args *widget.DragAndDropDroppedEventArgs) bool {

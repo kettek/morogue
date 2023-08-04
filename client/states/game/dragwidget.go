@@ -21,7 +21,6 @@ func init() {
 type dragWidget struct {
 	container      *widget.Container
 	graphic        *widget.Graphic
-	text           *widget.Text
 	targetedWidget widget.HasWidget
 	ctx            ifs.RunContext
 	data           interface{}
@@ -38,30 +37,40 @@ func (w *dragWidget) Create(parent widget.HasWidget) (*widget.Container, interfa
 	// For this example we do not need to recreate the Dragged element each time. We can re-use it.
 	if w.container == nil {
 		w.container = widget.NewContainer(
-			widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
-			widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{0, 200, 100, 255})),
+			widget.ContainerOpts.Layout(widget.NewRowLayout(
+				widget.RowLayoutOpts.Direction(widget.DirectionVertical),
+			)),
+			//widget.ContainerOpts.BackgroundImage(cellBackgroundHoverImage),
 		)
-
-		w.text = widget.NewText(widget.TextOpts.Text("Cannot Drop", w.ctx.UI.HeadlineFace, color.White), widget.TextOpts.WidgetOpts(widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+	}
+	if w.graphic == nil {
+		w.graphic = widget.NewGraphic(widget.GraphicOpts.Image(nil), widget.GraphicOpts.WidgetOpts(widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
 			HorizontalPosition: widget.AnchorLayoutPositionCenter,
 			VerticalPosition:   widget.AnchorLayoutPositionCenter,
 		})))
-
-		w.container.AddChild(w.text)
+		w.container.AddChild(w.graphic)
 	}
+
+	if d, ok := w.data.(dragContainer); ok {
+		switch cell := d.cell.(type) {
+		case *inventoryCell:
+			w.graphic.Image = cell.graphic.Image
+		case *belowCell:
+			w.graphic.Image = cell.graphic.Image
+		}
+	}
+
 	// return the container to be dragged and any arbitrary data associated with this operation
 	return w.container, w.data
 }
 
 func (w *dragWidget) Update(canDrop bool, targetWidget widget.HasWidget, dragData interface{}) {
 	if canDrop {
-		w.text.Label = "okay"
 		if targetWidget != nil {
 			targetWidget.(*widget.Container).BackgroundImage = cellBackgroundHoverImage
 			w.targetedWidget = targetWidget
 		}
 	} else {
-		w.text.Label = "nokay"
 		if w.targetedWidget != nil {
 			w.targetedWidget.(*widget.Container).BackgroundImage = cellBackgroundImage
 			w.targetedWidget = nil
