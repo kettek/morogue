@@ -1,0 +1,8 @@
+{
+  "id": "morogue:weapon:gnarled-cane",
+  "title": "Gnarled Cane",
+  "image": "gnarled-cane.png",
+  "description": "A gnarled and worn cane.",
+  "minDamage": 0,
+  "maxDamage": 1
+}

@@ -1,0 +1,8 @@
+{
+  "id": "morogue:armor:robe",
+  "title": "Robe",
+  "image": "robe.png",
+  "description": "A simple robe.",
+  "minArmor": 0,
+  "maxArmor": 1
+}

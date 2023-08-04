@@ -6,5 +6,6 @@
   "zooms": 0,
   "brains": 5,
   "funk": 4,
-  "traits": ["only clubs"]
+  "traits": ["only clubs"],
+  "startingObjects": ["morogue:armor:robe", "morogue:weapon:gnarled-cane"]
 }
