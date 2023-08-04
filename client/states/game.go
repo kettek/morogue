@@ -32,7 +32,7 @@ type Game struct {
 	binds    clgame.Binds
 	scroller clgame.Scroller
 	grid     clgame.Grid
-	mover    clgame.Mover
+	actioner clgame.Actioner
 	sounds   clgame.Sounds
 	//
 	inventory clgame.Inventory
@@ -60,7 +60,7 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 	)*/
 
 	state.binds.Init()
-	state.mover.Init()
+	state.actioner.Init()
 	state.scroller.Init()
 	state.scroller.SetHandler(func(x, y int) {
 		state.grid.SetOffset(x, y)
@@ -334,10 +334,8 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 
 	if state.location != nil {
 		if character := state.Character(); character != nil {
-			if dir := state.mover.Update(state.binds); dir != 0 {
-				state.sendDesire(state.characterWID, game.DesireMove{
-					Direction: dir,
-				})
+			if desire := state.actioner.Update(state.binds); desire != nil {
+				state.sendDesire(state.characterWID, desire)
 			}
 			// This isn't great, but whatever.
 			var belowObjects game.Objects

@@ -28,6 +28,7 @@ func (b *Binds) Init() {
 	b.SetActionKeys("move-right", []ebiten.Key{ebiten.KeyArrowRight, ebiten.KeyD, ebiten.KeyL})
 	b.SetActionKeys("move-up", []ebiten.Key{ebiten.KeyArrowUp, ebiten.KeyW, ebiten.KeyK})
 	b.SetActionKeys("move-down", []ebiten.Key{ebiten.KeyArrowDown, ebiten.KeyS, ebiten.KeyJ})
+	b.SetActionKeys("bash", []ebiten.Key{ebiten.KeyB})
 	b.SetMultiAction("move-upleft", []Action{"move-left", "move-up"})
 	b.SetMultiAction("move-upright", []Action{"move-right", "move-up"})
 	b.SetMultiAction("move-downleft", []Action{"move-left", "move-down"})
