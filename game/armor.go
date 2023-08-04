@@ -18,6 +18,8 @@ const (
 
 func (a ArmorType) String() string {
 	switch a {
+	case ArmorTypeNone:
+		return "petty"
 	case ArmorTypeLight:
 		return "light"
 	case ArmorTypeMedium:
@@ -31,6 +33,8 @@ func (a ArmorType) String() string {
 
 func (a *ArmorType) UnmarshalJSON(b []byte) error {
 	switch string(b) {
+	case `"petty"`:
+		*a = ArmorTypeNone
 	case `"light"`:
 		*a = ArmorTypeLight
 	case `"medium"`:
