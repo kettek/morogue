@@ -62,15 +62,28 @@ func (w *dragWidget) Update(canDrop bool, targetWidget widget.HasWidget, dragDat
 
 func (w *dragWidget) EndDrag(dropped bool, sourceWidget widget.HasWidget, dragData interface{}) {
 	if !dropped {
-		switch cell := dragData.(type) {
-		case *inventoryCell:
-			fmt.Println("dropped inventory cell nowhere, probably drop it", cell)
-		case *hotbarCell:
-			fmt.Println("dropped hotbar cell nowhere, probably clear it", cell)
+		if dragData, ok := dragData.(dragContainer); ok {
+			switch cell := dragData.cell.(type) {
+			case *inventoryCell:
+				if container, ok := dragData.container.(*Inventory); ok {
+					container.DropItem(cell.WID)
+				}
+			case *belowCell:
+				if container, ok := dragData.container.(*Below); ok {
+					container.PickupItem(cell.WID)
+				}
+			case *hotbarCell:
+				fmt.Println("dropped hotbar cell nowhere, probably clear it", cell)
+			}
 		}
 	}
 
 	if w.targetedWidget != nil {
 		w.targetedWidget.(*widget.Container).BackgroundImage = eimage.NewNineSliceColor(color.NRGBA{128, 128, 128, 128})
 	}
+}
+
+type dragContainer struct {
+	cell      interface{}
+	container interface{}
 }

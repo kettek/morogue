@@ -113,7 +113,7 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 					widget.WidgetOpts.ToolTip(tool),
 					widget.WidgetOpts.EnableDragAndDrop(
 						widget.NewDragAndDrop(
-							widget.DragAndDropOpts.ContentsCreater(makeDragWidget(ctx, invCell)),
+							widget.DragAndDropOpts.ContentsCreater(makeDragWidget(ctx, dragContainer{cell: invCell, container: inv})),
 							widget.DragAndDropOpts.MinDragStartDistance(8),
 							widget.DragAndDropOpts.ContentsOriginVertical(widget.DND_ANCHOR_END),
 							widget.DragAndDropOpts.ContentsOriginHorizontal(widget.DND_ANCHOR_END),
@@ -121,7 +121,7 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 						),
 					),
 					widget.WidgetOpts.CanDrop(func(args *widget.DragAndDropDroppedEventArgs) bool {
-						switch args.Data.(type) {
+						switch args.Data.(dragContainer).cell.(type) {
 						case *inventoryCell:
 							return true
 						case *belowCell:
@@ -130,9 +130,9 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 						return false
 					}),
 					widget.WidgetOpts.Dropped(func(args *widget.DragAndDropDroppedEventArgs) {
-						switch cell := args.Data.(type) {
+						switch cell := args.Data.(dragContainer).cell.(type) {
 						case *inventoryCell:
-							fmt.Println("dropped inventory cell on us", cell)
+							// TODO: Reorganize inventory?
 						case *belowCell:
 							inv.PickupItem(cell.WID)
 						}

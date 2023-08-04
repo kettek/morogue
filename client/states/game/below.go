@@ -110,7 +110,7 @@ func (below *Below) Init(container *widget.Container, ctx ifs.RunContext) {
 					widget.WidgetOpts.ToolTip(tool),
 					widget.WidgetOpts.EnableDragAndDrop(
 						widget.NewDragAndDrop(
-							widget.DragAndDropOpts.ContentsCreater(makeDragWidget(ctx, bCell)),
+							widget.DragAndDropOpts.ContentsCreater(makeDragWidget(ctx, dragContainer{cell: bCell, container: below})),
 							widget.DragAndDropOpts.MinDragStartDistance(8),
 							widget.DragAndDropOpts.ContentsOriginVertical(widget.DND_ANCHOR_END),
 							widget.DragAndDropOpts.ContentsOriginHorizontal(widget.DND_ANCHOR_END),
@@ -118,21 +118,16 @@ func (below *Below) Init(container *widget.Container, ctx ifs.RunContext) {
 						),
 					),
 					widget.WidgetOpts.CanDrop(func(args *widget.DragAndDropDroppedEventArgs) bool {
-						switch args.Data.(type) {
+						switch args.Data.(dragContainer).cell.(type) {
 						case *inventoryCell:
-							return true
-						case *belowCell:
 							return true
 						}
 						return false
 					}),
 					widget.WidgetOpts.Dropped(func(args *widget.DragAndDropDroppedEventArgs) {
-						switch cell := args.Data.(type) {
-						case *belowCell:
-							fmt.Println("dropped belowCell cell on us", cell)
+						switch cell := args.Data.(dragContainer).cell.(type) {
 						case *inventoryCell:
 							below.DropItem(cell.WID)
-							fmt.Println("dropped inventoryCell cell on us", cell)
 						}
 					}),
 					widget.WidgetOpts.MouseButtonReleasedHandler(func(args *widget.WidgetMouseButtonReleasedEventArgs) {

@@ -85,7 +85,7 @@ func (hb *Hotbar) Init(container *widget.Container, ctx ifs.RunContext, binds *B
 				widget.WidgetOpts.ToolTip(tool),
 				widget.WidgetOpts.EnableDragAndDrop(
 					widget.NewDragAndDrop(
-						widget.DragAndDropOpts.ContentsCreater(makeDragWidget(ctx, hbCell)),
+						widget.DragAndDropOpts.ContentsCreater(makeDragWidget(ctx, dragContainer{cell: hbCell, container: hb})),
 						widget.DragAndDropOpts.MinDragStartDistance(8),
 						widget.DragAndDropOpts.ContentsOriginVertical(widget.DND_ANCHOR_END),
 						widget.DragAndDropOpts.ContentsOriginHorizontal(widget.DND_ANCHOR_END),
@@ -93,7 +93,7 @@ func (hb *Hotbar) Init(container *widget.Container, ctx ifs.RunContext, binds *B
 					),
 				),
 				widget.WidgetOpts.CanDrop(func(args *widget.DragAndDropDroppedEventArgs) bool {
-					switch args.Data.(type) {
+					switch args.Data.(dragContainer).cell.(type) {
 					case *inventoryCell:
 						return true
 					case *hotbarCell:
@@ -102,11 +102,11 @@ func (hb *Hotbar) Init(container *widget.Container, ctx ifs.RunContext, binds *B
 					return false
 				}),
 				widget.WidgetOpts.Dropped(func(args *widget.DragAndDropDroppedEventArgs) {
-					switch cell := args.Data.(type) {
+					switch args.Data.(dragContainer).cell.(type) {
 					case *inventoryCell:
-						fmt.Println("dropped inventory cell on us", cell)
+						// TODO: Assign item to slot.
 					case *hotbarCell:
-						fmt.Println("dropped hotbar cell on us", cell)
+						// TODO: Swap hotbar entries.
 					}
 				}),
 				widget.WidgetOpts.MouseButtonReleasedHandler(func(args *widget.WidgetMouseButtonReleasedEventArgs) {
