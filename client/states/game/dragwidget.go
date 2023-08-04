@@ -9,6 +9,15 @@ import (
 	"github.com/kettek/morogue/client/ifs"
 )
 
+// This is annoying
+var cellBackgroundImage *eimage.NineSlice
+var cellBackgroundHoverImage *eimage.NineSlice
+
+func init() {
+	cellBackgroundImage = eimage.NewNineSliceColor(color.NRGBA{64, 64, 64, 128})
+	cellBackgroundHoverImage = eimage.NewNineSliceColor(color.NRGBA{128, 128, 128, 128})
+}
+
 type dragWidget struct {
 	container      *widget.Container
 	graphic        *widget.Graphic
@@ -48,13 +57,13 @@ func (w *dragWidget) Update(canDrop bool, targetWidget widget.HasWidget, dragDat
 	if canDrop {
 		w.text.Label = "okay"
 		if targetWidget != nil {
-			targetWidget.(*widget.Container).BackgroundImage = eimage.NewNineSliceColor(color.NRGBA{128, 128, 255, 128})
+			targetWidget.(*widget.Container).BackgroundImage = cellBackgroundHoverImage
 			w.targetedWidget = targetWidget
 		}
 	} else {
 		w.text.Label = "nokay"
 		if w.targetedWidget != nil {
-			w.targetedWidget.(*widget.Container).BackgroundImage = eimage.NewNineSliceColor(color.NRGBA{128, 128, 128, 128})
+			w.targetedWidget.(*widget.Container).BackgroundImage = cellBackgroundImage
 			w.targetedWidget = nil
 		}
 	}
@@ -79,7 +88,7 @@ func (w *dragWidget) EndDrag(dropped bool, sourceWidget widget.HasWidget, dragDa
 	}
 
 	if w.targetedWidget != nil {
-		w.targetedWidget.(*widget.Container).BackgroundImage = eimage.NewNineSliceColor(color.NRGBA{128, 128, 128, 128})
+		w.targetedWidget.(*widget.Container).BackgroundImage = cellBackgroundImage
 	}
 }
 

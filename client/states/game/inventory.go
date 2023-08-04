@@ -67,7 +67,7 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 			lastTime := time.Now()
 
 			tooltipContent := widget.NewContainer(
-				widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{R: 20, G: 20, B: 20, A: 255})),
+				widget.ContainerOpts.BackgroundImage(ctx.UI.ItemInfoBackgroundImage),
 				widget.ContainerOpts.AutoDisableChildren(),
 				widget.ContainerOpts.Layout(widget.NewRowLayout(
 					widget.RowLayoutOpts.Direction(widget.DirectionVertical),
@@ -100,7 +100,7 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 			invCell := &inventoryCell{}
 
 			cell := widget.NewContainer(
-				widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{32, 32, 32, 128})),
+				widget.ContainerOpts.BackgroundImage(cellBackgroundImage),
 				widget.ContainerOpts.Layout(widget.NewStackedLayout()),
 				widget.ContainerOpts.WidgetOpts(
 					widget.WidgetOpts.LayoutData(widget.GridLayoutData{
@@ -192,13 +192,7 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 }
 
 func (inv *Inventory) Refresh(ctx ifs.RunContext, objects game.Objects) {
-	noneColor := color.NRGBA{R: 200, G: 200, B: 200, A: 255}
-	lightColor := color.NRGBA{R: 100, G: 100, B: 200, A: 255}
-	mediumColor := color.NRGBA{R: 200, G: 200, B: 100, A: 255}
-	heavyColor := color.NRGBA{R: 200, G: 100, B: 100, A: 255}
-
 	// TODO: Don't clear cells that have remained the same.
-
 	// Clear old cells.
 	for _, cell := range inv.cells {
 		if cell.WID == 0 {

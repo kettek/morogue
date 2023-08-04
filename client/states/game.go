@@ -111,44 +111,55 @@ func (state *Game) Begin(ctx ifs.RunContext) error {
 	ch := int(float64(ctx.Game.CellHeight) * ctx.Game.Zoom)
 	state.grid.SetCellSize(cw, ch)
 
-	// TODO: Hide this.
-	inventoryContainer := widget.NewContainer(
-		widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
-	)
-	inventoryContainerInner := widget.NewContainer(
-		widget.ContainerOpts.Layout(widget.NewAnchorLayout(
-			widget.AnchorLayoutOpts.Padding(widget.NewInsetsSimple(8)),
-		)),
-		widget.ContainerOpts.WidgetOpts(
-			widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
-				StretchHorizontal:  false,
-				StretchVertical:    false,
-				HorizontalPosition: widget.AnchorLayoutPositionEnd,
-				VerticalPosition:   widget.AnchorLayoutPositionStart,
-			}),
-		),
-	)
-	inventoryContainer.AddChild(inventoryContainerInner)
-	state.inventory.Init(inventoryContainerInner, ctx)
+	{
+		invBelowContainer := widget.NewContainer(
+			widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
+		)
 
-	belowContainer := widget.NewContainer(
-		widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
-	)
-	belowContainerInner := widget.NewContainer(
-		widget.ContainerOpts.Layout(widget.NewAnchorLayout(
-			widget.AnchorLayoutOpts.Padding(widget.NewInsetsSimple(8)),
-		)),
-		widget.ContainerOpts.WidgetOpts(
-			widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
-				StretchHorizontal:  false,
-				StretchVertical:    false,
-				HorizontalPosition: widget.AnchorLayoutPositionEnd,
-				VerticalPosition:   widget.AnchorLayoutPositionEnd,
-			}),
-		),
-	)
-	belowContainer.AddChild(belowContainerInner)
-	state.below.Init(belowContainerInner, ctx)
+		invBelowContainerInner := widget.NewContainer(
+			widget.ContainerOpts.Layout(widget.NewRowLayout(
+				widget.RowLayoutOpts.Direction(widget.DirectionVertical),
+				widget.RowLayoutOpts.Padding(widget.Insets{Top: 100}),
+			)),
+			widget.ContainerOpts.WidgetOpts(
+				widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+					StretchHorizontal:  false,
+					StretchVertical:    false,
+					HorizontalPosition: widget.AnchorLayoutPositionEnd,
+					VerticalPosition:   widget.AnchorLayoutPositionStart,
+				}),
+			),
+		)
+
+		inventoryContainer := widget.NewContainer(
+			widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
+		)
+		inventoryContainerInner := widget.NewContainer(
+			widget.ContainerOpts.Layout(widget.NewAnchorLayout(
+				widget.AnchorLayoutOpts.Padding(widget.NewInsetsSimple(8)),
+			)),
+		)
+		inventoryContainer.AddChild(inventoryContainerInner)
+		state.inventory.Init(inventoryContainerInner, ctx)
+
+		belowContainer := widget.NewContainer(
+			widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
+		)
+		belowContainerInner := widget.NewContainer(
+			widget.ContainerOpts.Layout(widget.NewAnchorLayout(
+				widget.AnchorLayoutOpts.Padding(widget.NewInsetsSimple(8)),
+			)),
+		)
+		belowContainer.AddChild(belowContainerInner)
+		state.below.Init(belowContainerInner, ctx)
+
+		invBelowContainerInner.AddChild(inventoryContainer)
+		invBelowContainerInner.AddChild(belowContainer)
+
+		invBelowContainer.AddChild(invBelowContainerInner)
+
+		state.ui.Container.AddChild(invBelowContainer)
+	}
 
 	hotbarContainer := widget.NewContainer(
 		widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
@@ -169,8 +180,6 @@ func (state *Game) Begin(ctx ifs.RunContext) error {
 	hotbarContainer.AddChild(hotbarContainerInner)
 	state.hotbar.Init(hotbarContainerInner, ctx, &state.binds)
 
-	state.ui.Container.AddChild(inventoryContainer)
-	state.ui.Container.AddChild(belowContainer)
 	state.ui.Container.AddChild(hotbarContainer)
 
 	return nil

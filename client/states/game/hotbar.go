@@ -76,7 +76,7 @@ func (hb *Hotbar) Init(container *widget.Container, ctx ifs.RunContext, binds *B
 		hbCell := &hotbarCell{}
 
 		cell := widget.NewContainer(
-			widget.ContainerOpts.BackgroundImage(eimage.NewNineSliceColor(color.NRGBA{64, 64, 64, 128})),
+			widget.ContainerOpts.BackgroundImage(cellBackgroundImage),
 			widget.ContainerOpts.WidgetOpts(
 				widget.WidgetOpts.LayoutData(widget.GridLayoutData{
 					MaxWidth:  68,

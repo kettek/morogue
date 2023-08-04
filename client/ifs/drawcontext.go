@@ -30,6 +30,8 @@ type DrawContextUI struct {
 	TextInputColor   *widget.TextInputColor
 	TextInputImage   *widget.TextInputImage
 	TextInputPadding widget.Insets
+	//
+	ItemInfoBackgroundImage *eimage.NineSlice
 }
 
 // Init sets up the necessary data structuers, such as fonts, styling, images, etc.
@@ -76,5 +78,7 @@ func (ui *DrawContextUI) Init(txt *TextRenderer) {
 		Caret:         color.NRGBA{254, 255, 255, 255},
 		DisabledCaret: color.NRGBA{R: 200, G: 200, B: 200, A: 255},
 	}
+
+	ui.ItemInfoBackgroundImage = eimage.NewNineSliceColor(color.NRGBA{R: 20, G: 20, B: 20, A: 255})
 
 }
