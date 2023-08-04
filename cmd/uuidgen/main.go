@@ -16,8 +16,12 @@ func main() {
 	var namespace id.UUID
 
 	switch os.Args[1] {
-	case "archetype":
-		namespace = id.Archetype
+	case "character":
+		namespace = id.Character
+	case "weapon":
+		namespace = id.Weapon
+	case "armor":
+		namespace = id.Armor
 	case "tile":
 		namespace = id.Tile
 	case "mob":
