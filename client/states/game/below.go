@@ -21,6 +21,7 @@ type Below struct {
 	cells          []*belowCell
 	ApplyItem      func(wid id.WID)
 	PickupItem     func(wid id.WID)
+	DropItem       func(wid id.WID)
 }
 
 type belowCell struct {
@@ -118,6 +119,8 @@ func (below *Below) Init(container *widget.Container, ctx ifs.RunContext) {
 					),
 					widget.WidgetOpts.CanDrop(func(args *widget.DragAndDropDroppedEventArgs) bool {
 						switch args.Data.(type) {
+						case *inventoryCell:
+							return true
 						case *belowCell:
 							return true
 						}
@@ -127,6 +130,9 @@ func (below *Below) Init(container *widget.Container, ctx ifs.RunContext) {
 						switch cell := args.Data.(type) {
 						case *belowCell:
 							fmt.Println("dropped belowCell cell on us", cell)
+						case *inventoryCell:
+							below.DropItem(cell.WID)
+							fmt.Println("dropped inventoryCell cell on us", cell)
 						}
 					}),
 					widget.WidgetOpts.MouseButtonReleasedHandler(func(args *widget.WidgetMouseButtonReleasedEventArgs) {

@@ -80,6 +80,11 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 			Apply: apply,
 		})
 	}
+	state.inventory.PickupItem = func(wid id.WID) {
+		state.sendDesire(state.characterWID, game.DesirePickup{
+			WID: wid,
+		})
+	}
 
 	state.below.Data = data
 	state.below.PickupItem = func(wid id.WID) {
@@ -89,6 +94,11 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 	}
 	state.below.ApplyItem = func(wid id.WID) {
 		state.sendDesire(state.characterWID, game.DesireApply{
+			WID: wid,
+		})
+	}
+	state.below.DropItem = func(wid id.WID) {
+		state.sendDesire(state.characterWID, game.DesireDrop{
 			WID: wid,
 		})
 	}
@@ -185,21 +195,29 @@ func (state *Game) setLocationFromMessage(m net.LocationMessage) {
 		Objects: m.Objects,
 	}
 
-	// Request any tiles that we don't have.
-	requestedTiles := make(map[id.UUID]struct{})
-	for _, c := range m.Cells {
-		for _, cell := range c {
-			if cell.TileID != nil {
-				if _, ok := requestedTiles[*cell.TileID]; !ok {
-					if _, ok := state.data.tiles[*cell.TileID]; !ok {
-						state.connection.Write(net.TileMessage{
-							ID: *cell.TileID,
-						})
-					}
-					requestedTiles[*cell.TileID] = struct{}{}
-				}
+	// Request objects we don't have.
+	state.ensureObjects(m.Objects)
+
+	// Request tile objects.
+	var missingTiles []id.UUID
+	missingTiles2 := make(map[id.UUID]bool)
+	for _, r := range l.Cells {
+		for _, c := range r {
+			if c.TileID == nil {
+				continue
+			}
+
+			if _, ok := missingTiles2[*c.TileID]; !ok {
+				missingTiles2[*c.TileID] = true
+				missingTiles = append(missingTiles, *c.TileID)
 			}
 		}
+	}
+
+	if len(missingTiles) > 0 {
+		state.connection.Write(net.ArchetypesMessage{
+			IDs: missingTiles,
+		})
 	}
 
 	state.locations[m.ID] = l
@@ -248,17 +266,8 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 			state.setLocationFromMessage(m)
 			state.travelTo(m.ID)
 			state.syncUIToLocation(ctx)
-		case net.TileMessage:
-			if m.ResultCode == 200 {
-				// Store the tile and request the image.
-				state.data.tiles[m.Tile.ID] = m.Tile
-				if _, ok := state.data.tileImages[m.Tile.ID]; !ok {
-					src := "archetypes/" + m.Tile.Image
-					if img, err := state.data.LoadImage(src, ctx.Game.Zoom); err == nil {
-						state.data.tileImages[m.Tile.ID] = img
-					}
-				}
-			}
+		case net.ArchetypeMessage:
+			fmt.Println(msg)
 		case net.ArchetypesMessage:
 			for _, a := range m.Archetypes {
 				state.data.archetypes[a.GetID()] = a
@@ -476,7 +485,7 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 					continue
 				}
 
-				if img := state.data.tileImages[*cell.TileID]; img != nil {
+				if img := state.data.archetypeImages[*cell.TileID]; img != nil {
 					opts := ebiten.DrawImageOptions{}
 					opts.GeoM.Concat(scrollOpts)
 					opts.GeoM.Translate(float64(px), float64(py))

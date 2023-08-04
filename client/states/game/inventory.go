@@ -22,6 +22,7 @@ type Inventory struct {
 	cells          []*inventoryCell
 	ApplyItem      func(wid id.WID, apply bool)
 	DropItem       func(wid id.WID)
+	PickupItem     func(wid id.WID)
 }
 
 type inventoryCell struct {
@@ -123,6 +124,8 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 						switch args.Data.(type) {
 						case *inventoryCell:
 							return true
+						case *belowCell:
+							return true
 						}
 						return false
 					}),
@@ -130,6 +133,8 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 						switch cell := args.Data.(type) {
 						case *inventoryCell:
 							fmt.Println("dropped inventory cell on us", cell)
+						case *belowCell:
+							inv.PickupItem(cell.WID)
 						}
 					}),
 					widget.WidgetOpts.MouseButtonReleasedHandler(func(args *widget.WidgetMouseButtonReleasedEventArgs) {

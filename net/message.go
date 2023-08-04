@@ -185,6 +185,12 @@ func (m *ArchetypesMessage) UnmarshalMsgpack(data []byte) error {
 
 	for _, a := range msg.Archetypes {
 		switch a.Type {
+		case (game.TileArchetype{}).Type():
+			var archetype game.TileArchetype
+			if err := msgpack.Unmarshal(a.Data, &archetype); err != nil {
+				panic(err)
+			}
+			m.Archetypes = append(m.Archetypes, archetype)
 		case (game.CharacterArchetype{}).Type():
 			var archetype game.CharacterArchetype
 			if err := msgpack.Unmarshal(a.Data, &archetype); err != nil {

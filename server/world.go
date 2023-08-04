@@ -111,6 +111,10 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 				w.addToUniverseChan <- cl
 				return
 			}
+
+			// Now add the client to the list.
+			w.clients = append(w.clients, cl)
+
 			// Assign WIDs to character and their inventory.
 			w.assignWIDs(char)
 			cl.currentLocation = start
@@ -135,14 +139,15 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 				Object: cl.currentCharacter,
 			}); err == nil {
 				cls := w.clientsInLocation(start)
-				for _, cl := range cls {
-					cl.conn.Write(net.EventMessage{
+				for _, cl2 := range cls {
+					if cl == cl2 {
+						continue
+					}
+					cl2.conn.Write(net.EventMessage{
 						Event: evt,
 					})
 				}
 			}
-			// Now add the client to the list.
-			w.clients = append(w.clients, cl)
 		default:
 		}
 		// Select for timer delay.

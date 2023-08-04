@@ -27,8 +27,6 @@ func NewData() *Data {
 	return &Data{
 		archetypes:      make(map[id.UUID]game.Archetype),
 		archetypeImages: make(map[id.UUID]*ebiten.Image),
-		tiles:           make(map[id.UUID]game.TileArchetype),
-		tileImages:      make(map[id.UUID]*ebiten.Image),
 	}
 }
 
@@ -46,6 +44,13 @@ func (d *Data) EnsureImage(archetype game.Archetype, zoom float64) (*ebiten.Imag
 	}
 
 	switch a := archetype.(type) {
+	case game.TileArchetype:
+		if img, err := d.LoadImage("archetypes/"+a.Image, zoom); err == nil {
+			d.archetypeImages[a.GetID()] = img
+			return img, nil
+		} else {
+			return nil, err
+		}
 	case game.CharacterArchetype:
 		if img, err := d.LoadImage("archetypes/"+a.Image, zoom); err == nil {
 			d.archetypeImages[a.GetID()] = img
