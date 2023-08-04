@@ -18,11 +18,14 @@ type Login struct {
 	messageChan chan net.Message
 	ui          *ebitenui.UI
 	//
-	usernameInput               *widget.TextInput
-	passwordInput               *widget.TextInput
-	confirmInput                *widget.TextInput
-	resultText                  *widget.Text
-	loginButton, registerButton *widget.Button
+	inputs   *widget.Container
+	controls *widget.Container
+	//
+	usernameInput                           *widget.TextInput
+	passwordInput                           *widget.TextInput
+	confirmInput                            *widget.TextInput
+	resultText                              *widget.Text
+	loginButton, registerButton, backButton *widget.Button
 }
 
 // NewLogin creates a new Login instance.
@@ -33,10 +36,9 @@ func NewLogin(connection net.Connection, msgCh chan net.Message) *Login {
 		ui: &ebitenui.UI{
 			Container: widget.NewContainer(
 				widget.ContainerOpts.BackgroundImage(image.NewNineSliceColor(color.NRGBA{0x22, 0x13, 0x1a, 0xff})),
-				widget.ContainerOpts.Layout(widget.NewRowLayout(
-					widget.RowLayoutOpts.Direction(widget.DirectionVertical),
-					widget.RowLayoutOpts.Spacing(20),
-					widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(20)))),
+				widget.ContainerOpts.Layout(widget.NewAnchorLayout(
+					widget.AnchorLayoutOpts.Padding(widget.NewInsetsSimple(20)),
+				)),
 			),
 		},
 	}
@@ -45,6 +47,20 @@ func NewLogin(connection net.Connection, msgCh chan net.Message) *Login {
 
 func (state *Login) Begin(ctx ifs.RunContext) error {
 	state.connection.Write(net.PingMessage{})
+
+	innerContainer := widget.NewContainer(
+		widget.ContainerOpts.Layout(widget.NewRowLayout(
+			widget.RowLayoutOpts.Direction(widget.DirectionVertical),
+			widget.RowLayoutOpts.Spacing(20),
+			widget.RowLayoutOpts.Padding(widget.NewInsetsSimple(20))),
+		),
+		widget.ContainerOpts.WidgetOpts(
+			widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+				HorizontalPosition: widget.AnchorLayoutPositionCenter,
+				VerticalPosition:   widget.AnchorLayoutPositionCenter,
+			}),
+		),
+	)
 
 	state.usernameInput = widget.NewTextInput(
 		widget.TextInputOpts.WidgetOpts(
@@ -87,6 +103,32 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 		widget.TextInputOpts.ChangedHandler(func(args *widget.TextInputChangedEventArgs) {
 			state.checkInputs()
 		}),
+	)
+
+	state.inputs = widget.NewContainer(
+		widget.ContainerOpts.Layout(widget.NewRowLayout(
+			widget.RowLayoutOpts.Direction(widget.DirectionVertical),
+			widget.RowLayoutOpts.Spacing(10),
+		)),
+		widget.ContainerOpts.WidgetOpts(
+			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+				Position: widget.RowLayoutPositionStart,
+				Stretch:  true,
+			}),
+		),
+	)
+
+	state.controls = widget.NewContainer(
+		widget.ContainerOpts.Layout(widget.NewRowLayout(
+			widget.RowLayoutOpts.Direction(widget.DirectionHorizontal),
+			widget.RowLayoutOpts.Spacing(10),
+		)),
+		widget.ContainerOpts.WidgetOpts(
+			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+				Stretch: true,
+			}),
+			widget.WidgetOpts.MinSize(400, 20),
+		),
 	)
 
 	state.confirmInput = widget.NewTextInput(
@@ -143,6 +185,22 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 		}),
 	)
 
+	state.backButton = widget.NewButton(
+		widget.ButtonOpts.WidgetOpts(
+			widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+				HorizontalPosition: widget.AnchorLayoutPositionCenter,
+				VerticalPosition:   widget.AnchorLayoutPositionCenter,
+			}),
+			widget.WidgetOpts.CursorHovered("interactive"),
+		),
+		widget.ButtonOpts.Image(ctx.UI.ButtonImage),
+		widget.ButtonOpts.Text("back", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
+		widget.ButtonOpts.TextPadding(ctx.UI.ButtonPadding),
+		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
+			state.showLogin()
+		}),
+	)
+
 	state.resultText = widget.NewText(
 		widget.TextOpts.Text("login. you will be prompted to register if username does not exist.", ctx.UI.BodyCopyFace, color.White),
 		widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
@@ -152,6 +210,12 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 			}),
 		),
 	)
+
+	innerContainer.AddChild(state.inputs)
+	innerContainer.AddChild(state.controls)
+	innerContainer.AddChild(state.resultText)
+
+	state.ui.Container.AddChild(innerContainer)
 
 	state.showLogin()
 
@@ -204,28 +268,29 @@ func (state *Login) doRegister() {
 }
 
 func (state *Login) showLogin() {
-	state.ui.Container.RemoveChild(state.resultText)
-	state.ui.Container.RemoveChild(state.confirmInput)
-	state.ui.Container.RemoveChild(state.registerButton)
-	state.ui.Container.AddChild(state.usernameInput)
-	state.ui.Container.AddChild(state.passwordInput)
-	state.ui.Container.AddChild(state.loginButton)
+	state.inputs.RemoveChildren()
+	state.inputs.AddChild(state.usernameInput)
+	state.inputs.AddChild(state.passwordInput)
 
-	state.ui.Container.AddChild(state.resultText)
+	state.controls.RemoveChildren()
+	state.controls.AddChild(state.loginButton)
 }
 
 func (state *Login) showRegister() {
-	state.ui.Container.RemoveChild(state.resultText)
-	state.ui.Container.RemoveChild(state.loginButton)
-	state.ui.Container.AddChild(state.confirmInput)
-	state.ui.Container.AddChild(state.registerButton)
+	state.inputs.RemoveChildren()
+	state.inputs.AddChild(state.usernameInput)
+	state.inputs.AddChild(state.passwordInput)
+	state.inputs.AddChild(state.confirmInput)
+
+	state.controls.RemoveChildren()
+	state.controls.AddChild(state.backButton)
+	state.controls.AddChild(state.registerButton)
 
 	state.ui.Container.AddChild(state.resultText)
 }
 
 func (state *Login) Return(interface{}) error {
 	state.resultText.Label = "...and so you return."
-	state.ui.Container.RemoveChildren()
 	state.showLogin()
 
 	return nil
