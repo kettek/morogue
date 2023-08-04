@@ -255,6 +255,13 @@ func (l *location) process() (events []game.Event) {
 							}
 						}
 					}
+				case game.DesireBash:
+					if t := l.ObjectByWID(d.WID); t != nil {
+					} else {
+						c.Events = append(c.Events, game.EventNotice{
+							Message: "You kick at the air.",
+						})
+					}
 				}
 				c.LastDesire = c.Desire
 				c.Desire = nil

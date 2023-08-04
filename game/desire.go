@@ -35,6 +35,10 @@ func (w *DesireWrapper) Desire() Desire {
 		var d DesireDrop
 		msgpack.Unmarshal(w.Data, &d)
 		return d
+	case (DesireBash{}).Type():
+		var d DesireBash
+		msgpack.Unmarshal(w.Data, &d)
+		return d
 	}
 	return nil
 }
@@ -74,4 +78,14 @@ type DesireDrop struct {
 
 func (d DesireDrop) Type() string {
 	return "drop"
+}
+
+// DesireBash represents the desire to bash a particular object or direction.
+type DesireBash struct {
+	WID       id.WID        `msgpack:"wid,omitempty"`
+	Direction MoveDirection `msgpack:"d,omitempty"`
+}
+
+func (d DesireBash) Type() string {
+	return "bash"
 }
