@@ -93,9 +93,23 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 				),
 			)
 
+			indicatorOuter := widget.NewContainer(
+				widget.ContainerOpts.Layout(widget.NewAnchorLayout(
+					widget.AnchorLayoutOpts.Padding(widget.NewInsetsSimple(2)),
+				)),
+			)
 			indicator := widget.NewGraphic(
 				widget.GraphicOpts.Image(nil),
+				widget.GraphicOpts.WidgetOpts(
+					widget.WidgetOpts.LayoutData(
+						widget.AnchorLayoutData{
+							HorizontalPosition: widget.AnchorLayoutPositionEnd,
+							VerticalPosition:   widget.AnchorLayoutPositionStart,
+						},
+					),
+				),
 			)
+			indicatorOuter.AddChild(indicator)
 
 			invCell := &inventoryCell{}
 
@@ -174,7 +188,7 @@ func (inv *Inventory) Init(container *widget.Container, ctx ifs.RunContext) {
 			)
 
 			cell.AddChild(graphic)
-			cell.AddChild(indicator)
+			cell.AddChild(indicatorOuter)
 
 			invCell.cell = cell
 			invCell.tooltip = tool
