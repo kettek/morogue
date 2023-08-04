@@ -218,20 +218,6 @@ func (w *world) updateClient(cl *client) error {
 	select {
 	case msg := <-cl.msgChan:
 		switch m := msg.(type) {
-		case net.TileMessage:
-			if t, err := w.data.Tile(m.ID); err != nil {
-				cl.conn.Write(net.TileMessage{
-					ResultCode: 404,
-					Result:     err.Error(),
-					ID:         m.ID,
-				})
-			} else {
-				cl.conn.Write(net.TileMessage{
-					ResultCode: 200,
-					ID:         m.ID,
-					Tile:       t,
-				})
-			}
 		case net.ArchetypesMessage:
 			var archetypes []game.Archetype
 			for _, uuid := range m.IDs {

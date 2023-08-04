@@ -73,10 +73,6 @@ func (w *Wrapper) Message() Message {
 		var m LocationMessage
 		msgpack.Unmarshal(w.Data, &m)
 		return m
-	case (TileMessage{}).Type():
-		var m TileMessage
-		msgpack.Unmarshal(w.Data, &m)
-		return m
 	case (DesireMessage{}).Type():
 		var m DesireMessage
 		msgpack.Unmarshal(w.Data, &m)
@@ -335,17 +331,6 @@ type LocationMessage struct {
 
 func (m LocationMessage) Type() string {
 	return "location"
-}
-
-type TileMessage struct {
-	Result     string             `msgpack:"r,omitempty"`
-	ResultCode int                `msgpack:"c,omitempty"`
-	ID         id.UUID            `msgpack:"id,omitempty"`
-	Tile       game.TileArchetype `sjon:"t,omitempty"`
-}
-
-func (m TileMessage) Type() string {
-	return "tile"
 }
 
 type OwnerMessage struct {
