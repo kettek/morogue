@@ -239,8 +239,23 @@ func (inv *Inventory) Refresh(ctx ifs.RunContext, objects game.Objects) {
 			title := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s", a.Title), ctx.UI.BodyCopyFace, color.White))
 			values := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s %s", a.RangeString(), a.ArmorType), ctx.UI.BodyCopyFace, armorColor))
 			desc := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(a.Description, ctx.UI.BodyCopyFace, color.NRGBA{128, 128, 128, 255}))
+
+			armorLine := widget.NewContainer(
+				widget.ContainerOpts.Layout(widget.NewRowLayout(widget.RowLayoutOpts.Direction(widget.DirectionHorizontal))),
+			)
+			graphic := widget.NewGraphic(
+				widget.GraphicOpts.Image(embed.IconDefense),
+				widget.GraphicOpts.WidgetOpts(
+					widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+						Position: widget.RowLayoutPositionCenter,
+					}),
+				),
+			)
+			armorLine.AddChild(values)
+			armorLine.AddChild(graphic)
+
 			inv.cells[i].tooltipContent.AddChild(title)
-			inv.cells[i].tooltipContent.AddChild(values)
+			inv.cells[i].tooltipContent.AddChild(armorLine)
 			inv.cells[i].tooltipContent.AddChild(desc)
 		case game.ItemArchetype:
 			// TODO

@@ -30,6 +30,9 @@ var IndicatorImage *ebiten.Image
 var IndicatorApplied *ebiten.Image
 var IndicatorCursed *ebiten.Image
 
+var IconOffense *ebiten.Image
+var IconDefense *ebiten.Image
+
 func Setup() {
 	f, err := Assets.Open("images/icon.png")
 	if err != nil {
@@ -77,6 +80,21 @@ func Setup() {
 	IndicatorImage, _, _ = ebitenutil.NewImageFromReader(f)
 	IndicatorApplied = ebiten.NewImageFromImage(IndicatorImage.SubImage(image.Rect(0, 0, 8, 8)))
 	IndicatorCursed = ebiten.NewImageFromImage(IndicatorImage.SubImage(image.Rect(8, 0, 16, 8)))
+
+	//
+	f, err = Assets.Open("images/defense.png")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	IconDefense, _, _ = ebitenutil.NewImageFromReader(f)
+
+	f, err = Assets.Open("images/offense.png")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	IconOffense, _, _ = ebitenutil.NewImageFromReader(f)
 
 	//
 	b, err := Assets.ReadFile("fonts/x12y16pxMaruMonica.ttf")
