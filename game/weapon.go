@@ -12,6 +12,7 @@ type WeaponType uint8
 const (
 	WeaponTypeMelee WeaponType = iota
 	WeaponTypeRange
+	WeaponTypeThrown
 	WeaponTypeUnarmed
 )
 
@@ -19,6 +20,8 @@ func (a WeaponType) String() string {
 	switch a {
 	case WeaponTypeRange:
 		return "range"
+	case WeaponTypeThrown:
+		return "thrown"
 	case WeaponTypeMelee:
 		return "melee"
 	case WeaponTypeUnarmed:
@@ -32,6 +35,8 @@ func (a *WeaponType) UnmarshalJSON(b []byte) error {
 	switch string(b) {
 	case `"range"`:
 		*a = WeaponTypeRange
+	case `"thrown"`:
+		*a = WeaponTypeThrown
 	case `"melee"`:
 		*a = WeaponTypeMelee
 	case `"unarmed"`:

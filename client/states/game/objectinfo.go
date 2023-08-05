@@ -62,6 +62,7 @@ func addObjectInfo(ctx ifs.RunContext, object game.Object, arch game.Archetype, 
 
 	unarmedColor := color.NRGBA{R: 250, G: 150, B: 50, A: 255}
 	rangedColor := color.NRGBA{R: 50, G: 250, B: 50, A: 255}
+	thrownColor := color.NRGBA{R: 50, G: 250, B: 150, A: 255}
 	meleeColor := color.NRGBA{R: 250, G: 50, B: 50, A: 255}
 
 	switch a := arch.(type) {
@@ -69,6 +70,8 @@ func addObjectInfo(ctx ifs.RunContext, object game.Object, arch game.Archetype, 
 		weaponColor := noneColor
 		if a.WeaponType == game.WeaponTypeRange {
 			weaponColor = rangedColor
+		} else if a.WeaponType == game.WeaponTypeThrown {
+			weaponColor = thrownColor
 		} else if a.WeaponType == game.WeaponTypeMelee {
 			weaponColor = meleeColor
 		} else if a.WeaponType == game.WeaponTypeUnarmed {
