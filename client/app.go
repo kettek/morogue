@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"image"
@@ -25,7 +25,7 @@ type app struct {
 	runContext   ifs.RunContext
 }
 
-func newApp() *app {
+func NewApp() *app {
 	a := &app{}
 	a.runContext.Sm = a
 

@@ -14,7 +14,7 @@ func main() {
 
 	builds := map[string][2]string{
 		"build-server": {"cmd/server", "server" + exe},
-		"build-client": {"client", "client" + exe},
+		"build-client": {"cmd/client", "client" + exe},
 	}
 	for taskName, build := range builds {
 		func(taskName string, build [2]string) {
@@ -40,19 +40,19 @@ func main() {
 		Run("build-server").
 		Run("run-server")
 	Task("watch-client").
-		Watch("client/*.go", "client/*/*.go", "client/*/*/*.go", "net/*.go", "game/*.go").
+		Watch("cmd/client/*.go", "client/*.go", "client/*/*.go", "client/*/*/*.go", "net/*.go", "game/*.go").
 		Signaler(SigQuit).
 		Run("build-client").
 		Run("run-client")
 	Task("watch-client-wasm").
-		Watch("client/*.go", "client/*/*.go", "client/*/*/*.go", "net/*.go", "game/*.go").
+		Watch("cmd/client/*.go", "client/*.go", "client/*/*.go", "client/*/*/*.go", "net/*.go", "game/*.go").
 		Signaler(SigQuit).
 		Run("build-client-wasm")
 
 	Task("run-server").
 		Exec("./cmd/server/server"+exe, ":8080")
 	Task("run-client").
-		Exec("./client/client" + exe)
+		Exec("./cmd/client/client" + exe)
 
 	Go()
 }
