@@ -49,14 +49,14 @@ func (a *ArmorType) UnmarshalJSON(b []byte) error {
 
 // ArmorArchetype is effectively a blueprint for armour.
 type ArmorArchetype struct {
-	ID           id.UUID
-	Title        string
-	Image        string
-	Description  string
-	ArmorType    ArmorType
-	MinArmor     int // Character proficiency with a weapon increases min up to max.
-	MaxArmor     int
-	ArmorPenalty int // Penalty to movement speed.
+	ID          id.UUID
+	Title       string
+	Image       string
+	Description string
+	ArmorType   ArmorType
+	MinArmor    int // Character proficiency with a weapon increases min up to max.
+	MaxArmor    int
+	MovePenalty int // Penalty to movement speed.
 }
 
 func (a ArmorArchetype) Type() string {
