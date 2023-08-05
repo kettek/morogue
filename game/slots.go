@@ -17,6 +17,17 @@ func (s Slots) ToMap() SlotMap {
 	return m
 }
 
+func (s Slots) String() string {
+	var str string
+	for i, slot := range s {
+		str += string(slot)
+		if i != len(s)-1 {
+			str += " & "
+		}
+	}
+	return str
+}
+
 // SlotMap is a map of slots used by characters.
 type SlotMap map[Slot]bool
 

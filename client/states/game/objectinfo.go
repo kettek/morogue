@@ -80,6 +80,7 @@ func addObjectInfo(ctx ifs.RunContext, object game.Object, arch game.Archetype, 
 
 		title := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s", a.Title), ctx.UI.BodyCopyFace, color.White))
 		values := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s %s", a.RangeString(), a.WeaponType), ctx.UI.BodyCopyFace, weaponColor))
+		slots := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s", a.Slots.String()), ctx.UI.BodyCopyFace, color.NRGBA{R: 200, G: 200, B: 200, A: 255}))
 		desc := makeDescription(ctx, a.Description)
 
 		weaponLine := widget.NewContainer(
@@ -97,6 +98,7 @@ func addObjectInfo(ctx ifs.RunContext, object game.Object, arch game.Archetype, 
 		weaponLine.AddChild(graphic)
 
 		container.AddChild(title)
+		container.AddChild(slots)
 		container.AddChild(weaponLine)
 		container.AddChild(desc)
 	case game.ArmorArchetype:
@@ -111,6 +113,7 @@ func addObjectInfo(ctx ifs.RunContext, object game.Object, arch game.Archetype, 
 
 		title := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s", a.Title), ctx.UI.BodyCopyFace, color.White))
 		values := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s %s", a.RangeString(), a.ArmorType), ctx.UI.BodyCopyFace, armorColor))
+		slots := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s", a.Slots.String()), ctx.UI.BodyCopyFace, color.NRGBA{R: 200, G: 200, B: 200, A: 255}))
 		desc := makeDescription(ctx, a.Description)
 
 		armorLine := widget.NewContainer(
@@ -128,6 +131,7 @@ func addObjectInfo(ctx ifs.RunContext, object game.Object, arch game.Archetype, 
 		armorLine.AddChild(graphic)
 
 		container.AddChild(title)
+		container.AddChild(slots)
 		container.AddChild(armorLine)
 		container.AddChild(desc)
 	case game.ItemArchetype:
