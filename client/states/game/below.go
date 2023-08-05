@@ -15,6 +15,7 @@ import (
 
 type Below struct {
 	Data           Data
+	binds          *Binds
 	container      *widget.Container
 	innerContainer *widget.Container
 	cells          []*belowCell
@@ -32,8 +33,9 @@ type belowCell struct {
 	WID            id.WID
 }
 
-func (below *Below) Init(container *widget.Container, ctx ifs.RunContext) {
+func (below *Below) Init(container *widget.Container, ctx ifs.RunContext, binds *Binds) {
 	below.container = container
+	below.binds = binds
 
 	below.innerContainer = widget.NewContainer(
 		// the container will use a plain color as its background
@@ -182,6 +184,13 @@ func (below *Below) Init(container *widget.Container, ctx ifs.RunContext) {
 	}
 
 	below.container.AddChild(below.innerContainer)
+}
+
+func (below *Below) Update(ctx ifs.RunContext) game.Desire {
+	if below.binds.IsActionHeld("pickup") == 0 {
+		below.PickupItem(below.cells[0].WID)
+	}
+	return nil
 }
 
 func (below *Below) Refresh(ctx ifs.RunContext, objects game.Objects) {

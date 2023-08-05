@@ -151,7 +151,7 @@ func (state *Game) Begin(ctx ifs.RunContext) error {
 			)),
 		)
 		belowContainer.AddChild(belowContainerInner)
-		state.below.Init(belowContainerInner, ctx)
+		state.below.Init(belowContainerInner, ctx, &state.binds)
 
 		invBelowContainerInner.AddChild(inventoryContainer)
 		invBelowContainerInner.AddChild(belowContainer)
@@ -329,6 +329,7 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 	state.scroller.Update(ctx)
 
 	state.hotbar.Update(ctx)
+	state.below.Update(ctx)
 
 	state.sounds.Update()
 
