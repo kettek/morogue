@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"errors"
@@ -27,8 +27,8 @@ type universe struct {
 	data *Data
 }
 
-func newUniverse(accounts Accounts, data *Data) universe {
-	return universe{
+func NewUniverse(accounts Accounts, data *Data) (universe, chan client, chan struct{}) {
+	u := universe{
 		accounts:               accounts,
 		clientChan:             make(chan client, 10),
 		checkChan:              make(chan struct{}, 10),
@@ -36,6 +36,7 @@ func newUniverse(accounts Accounts, data *Data) universe {
 		clientAddFromWorldChan: make(chan *client, 10),
 		data:                   data,
 	}
+	return u, u.clientChan, u.checkChan
 }
 
 // spinWorld adds the given world to the universe and starts the world's

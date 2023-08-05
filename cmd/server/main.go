@@ -9,6 +9,8 @@ import (
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/kettek/morogue/server"
 )
 
 func main() {
@@ -28,25 +30,26 @@ func run() error {
 	}
 	log.Printf("listening on http://%v", l.Addr())
 
-	data := &Data{}
-	if err := data.loadArchetypes(); err != nil {
+	data := &server.Data{}
+	if err := data.LoadArchetypes(); err != nil {
 		return err
 	}
 
-	accounts, err := newAccounts("accounts")
+	accounts, err := server.NewAccounts("accounts")
 	if err != nil {
 		return err
 	}
+	for _, bucket := range accounts.Buckets() {
+		log.Printf("bucket: %v", bucket)
+		for _, account := range accounts.ListBucket(bucket) {
+			log.Printf("account: %v", account)
+		}
+	}
 
-	u := newUniverse(accounts, data)
+	u, clientChan, checkChan := server.NewUniverse(accounts, data)
 	u.Run()
 
-	ps := newSocketServer(u.clientChan, u.checkChan)
-
-	// Allow access to archetypes via archetypes subdir.
-	ps.serveMux.Handle("/archetypes/", http.StripPrefix("/archetypes/", http.FileServer(http.Dir("./archetypes"))))
-
-	ps.serveMux.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("./images"))))
+	ps := server.NewSocketServer(clientChan, checkChan)
 
 	s := &http.Server{
 		Handler:      ps,

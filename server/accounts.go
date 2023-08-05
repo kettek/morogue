@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"encoding/json"
@@ -13,13 +13,16 @@ type Accounts interface {
 	Account(username string) (account Account, err error)
 	NewAccount(username string, password string) error
 	SaveAccount(account Account) error
+	Buckets() (buckets []string)
+	ListBucket(bucket string) (list []string)
+	DumpBytes(bucket, data string) []byte
 }
 
 type accounts struct {
 	db *bolt.DB
 }
 
-func newAccounts(path string) (*accounts, error) {
+func NewAccounts(path string) (*accounts, error) {
 	db, err := bolt.Open(path, 0666, nil)
 	if err != nil {
 		return nil, err
@@ -107,6 +110,38 @@ func (a *accounts) SaveAccount(account Account) error {
 		return b.Put([]byte(account.username), buf)
 	})
 	return err
+}
+
+func (a *accounts) Buckets() (buckets []string) {
+	a.db.View(func(tx *bolt.Tx) error {
+		tx.ForEach(func(name []byte, b *bolt.Bucket) error {
+			buckets = append(buckets, string(name))
+			return nil
+		})
+		return nil
+	})
+	return
+}
+
+func (a *accounts) ListBucket(bucket string) (list []string) {
+	a.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(bucket))
+		b.ForEach(func(k, v []byte) error {
+			list = append(list, string(k))
+			return nil
+		})
+		return nil
+	})
+	return
+}
+
+func (a *accounts) DumpBytes(bucket, data string) (d []byte) {
+	a.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(bucket))
+		d = b.Get([]byte(data))
+		return nil
+	})
+	return
 }
 
 var (

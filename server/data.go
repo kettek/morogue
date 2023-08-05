@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"encoding/json"
@@ -93,7 +93,7 @@ func (d *Data) ArmorArchetypes() []game.ArmorArchetype {
 	return archetypes
 }
 
-func (d *Data) loadArchetypes() error {
+func (d *Data) LoadArchetypes() error {
 	entries, err := os.ReadDir("archetypes")
 	if err != nil {
 		return err

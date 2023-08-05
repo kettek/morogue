@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"log"
@@ -19,7 +19,7 @@ type socketServer struct {
 	checkChan     chan struct{}
 }
 
-func newSocketServer(newClientChan chan client, checkChan chan struct{}) *socketServer {
+func NewSocketServer(newClientChan chan client, checkChan chan struct{}) *socketServer {
 	p := &socketServer{
 		logf:          log.Printf,
 		newClientChan: newClientChan,
@@ -27,6 +27,9 @@ func newSocketServer(newClientChan chan client, checkChan chan struct{}) *socket
 	}
 
 	p.serveMux.Handle("/", http.FileServer(http.Dir("./static")))
+	p.serveMux.Handle("/archetypes/", http.StripPrefix("/archetypes/", http.FileServer(http.Dir("./archetypes"))))
+	p.serveMux.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("./images"))))
+
 	p.serveMux.HandleFunc("/sockit", p.handleSockit)
 
 	return p
