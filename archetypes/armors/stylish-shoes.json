@@ -1,0 +1,8 @@
+{
+  "id": "morogue:armor:stylish-shoes",
+  "title": "Stylish Shoes",
+  "image": "stylish-shoes.png",
+  "description": "A pair of stylin' shoes.",
+  "minArmor": 1,
+  "maxArmor": 1
+}

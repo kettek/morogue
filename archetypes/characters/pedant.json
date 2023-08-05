@@ -6,5 +6,6 @@
   "zooms": 2,
   "brains": 6,
   "funk": 0,
-  "traits": ["no helmets"]
+  "traits": ["no helmets"],
+  "startingObjects": ["morogue:weapon:figurine", "morogue:weapon:dictionary", "morogue:armor:t-shirt", "morogue:armor:jorts", "morogue:armor:sneakers" ]
 }

@@ -1,0 +1,8 @@
+{
+  "id": "morogue:weapon:figurine",
+  "title": "Figurine",
+  "image": "figurine.png",
+  "description": "A small, anatomically-correct figurine.",
+  "minDamage": 0,
+  "maxDamage": 0
+}

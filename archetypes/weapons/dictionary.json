@@ -1,0 +1,8 @@
+{
+  "id": "morogue:weapon:dictionary",
+  "title": "Dictionary",
+  "image": "dictionary.png",
+  "description": "The pen might be mightier than the sword, but what about the dictionary?",
+  "minDamage": 2,
+  "maxDamage": 2
+}

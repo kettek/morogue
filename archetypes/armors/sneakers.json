@@ -1,0 +1,8 @@
+{
+  "id": "morogue:armor:sneakers",
+  "title": "Sneakers",
+  "image": "sneakers.png",
+  "description": "Sneakers are a type of footwear designed for sports or other forms of physical exercise. In the pedant's case, they are worn for their cool style.",
+  "minArmor": 0,
+  "maxArmor": 1
+}
