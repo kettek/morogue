@@ -5,5 +5,16 @@
   "swole": 1,
   "zooms": 2,
   "brains": 1,
-  "funk": 5
+  "funk": 5,
+  "slots": [
+    "head",
+    "neck",
+    "torso",
+    "arms",
+    "hands",
+    "legs",
+    "feet",
+    "weapon",
+    "off-hand"
+  ]
 }

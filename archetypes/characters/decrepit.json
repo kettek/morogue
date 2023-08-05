@@ -7,5 +7,16 @@
   "brains": 5,
   "funk": 4,
   "traits": ["only clubs"],
-  "startingObjects": ["morogue:armor:robe", "morogue:weapon:gnarled-cane"]
+  "startingObjects": ["morogue:armor:robe", "morogue:weapon:gnarled-cane"],
+  "slots": [
+    "head",
+    "neck",
+    "torso",
+    "arms",
+    "hands",
+    "legs",
+    "feet",
+    "weapon",
+    "off-hand"
+  ]
 }

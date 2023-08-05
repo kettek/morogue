@@ -4,5 +4,6 @@
   "image": "gnarled-cane.png",
   "description": "A gnarled and worn cane.",
   "minDamage": 0,
-  "maxDamage": 1
+  "maxDamage": 1,
+  "slots": ["weapon"]
 }

@@ -4,5 +4,6 @@
   "image": "han-fu.png",
   "description": "A traditional clothing worn by a Master.",
   "minArmor": 0,
-  "maxArmor": 1
+  "maxArmor": 1,
+  "slots": ["torso"]
 }

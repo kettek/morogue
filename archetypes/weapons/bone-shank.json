@@ -4,5 +4,6 @@
   "image": "bone-shank.png",
   "description": "A crude shank made from a sharpened bone.",
   "minDamage": 1,
-  "maxDamage": 1
+  "maxDamage": 1,
+  "slots": ["off-hand"]
 }

@@ -4,5 +4,6 @@
   "image": "stylish-shoes.png",
   "description": "A pair of stylin' shoes.",
   "minArmor": 1,
-  "maxArmor": 1
+  "maxArmor": 1,
+  "slots": ["feet"]
 }

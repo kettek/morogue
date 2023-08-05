@@ -5,5 +5,6 @@
   "description": "An armor that protects the legs and is made of leather and metal.",
   "armorType": "medium",
   "minArmor": 1,
-  "maxArmor": 2
+  "maxArmor": 2,
+  "slots": ["legs"]
 }

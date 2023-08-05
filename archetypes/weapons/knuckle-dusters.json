@@ -4,5 +4,6 @@
   "image": "knuckle-dusters.png",
   "description": "Metal knuckles that fit over the fingers to hurt things gooder.",
   "minDamage": 1,
-  "maxDamage": 2
+  "maxDamage": 2,
+  "slots": ["hands", "off-hand"]
 }

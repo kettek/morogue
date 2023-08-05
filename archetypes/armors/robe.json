@@ -4,5 +4,6 @@
   "image": "robe.png",
   "description": "A simple robe.",
   "minArmor": 0,
-  "maxArmor": 1
+  "maxArmor": 1,
+  "slots": ["torso"]
 }

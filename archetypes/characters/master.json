@@ -7,5 +7,16 @@
   "brains": 1,
   "funk": 2,
   "traits": ["unarmed x2 damage"],
-  "startingObjects": ["morogue:armor:handwraps", "morogue:armor:han-fu", "morogue:armor:han-ku", "morogue:armor:han-xie"]
+  "startingObjects": ["morogue:armor:handwraps", "morogue:armor:han-fu", "morogue:armor:han-ku", "morogue:armor:han-xie"],
+  "slots": [
+    "head",
+    "neck",
+    "torso",
+    "arms",
+    "hands",
+    "legs",
+    "feet",
+    "weapon",
+    "off-hand"
+  ]
 }

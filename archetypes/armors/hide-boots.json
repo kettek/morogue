@@ -6,5 +6,6 @@
   "armorType": "light",
   "movePenalty": 1,
   "minArmor": 1,
-  "maxArmor": 1
+  "maxArmor": 1,
+  "slots": ["feet"]
 }

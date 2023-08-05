@@ -4,5 +4,6 @@
   "image": "jorts.png",
   "description": "Jorts are the perfect armor for the modern pedant. They're comfortable, stylish, and made from the finest denim. They're also the only armor that can be worn with a fanny pack.",
   "minArmor": 0,
-  "maxArmor": 1
+  "maxArmor": 1,
+  "slots": ["legs"]
 }

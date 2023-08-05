@@ -6,5 +6,17 @@
   "zooms": 4,
   "brains": 1,
   "funk": 1,
-  "startingObjects": ["morogue:armor:hide-armor", "morogue:armor:hide-leggings", "morogue:armor:hide-boots", "morogue:weapon:bow", "morogue:weapon:bone-shank"]
+  "traits": ["wilder-only helmets", "wilder-only boots"],
+  "startingObjects": ["morogue:armor:hide-armor", "morogue:armor:hide-leggings", "morogue:weapon:bow", "morogue:weapon:bone-shank"],
+  "slots": [
+    "wilder-head",
+    "neck",
+    "torso",
+    "arms",
+    "hands",
+    "legs",
+    "wilder-feet",
+    "weapon",
+    "off-hand"
+  ]
 }

@@ -4,5 +4,6 @@
   "image": "t-shirt.png",
   "description": "A simple covering for the upper body. There seems to be strange writing on it.",
   "minArmor": 0,
-  "maxArmor": 1
+  "maxArmor": 1,
+  "slots": ["torso"]
 }

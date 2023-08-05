@@ -6,5 +6,6 @@
   "armorType": "light",
   "movePenalty": 1,
   "minArmor": 1,
-  "maxArmor": 2
+  "maxArmor": 2,
+  "slots": ["torso"]
 }

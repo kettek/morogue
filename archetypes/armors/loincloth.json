@@ -4,5 +4,6 @@
   "image": "loincloth.png",
   "description": "A tattered loincloth.",
   "minArmor": 0,
-  "maxArmor": 1
+  "maxArmor": 1,
+  "slots": ["other"]
 }

@@ -6,5 +6,17 @@
   "zooms": 2,
   "brains": 1,
   "funk": 1,
-  "startingObjects": ["morogue:weapon:knuckle-dusters", "morogue:armor:vambraces", "morogue:armor:loincloth", "morogue:armor:greaves", "morogue:armor:sandals"]
+  "startingObjects": ["morogue:weapon:knuckle-dusters", "morogue:armor:vambraces", "morogue:armor:loincloth", "morogue:armor:greaves", "morogue:armor:sandals"],
+  "slots": [
+    "head",
+    "thick-neck",
+    "torso",
+    "arms",
+    "hands",
+    "other",
+    "legs",
+    "feet",
+    "weapon",
+    "off-hand"
+  ]
 }
