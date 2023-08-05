@@ -1,0 +1,8 @@
+{
+  "id": "morogue:armor:loincloth",
+  "title": "Loincloth",
+  "image": "loincloth.png",
+  "description": "A tattered loincloth.",
+  "minArmor": 0,
+  "maxArmor": 1
+}

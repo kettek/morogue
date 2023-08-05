@@ -1,0 +1,9 @@
+{
+  "id": "morogue:armor:greaves",
+  "title": "Greaves",
+  "image": "greaves.png",
+  "description": "An armor that protects the legs and is made of leather and metal.",
+  "armorType": "medium",
+  "minArmor": 1,
+  "maxArmor": 2
+}

@@ -1,0 +1,8 @@
+{
+  "id": "morogue:weapon:knuckle-dusters",
+  "title": "Knuckle Dusters",
+  "image": "knuckle-dusters.png",
+  "description": "Metal knuckles that fit over the fingers to hurt things gooder.",
+  "minDamage": 1,
+  "maxDamage": 2
+}

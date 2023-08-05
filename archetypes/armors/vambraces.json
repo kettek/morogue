@@ -1,0 +1,9 @@
+{
+  "id": "morogue:armor:vambraces",
+  "title": "Vambraces",
+  "image": "vambraces.png",
+  "description": "Forearm guards made of leather and metal.",
+  "armorType": "medium",
+  "minArmor": 1,
+  "maxArmor": 2
+}

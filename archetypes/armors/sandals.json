@@ -1,0 +1,8 @@
+{
+  "id": "morogue:armor:sandals",
+  "title": "Sandals",
+  "image": "sandals.png",
+  "description": "Footwear made of leather and rope with a thin sole.",
+  "minArmor": 0,
+  "maxArmor": 1
+}
