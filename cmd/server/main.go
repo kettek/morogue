@@ -39,12 +39,6 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	for _, bucket := range accounts.Buckets() {
-		log.Printf("bucket: %v", bucket)
-		for _, account := range accounts.ListBucket(bucket) {
-			log.Printf("account: %v", account)
-		}
-	}
 
 	u, clientChan, checkChan := server.NewUniverse(accounts, data)
 	u.Run()
