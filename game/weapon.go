@@ -67,6 +67,9 @@ func (a WeaponArchetype) RangeString() string {
 	if a.MinDamage == 0 {
 		return fmt.Sprintf("〜%d", a.MaxDamage)
 	}
+	if a.MinDamage == a.MaxDamage {
+		return fmt.Sprintf("%d", a.MaxDamage)
+	}
 	return fmt.Sprintf("%d〜%d", a.MinDamage, a.MaxDamage)
 }
 

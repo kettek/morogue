@@ -71,6 +71,9 @@ func (a ArmorArchetype) RangeString() string {
 	if a.MinArmor == 0 {
 		return fmt.Sprintf("〜%d", a.MaxArmor)
 	}
+	if a.MinArmor == a.MaxArmor {
+		return fmt.Sprintf("%d", a.MaxArmor)
+	}
 	return fmt.Sprintf("%d〜%d", a.MinArmor, a.MaxArmor)
 }
 
