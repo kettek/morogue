@@ -4,6 +4,6 @@
   "image": "figurine.png",
   "description": "A small, anatomically-correct figurine.",
   "weaponType": "thrown",
-  "minDamage": 0,
-  "maxDamage": 0
+  "minDamage": 1,
+  "maxDamage": 1
 }
