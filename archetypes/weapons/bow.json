@@ -1,0 +1,9 @@
+{
+  "id": "morogue:weapon:bow",
+  "title": "Bow",
+  "image": "bow.png",
+  "description": "A simple bow.",
+  "weaponType": "range",
+  "minDamage": 1,
+  "maxDamage": 3
+}

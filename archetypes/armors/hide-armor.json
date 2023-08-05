@@ -1,0 +1,10 @@
+{
+  "id": "morogue:armor:hide-armor",
+  "title": "Hide Armor",
+  "image": "hide-armor.png",
+  "description": "Armor made from the hide of an animal.",
+  "armorType": "light",
+  "movePenalty": 1,
+  "minArmor": 1,
+  "maxArmor": 2
+}

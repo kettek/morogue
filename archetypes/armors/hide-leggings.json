@@ -1,0 +1,10 @@
+{
+  "id": "morogue:armor:hide-leggings",
+  "title": "Hide Leggings",
+  "image": "hide-leggings.png",
+  "description": "Leggings made from the hide of an animal.",
+  "armorType": "light",
+  "movePenalty": 1,
+  "minArmor": 1,
+  "maxArmor": 2
+}

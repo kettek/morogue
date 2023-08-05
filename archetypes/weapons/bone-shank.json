@@ -1,0 +1,8 @@
+{
+  "id": "morogue:weapon:bone-shank",
+  "title": "Bone Shank",
+  "image": "bone-shank.png",
+  "description": "A crude shank made from a sharpened bone.",
+  "minDamage": 1,
+  "maxDamage": 1
+}

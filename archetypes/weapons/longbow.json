@@ -1,0 +1,9 @@
+{
+  "id": "morogue:weapon:longbow",
+  "title": "Longbow",
+  "image": "longbow.png",
+  "description": "A bow that is longer than a shortbow.",
+  "weaponType": "range",
+  "minDamage": 2,
+  "maxDamage": 6
+}

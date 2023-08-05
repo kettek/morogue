@@ -5,5 +5,6 @@
   "swole": 3,
   "zooms": 4,
   "brains": 1,
-  "funk": 1
+  "funk": 1,
+  "startingObjects": ["morogue:armor:hide-armor", "morogue:armor:hide-leggings", "morogue:armor:hide-boots", "morogue:weapon:bow", "morogue:weapon:bone-shank"]
 }

@@ -1,0 +1,10 @@
+{
+  "id": "morogue:armor:hide-boots",
+  "title": "Hide Boots",
+  "image": "hide-boots.png",
+  "description": "Boots made from the hide of an animal.",
+  "armorType": "light",
+  "movePenalty": 1,
+  "minArmor": 1,
+  "maxArmor": 1
+}
