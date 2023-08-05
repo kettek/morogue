@@ -39,8 +39,8 @@ func (a *Account) CreateCharacter(name string, archetype id.UUID) (*game.Charact
 	}
 
 	a.Characters = append(a.Characters, &game.Character{
-		Name:      name,
-		Archetype: archetype,
+		Name:        name,
+		ArchetypeID: archetype,
 	})
 
 	return a.Characters[len(a.Characters)-1], nil

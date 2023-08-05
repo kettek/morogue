@@ -20,11 +20,12 @@ func (a ItemArchetype) GetID() id.UUID {
 // Item represents a generic item in the world.
 type Item struct {
 	Position
-	Archetype id.UUID `msgpack:"A,omitempty"`
-	WID       id.WID  // ID assigned when entering da world.
-	Container id.WID  `msgpack:"c,omitempty"` // The container of the item, if any.
-	ID        id.UUID `msgpack:"id,omitempty"`
-	Name      string  `msgpack:"n,omitempty"`
+	ArchetypeID id.UUID   `msgpack:"A,omitempty"`
+	Archetype   Archetype `msgpack:"-" json:"-"`
+	WID         id.WID    // ID assigned when entering da world.
+	Container   id.WID    `msgpack:"c,omitempty"` // The container of the item, if any.
+	ID          id.UUID   `msgpack:"id,omitempty"`
+	Name        string    `msgpack:"n,omitempty"`
 }
 
 // Type returns "item"
@@ -52,6 +53,14 @@ func (o *Item) SetPosition(p Position) {
 	o.Position = p
 }
 
-func (o *Item) GetArchetype() id.UUID {
+func (o *Item) GetArchetypeID() id.UUID {
+	return o.ArchetypeID
+}
+
+func (o *Item) SetArchetype(a Archetype) {
+	o.Archetype = a
+}
+
+func (o *Item) GetArchetype() Archetype {
 	return o.Archetype
 }

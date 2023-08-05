@@ -48,9 +48,10 @@ func (w *world) generateLocation( /*locationInfo*/ ) {
 	// TODO: Generate and add location to locations.
 }
 
-// assignWIDs assigns a WID to an object and all of its children. This is done when any object is added to the world.
+// assignWIDs assigns a WID to an object and all of its children. This is done when any object is added to the world. Piggy-backing off this function is assigning the object's archetype pointer.
 func (w *world) assignWIDs(o game.Object) {
 	o.SetWID(w.wids.Next())
+	o.SetArchetype(w.data.Archetype(o.GetArchetypeID()))
 	switch o := o.(type) {
 	case *game.Character:
 		for _, o2 := range o.Inventory {

@@ -19,6 +19,7 @@ type CharacterArchetype struct {
 	Brains          AttributeLevel     // Thinkin' and spell-related
 	Funk            AttributeLevel     // Charm and god-related
 	Traits          []string           // Traits
+	Slots           Slots              // Slots
 	StartingObjects []id.UUID          // Starting objects
 	StartingSkills  map[string]float64 // Starting skills
 }
@@ -34,15 +35,17 @@ func (c CharacterArchetype) GetID() id.UUID {
 // Character represents a character. This can be a player or an NPC.
 type Character struct {
 	Position
-	Events     []Event `msgpack:"-" json:"-"` // Events that have happened to the character. These are only sent to the owning client.
-	Desire     Desire  `msgpack:"-" json:"-"` // The current desire of the character. Used server-side.
-	LastDesire Desire  `msgpack:"-" json:"-"` // Last desire processed. Used server-side.
-	WID        id.WID  // ID assigned when entering da world.
-	Archetype  id.UUID `msgpack:"A,omitempty"`
-	Name       string  `msgpack:"n,omitempty"`
-	Level      int     `msgpack:"l,omitempty"`
-	Skills     Skills  `msgpack:"-"`
-	Inventory  Objects `msgpack:"-"`
+	Events      []Event   `msgpack:"-" json:"-"` // Events that have happened to the character. These are only sent to the owning client.
+	Desire      Desire    `msgpack:"-" json:"-"` // The current desire of the character. Used server-side.
+	LastDesire  Desire    `msgpack:"-" json:"-"` // Last desire processed. Used server-side.
+	WID         id.WID    // ID assigned when entering da world.
+	Archetype   Archetype `msgpack:"-" json:"-"` // Archetype of the character. This is likely a pointer.
+	ArchetypeID id.UUID   `msgpack:"A,omitempty"`
+	Name        string    `msgpack:"n,omitempty"`
+	Level       int       `msgpack:"l,omitempty"`
+	Slots       SlotMap   `msgpack:"-"`
+	Skills      Skills    `msgpack:"-"`
+	Inventory   Objects   `msgpack:"-"`
 }
 
 // Type returns "character"
@@ -70,8 +73,18 @@ func (c *Character) SetPosition(p Position) {
 	c.Position = p
 }
 
+// GetArchetypeID returns the archetype.
+func (c *Character) GetArchetypeID() id.UUID {
+	return c.ArchetypeID
+}
+
+// SetArchetypeID sets the archetype.
+func (c *Character) SetArchetype(a Archetype) {
+	c.Archetype = a
+}
+
 // GetArchetype returns the archetype.
-func (c *Character) GetArchetype() id.UUID {
+func (c *Character) GetArchetype() Archetype {
 	return c.Archetype
 }
 
@@ -104,6 +117,14 @@ func (c *Character) Apply(o Object) Event {
 }
 
 func (c *Character) applyWeapon(w *Weapon) Event {
+	if w.Archetype != nil {
+		if err := c.Slots.Apply(w.Archetype.(WeaponArchetype).Slots); err != nil {
+			return EventNotice{
+				Message: err.Error(),
+			}
+		}
+	}
+
 	w.Applied = true
 	return EventApply{
 		Applier: c.WID,
@@ -113,6 +134,14 @@ func (c *Character) applyWeapon(w *Weapon) Event {
 }
 
 func (c *Character) applyArmor(a *Armor) Event {
+	if a.Archetype != nil {
+		if err := c.Slots.Apply(a.Archetype.(ArmorArchetype).Slots); err != nil {
+			return EventNotice{
+				Message: err.Error(),
+			}
+		}
+	}
+
 	a.Applied = true
 	return EventApply{
 		Applier: c.WID,
@@ -140,6 +169,14 @@ func (c *Character) Unapply(o Object) Event {
 }
 
 func (c *Character) unapplyWeapon(w *Weapon) Event {
+	if w.Archetype != nil {
+		if err := c.Slots.Unapply(w.Archetype.(WeaponArchetype).Slots); err != nil {
+			return EventNotice{
+				Message: err.Error(),
+			}
+		}
+	}
+
 	w.Applied = false
 	return EventApply{
 		Applier: c.WID,
@@ -149,6 +186,14 @@ func (c *Character) unapplyWeapon(w *Weapon) Event {
 }
 
 func (c *Character) unapplyArmor(a *Armor) Event {
+	if a.Archetype != nil {
+		if err := c.Slots.Unapply(a.Archetype.(ArmorArchetype).Slots); err != nil {
+			return EventNotice{
+				Message: err.Error(),
+			}
+		}
+	}
+
 	a.Applied = false
 	return EventApply{
 		Applier: c.WID,

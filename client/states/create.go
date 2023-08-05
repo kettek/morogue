@@ -452,7 +452,7 @@ func (state *Create) populateCharacters(ctx ifs.RunContext, characters []*game.C
 
 			var img *ebiten.Image
 			for _, arch := range state.archetypes {
-				if arch.Archetype.GetID() == ch.Archetype {
+				if arch.Archetype.GetID() == ch.ArchetypeID {
 					img = arch.Image
 					break
 				}

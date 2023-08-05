@@ -56,7 +56,8 @@ type ArmorArchetype struct {
 	ArmorType   ArmorType
 	MinArmor    int // Character proficiency with a weapon increases min up to max.
 	MaxArmor    int
-	MovePenalty int // Penalty to movement speed.
+	MovePenalty int   // Penalty to movement speed.
+	Slots       Slots `msgpack:"S,omitempty"`
 }
 
 func (a ArmorArchetype) Type() string {
@@ -80,10 +81,11 @@ func (a ArmorArchetype) RangeString() string {
 // Armor is a weapon.
 type Armor struct {
 	Position
-	Archetype id.UUID `msgpack:"A,omitempty"`
-	WID       id.WID
-	Container id.WID `msgpack:"c,omitempty"` // The container of the item, if any.
-	Applied   bool   `msgpack:"a,omitempty"`
+	ArchetypeID id.UUID   `msgpack:"A,omitempty"`
+	Archetype   Archetype `msgpack:"-" json:"-"`
+	WID         id.WID
+	Container   id.WID `msgpack:"c,omitempty"` // The container of the item, if any.
+	Applied     bool   `msgpack:"a,omitempty"`
 }
 
 func (a Armor) Type() ObjectType {
@@ -106,6 +108,14 @@ func (a *Armor) SetPosition(p Position) {
 	a.Position = p
 }
 
-func (a *Armor) GetArchetype() id.UUID {
+func (a *Armor) GetArchetypeID() id.UUID {
+	return a.ArchetypeID
+}
+
+func (a *Armor) SetArchetype(archetype Archetype) {
+	a.Archetype = archetype
+}
+
+func (a *Armor) GetArchetype() Archetype {
 	return a.Archetype
 }

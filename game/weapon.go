@@ -58,6 +58,7 @@ type WeaponArchetype struct {
 	WeaponType         WeaponType `msgpack:"w,omitempty"`
 	MinDamage          int        `msgpack:"m,omitempty"` // Character proficiency with a weapon increases min up to max.
 	MaxDamage          int        `msgpack:"M,omitempty"`
+	Slots              Slots      `msgpack:"S,omitempty"`
 }
 
 func (a WeaponArchetype) Type() string {
@@ -81,10 +82,11 @@ func (a WeaponArchetype) RangeString() string {
 // Weapon is a weapon.
 type Weapon struct {
 	Position
-	Archetype id.UUID `msgpack:"A,omitempty"`
-	WID       id.WID
-	Container id.WID `msgpack:"c,omitempty"` // The container of the item, if any.
-	Applied   bool   `msgpack:"a,omitempty"`
+	ArchetypeID id.UUID   `msgpack:"A,omitempty"`
+	Archetype   Archetype `msgpack:"-" json:"-"`
+	WID         id.WID
+	Container   id.WID `msgpack:"c,omitempty"` // The container of the item, if any.
+	Applied     bool   `msgpack:"a,omitempty"`
 }
 
 func (w Weapon) Type() ObjectType {
@@ -109,6 +111,14 @@ func (w *Weapon) SetPosition(p Position) {
 	w.Position = p
 }
 
-func (w *Weapon) GetArchetype() id.UUID {
+func (w *Weapon) GetArchetypeID() id.UUID {
+	return w.ArchetypeID
+}
+
+func (w *Weapon) GetArchetype() Archetype {
 	return w.Archetype
+}
+
+func (w *Weapon) SetArchetype(a Archetype) {
+	w.Archetype = a
 }

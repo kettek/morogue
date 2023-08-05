@@ -20,22 +20,28 @@ type Object interface {
 	GetWID() id.WID
 	SetPosition(Position)
 	GetPosition() Position
-	GetArchetype() id.UUID
+	GetArchetypeID() id.UUID
+	SetArchetype(a Archetype)
+	GetArchetype() Archetype
 }
 
 func CreateObjectFromArchetype(a Archetype) Object {
-	switch a.(type) {
+	switch a := a.(type) {
 	case CharacterArchetype:
 		return &Character{
-			Archetype: a.GetID(),
+			ArchetypeID: a.GetID(),
+			Slots:       a.Slots.ToMap(),
+			Archetype:   a,
 		}
 	case WeaponArchetype:
 		return &Weapon{
-			Archetype: a.GetID(),
+			ArchetypeID: a.GetID(),
+			Archetype:   a,
 		}
 	case ArmorArchetype:
 		return &Armor{
-			Archetype: a.GetID(),
+			ArchetypeID: a.GetID(),
+			Archetype:   a,
 		}
 	}
 	return nil

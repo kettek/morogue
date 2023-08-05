@@ -222,12 +222,12 @@ func (inv *Inventory) Refresh(ctx ifs.RunContext, objects game.Objects) {
 
 	// Refresh it.
 	for i, o := range objects {
-		img := inv.Data.ArchetypeImage(o.GetArchetype())
+		img := inv.Data.ArchetypeImage(o.GetArchetypeID())
 		inv.cells[i].WID = o.GetWID()
 		inv.cells[i].graphic.Image = img
 		inv.cells[i].tooltip.Offset = image.Pt(2, 2)
 
-		arch := inv.Data.Archetype(o.GetArchetype())
+		arch := inv.Data.Archetype(o.GetArchetypeID())
 		inv.cells[i].tooltipContent.RemoveChildren()
 		addObjectInfo(ctx, o, arch, inv.cells[i].tooltipContent)
 

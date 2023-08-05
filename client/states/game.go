@@ -255,8 +255,8 @@ func (state *Game) syncUIToLocation(ctx ifs.RunContext) {
 func (state *Game) ensureObjects(objects game.Objects) {
 	var missingArchetypes []id.UUID
 	for _, obj := range objects {
-		if _, ok := state.data.archetypes[obj.GetArchetype()]; !ok {
-			missingArchetypes = append(missingArchetypes, obj.GetArchetype())
+		if _, ok := state.data.archetypes[obj.GetArchetypeID()]; !ok {
+			missingArchetypes = append(missingArchetypes, obj.GetArchetypeID())
 		}
 	}
 	if len(missingArchetypes) > 0 {
@@ -508,7 +508,7 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 			if pos.X < 0 || pos.Y < 0 {
 				continue
 			}
-			if img := state.data.archetypeImages[o.GetArchetype()]; img != nil {
+			if img := state.data.archetypeImages[o.GetArchetypeID()]; img != nil {
 				px := pos.X * cw
 				py := pos.Y * ch
 				opts := ebiten.DrawImageOptions{}
