@@ -77,7 +77,7 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 	start := &location{}
 	start.ID = id.UUID(lid)
 	start.active = true
-	err = start.generate()
+	err = start.generate(w.data, &w.wids)
 	if err != nil {
 		fmt.Println("OH NO", err)
 	}

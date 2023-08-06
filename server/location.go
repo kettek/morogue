@@ -102,7 +102,7 @@ func (l *location) moveCharacter(wid id.WID, dir game.MoveDirection) error {
 	return nil
 }
 
-func (l *location) generate() error {
+func (l *location) generate(data *Data, wids *id.WIDGenerator) error {
 	// FIXME: Pull from somewhere.
 	for x := 0; x < 60; x++ {
 		l.Cells = append(l.Cells, make([]game.Cell, 0))
