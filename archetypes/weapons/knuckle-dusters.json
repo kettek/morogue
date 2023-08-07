@@ -5,5 +5,5 @@
   "description": "Metal knuckles that fit over the fingers to hurt things gooder.",
   "minDamage": 1,
   "maxDamage": 2,
-  "slots": ["hands", "off-hand"]
+  "slots": ["main-hand", "off-hand"]
 }

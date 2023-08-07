@@ -5,5 +5,5 @@
   "description": "A gnarled and worn cane.",
   "minDamage": 0,
   "maxDamage": 1,
-  "slots": ["weapon"]
+  "slots": ["main-hand"]
 }

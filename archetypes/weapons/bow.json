@@ -6,5 +6,5 @@
   "weaponType": "range",
   "minDamage": 1,
   "maxDamage": 3,
-  "slots": ["weapon", "off-hand"]
+  "slots": ["main-hand", "off-hand"]
 }

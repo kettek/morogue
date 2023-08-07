@@ -5,5 +5,5 @@
   "description": "The pen might be mightier than the sword, but what about the dictionary?",
   "minDamage": 2,
   "maxDamage": 2,
-  "slots": ["weapon"]
+  "slots": ["main-hand"]
 }
