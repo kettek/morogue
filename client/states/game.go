@@ -27,7 +27,8 @@ type Game struct {
 	locations map[id.UUID]*game.Location
 	location  *game.Location // current
 	//
-	characterWID id.WID
+	characterWID        id.WID
+	objectsMissingArchs []id.WID
 	//
 	binds    clgame.Binds
 	scroller clgame.Scroller
@@ -38,6 +39,7 @@ type Game struct {
 	inventory clgame.Inventory
 	below     clgame.Below
 	hotbar    clgame.Hotbar
+	statbar   clgame.Statbar
 }
 
 // NewGame creates a new Game instance.
@@ -161,26 +163,67 @@ func (state *Game) Begin(ctx ifs.RunContext) error {
 		state.ui.Container.AddChild(invBelowContainer)
 	}
 
-	hotbarContainer := widget.NewContainer(
-		widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
-	)
-	hotbarContainerInner := widget.NewContainer(
-		widget.ContainerOpts.Layout(widget.NewAnchorLayout(
-			widget.AnchorLayoutOpts.Padding(widget.NewInsetsSimple(8)),
-		)),
-		widget.ContainerOpts.WidgetOpts(
-			widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
-				StretchHorizontal:  false,
-				StretchVertical:    false,
-				HorizontalPosition: widget.AnchorLayoutPositionCenter,
-				VerticalPosition:   widget.AnchorLayoutPositionEnd,
-			}),
-		),
-	)
-	hotbarContainer.AddChild(hotbarContainerInner)
-	state.hotbar.Init(hotbarContainerInner, ctx, &state.binds)
+	{
+		hotbarAndStatbarContainer := widget.NewContainer(
+			widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
+		)
+		hotbarAndStatbarContainerInner := widget.NewContainer(
+			widget.ContainerOpts.Layout(widget.NewRowLayout(
+				widget.RowLayoutOpts.Direction(widget.DirectionVertical),
+			)),
+			widget.ContainerOpts.WidgetOpts(
+				widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+					StretchHorizontal:  false,
+					StretchVertical:    false,
+					HorizontalPosition: widget.AnchorLayoutPositionCenter,
+					VerticalPosition:   widget.AnchorLayoutPositionEnd,
+				}),
+			),
+		)
+		hotbarAndStatbarContainer.AddChild(hotbarAndStatbarContainerInner)
 
-	state.ui.Container.AddChild(hotbarContainer)
+		state.ui.Container.AddChild(hotbarAndStatbarContainer)
+
+		hotbarContainer := widget.NewContainer(
+			widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
+		)
+		hotbarContainerInner := widget.NewContainer(
+			widget.ContainerOpts.Layout(widget.NewAnchorLayout(
+				widget.AnchorLayoutOpts.Padding(widget.Insets{Bottom: 30}),
+			)),
+			widget.ContainerOpts.WidgetOpts(
+				widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+					StretchHorizontal:  false,
+					StretchVertical:    false,
+					HorizontalPosition: widget.AnchorLayoutPositionCenter,
+					VerticalPosition:   widget.AnchorLayoutPositionEnd,
+				}),
+			),
+		)
+		hotbarContainer.AddChild(hotbarContainerInner)
+		state.hotbar.Init(hotbarContainerInner, ctx, &state.binds)
+
+		hotbarAndStatbarContainerInner.AddChild(hotbarContainer)
+
+		statbarContainer := widget.NewContainer(
+			widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
+		)
+		statbarContainerInner := widget.NewContainer(
+			widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
+			widget.ContainerOpts.WidgetOpts(
+				widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+					StretchHorizontal:  true,
+					StretchVertical:    false,
+					HorizontalPosition: widget.AnchorLayoutPositionCenter,
+					VerticalPosition:   widget.AnchorLayoutPositionEnd,
+				}),
+			),
+		)
+		statbarContainer.AddChild(statbarContainerInner)
+		state.statbar.Init(statbarContainerInner, ctx)
+
+		hotbarAndStatbarContainerInner.AddChild(statbarContainer)
+	}
 
 	return nil
 }
@@ -338,6 +381,7 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 					character.Inventory[i] = realObj
 				}
 				state.refreshInventory(ctx)
+				state.refreshStatbar(ctx)
 
 				character.Skills = m.Skills
 			}
@@ -411,6 +455,7 @@ func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 						if ch == state.Character() {
 							fmt.Println("You applied an item")
 							state.refreshInventory(ctx)
+							state.refreshStatbar(ctx)
 						} else {
 							fmt.Printf("%s applied an item\n", ch.Name)
 						}
@@ -419,6 +464,7 @@ func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 						if ch == state.Character() {
 							fmt.Println("You unapplied an item")
 							state.refreshInventory(ctx)
+							state.refreshStatbar(ctx)
 						} else {
 							fmt.Printf("%s unapplied an item\n", ch.Name)
 						}
@@ -456,6 +502,7 @@ func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 				if ch == state.Character() {
 					fmt.Println("You dropped an item")
 					state.refreshInventory(ctx)
+					state.refreshStatbar(ctx)
 				} else {
 					fmt.Printf("%s dropped an item\n", ch.Name)
 				}
@@ -491,6 +538,14 @@ func (state *Game) Character() *game.Character {
 
 func (state *Game) refreshInventory(ctx ifs.RunContext) {
 	state.inventory.Refresh(ctx, state.Character().Inventory)
+}
+
+func (state *Game) refreshStatbar(ctx ifs.RunContext) {
+	if ch := state.Character(); ch != nil {
+		if a := state.data.archetypes[state.Character().ArchetypeID]; a != nil {
+			state.statbar.Refresh(ctx, ch, a.(game.CharacterArchetype))
+		}
+	}
 }
 
 func (state *Game) Draw(ctx ifs.DrawContext) {
