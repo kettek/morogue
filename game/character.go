@@ -46,6 +46,8 @@ type Character struct {
 	Slots       SlotMap   `msgpack:"-"`
 	Skills      Skills    `msgpack:"-"`
 	Inventory   Objects   `msgpack:"-"`
+	//
+	Damages []Damage `msgpack:"d,omitempty"`
 }
 
 // Type returns "character"
@@ -99,7 +101,7 @@ func (c *Character) InInventory(wid id.WID) bool {
 }
 
 // Apply applies an object from the character's inventory.
-func (c *Character) Apply(o Object) Event {
+func (c *Character) Apply(o Object, force bool) Event {
 	if !c.InInventory(o.GetWID()) {
 		return EventNotice{
 			Message: "You don't have that item.",
@@ -107,20 +109,22 @@ func (c *Character) Apply(o Object) Event {
 	}
 	switch o := o.(type) {
 	case *Weapon:
-		return c.applyWeapon(o)
+		return c.applyWeapon(o, force)
 	case *Armor:
-		return c.applyArmor(o)
+		return c.applyArmor(o, force)
 	case *Item:
 		// TODO
 	}
 	return nil
 }
 
-func (c *Character) applyWeapon(w *Weapon) Event {
+func (c *Character) applyWeapon(w *Weapon, force bool) Event {
 	if w.Archetype != nil {
 		if err := c.Slots.Apply(w.Archetype.(WeaponArchetype).Slots); err != nil {
-			return EventNotice{
-				Message: err.Error(),
+			if !force {
+				return EventNotice{
+					Message: err.Error(),
+				}
 			}
 		}
 	}
@@ -133,11 +137,13 @@ func (c *Character) applyWeapon(w *Weapon) Event {
 	}
 }
 
-func (c *Character) applyArmor(a *Armor) Event {
+func (c *Character) applyArmor(a *Armor, force bool) Event {
 	if a.Archetype != nil {
 		if err := c.Slots.Apply(a.Archetype.(ArmorArchetype).Slots); err != nil {
-			return EventNotice{
-				Message: err.Error(),
+			if !force {
+				return EventNotice{
+					Message: err.Error(),
+				}
 			}
 		}
 	}
@@ -151,7 +157,7 @@ func (c *Character) applyArmor(a *Armor) Event {
 }
 
 // Unapply unapplies an object from the character's inventory.
-func (c *Character) Unapply(o Object) Event {
+func (c *Character) Unapply(o Object, force bool) Event {
 	if !c.InInventory(o.GetWID()) {
 		return EventNotice{
 			Message: "You don't have that item.",
@@ -159,20 +165,22 @@ func (c *Character) Unapply(o Object) Event {
 	}
 	switch o := o.(type) {
 	case *Weapon:
-		return c.unapplyWeapon(o)
+		return c.unapplyWeapon(o, force)
 	case *Armor:
-		return c.unapplyArmor(o)
+		return c.unapplyArmor(o, force)
 	case *Item:
 		// TODO
 	}
 	return nil
 }
 
-func (c *Character) unapplyWeapon(w *Weapon) Event {
+func (c *Character) unapplyWeapon(w *Weapon, force bool) Event {
 	if w.Archetype != nil {
 		if err := c.Slots.Unapply(w.Archetype.(WeaponArchetype).Slots); err != nil {
-			return EventNotice{
-				Message: err.Error(),
+			if !force {
+				return EventNotice{
+					Message: err.Error(),
+				}
 			}
 		}
 	}
@@ -185,11 +193,13 @@ func (c *Character) unapplyWeapon(w *Weapon) Event {
 	}
 }
 
-func (c *Character) unapplyArmor(a *Armor) Event {
+func (c *Character) unapplyArmor(a *Armor, force bool) Event {
 	if a.Archetype != nil {
 		if err := c.Slots.Unapply(a.Archetype.(ArmorArchetype).Slots); err != nil {
-			return EventNotice{
-				Message: err.Error(),
+			if !force {
+				return EventNotice{
+					Message: err.Error(),
+				}
 			}
 		}
 	}
@@ -228,9 +238,9 @@ func (c *Character) Drop(o Object) Event {
 	// Unapply it, for obvious reasons.
 	switch o := o.(type) {
 	case *Weapon:
-		c.unapplyWeapon(o)
+		c.unapplyWeapon(o, true)
 	case *Armor:
-		c.unapplyArmor(o)
+		c.unapplyArmor(o, true)
 	}
 
 	// Remove from the inventory.
@@ -246,4 +256,73 @@ func (c *Character) Drop(o Object) Event {
 		Object:   o,
 		Position: c.GetPosition(),
 	}
+}
+
+func (c *Character) CacheDamages() {
+	c.Damages = []Damage{}
+	var mainHand, offHand *Weapon
+	for _, w := range c.Inventory {
+		if w, ok := w.(*Weapon); ok {
+			if !w.Applied || w.Archetype == nil {
+				continue
+			}
+			if w.Archetype.(WeaponArchetype).Slots.HasSlot(SlotMainHand) {
+				mainHand = w
+			} else if w.Archetype.(WeaponArchetype).Slots.HasSlot(SlotOffHand) {
+				offHand = w
+			}
+		}
+	}
+	// FIXME: Don't assume Swole, use the weapon's preferred attribute.
+	var mainMin, mainMax, offMin, offMax int
+	if mainHand != nil {
+		mainMin = mainHand.Archetype.(WeaponArchetype).MinDamage
+		mainMax = mainHand.Archetype.(WeaponArchetype).MinDamage
+		if c.Archetype.(CharacterArchetype).Swole > AttributeLevel(mainMin) {
+			if c.Archetype.(CharacterArchetype).Swole > AttributeLevel(mainMax) {
+				mainMin = int(c.Archetype.(CharacterArchetype).Swole)
+				mainMax = int(c.Archetype.(CharacterArchetype).Swole)
+			} else {
+				mainMin = int(c.Archetype.(CharacterArchetype).Swole)
+			}
+		}
+		c.Damages = append(c.Damages, Damage{
+			Source:  mainHand.WID,
+			Min:     mainMin,
+			Max:     mainMax,
+			Reduced: false,
+		})
+	}
+	if offHand != nil {
+		offMin = offHand.Archetype.(WeaponArchetype).MinDamage
+		offMax = offHand.Archetype.(WeaponArchetype).MinDamage
+		if c.Archetype.(CharacterArchetype).Swole > AttributeLevel(offMin) {
+			if c.Archetype.(CharacterArchetype).Swole > AttributeLevel(offMax) {
+				offMin = int(c.Archetype.(CharacterArchetype).Swole)
+				offMax = int(c.Archetype.(CharacterArchetype).Swole)
+			} else {
+				offMin = int(c.Archetype.(CharacterArchetype).Swole)
+			}
+		}
+		c.Damages = append(c.Damages, Damage{
+			Source:  offHand.WID,
+			Min:     offMin,
+			Max:     offMax,
+			Reduced: false,
+		})
+	}
+	if mainHand == nil && offHand == nil {
+		c.Damages = append(c.Damages, Damage{
+			Source:  c.WID,
+			Min:     0,
+			Max:     int(c.Archetype.(CharacterArchetype).Swole),
+			Reduced: true,
+		})
+	}
+}
+
+type Damage struct {
+	Source   id.WID
+	Min, Max int
+	Reduced  bool
 }

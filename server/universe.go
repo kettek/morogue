@@ -250,9 +250,9 @@ func (u *universe) updateClient(cl *client) error {
 										char.Pickup(o)
 										// Apply armor and weapons.
 										if _, ok := o.(*game.Armor); ok {
-											char.Apply(o)
+											char.Apply(o, false)
 										} else if _, ok := o.(*game.Weapon); ok {
-											char.Apply(o)
+											char.Apply(o, false)
 										}
 									}
 								}

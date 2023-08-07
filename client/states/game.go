@@ -252,12 +252,21 @@ func (state *Game) syncUIToLocation(ctx ifs.RunContext) {
 	state.grid.SetSize(w, h)
 }
 
+func (state *Game) assignObjectArchetype(obj game.Object) {
+	if a := state.data.archetypes[obj.GetArchetypeID()]; a == nil {
+		state.objectsMissingArchs = append(state.objectsMissingArchs, obj.GetWID())
+	} else {
+		obj.SetArchetype(a)
+	}
+}
+
 func (state *Game) ensureObjects(objects game.Objects) {
 	var missingArchetypes []id.UUID
 	for _, obj := range objects {
 		if _, ok := state.data.archetypes[obj.GetArchetypeID()]; !ok {
 			missingArchetypes = append(missingArchetypes, obj.GetArchetypeID())
 		}
+		state.assignObjectArchetype(obj)
 	}
 	if len(missingArchetypes) > 0 {
 		state.connection.Write(net.ArchetypesMessage{
@@ -283,6 +292,19 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 				if _, err := state.data.EnsureImage(a, ctx.Game.Zoom); err != nil {
 					fmt.Println("Error loading archetype image:", err)
 				}
+				// Update any objects awaiting this archetype.
+				i := 0
+				for _, wid := range state.objectsMissingArchs {
+					if o := state.location.ObjectByWID(wid); o != nil {
+						if o.GetArchetypeID() == a.GetID() {
+							state.assignObjectArchetype(o)
+							continue
+						}
+					}
+					state.objectsMissingArchs[i] = wid
+					i++
+				}
+				state.objectsMissingArchs = state.objectsMissingArchs[:i]
 			}
 			// This isn't exactly efficient.
 			state.refreshInventory(ctx)
@@ -363,9 +385,11 @@ func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 	case game.EventAdd:
 		if ch := state.location.ObjectByWID(evt.Object.GetWID()); ch == nil {
 			state.location.Objects.Add(evt.Object)
+			state.assignObjectArchetype(evt.Object)
 		} else {
 			state.location.Objects.RemoveByWID(evt.Object.GetWID())
 			state.location.Objects.Add(evt.Object)
+			state.assignObjectArchetype(evt.Object)
 		}
 	case game.EventRemove:
 		state.location.Objects.RemoveByWID(evt.WID)
@@ -383,7 +407,7 @@ func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 			if applier := state.location.ObjectByWID(evt.Applier); applier != nil {
 				if ch, ok := applier.(*game.Character); ok {
 					if evt.Applied {
-						ch.Apply(o)
+						ch.Apply(o, true)
 						if ch == state.Character() {
 							fmt.Println("You applied an item")
 							state.refreshInventory(ctx)
@@ -391,7 +415,7 @@ func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 							fmt.Printf("%s applied an item\n", ch.Name)
 						}
 					} else {
-						ch.Unapply(o)
+						ch.Unapply(o, true)
 						if ch == state.Character() {
 							fmt.Println("You unapplied an item")
 							state.refreshInventory(ctx)

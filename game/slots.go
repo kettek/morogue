@@ -1,9 +1,24 @@
 package game
 
-import "errors"
+import (
+	"errors"
+)
 
 // Slot is a slot used for equipment.
 type Slot string
+
+const (
+	SlotNone     Slot = ""
+	SlotHead     Slot = "head"
+	SlotTorso    Slot = "torso"
+	SlotArms     Slot = "arms"
+	SlotHands    Slot = "hands"
+	SlotOther    Slot = "other"
+	SlotLegs     Slot = "legs"
+	SlotFeet     Slot = "feet"
+	SlotMainHand Slot = "main-hand"
+	SlotOffHand  Slot = "off-hand"
+)
 
 // Slots is a slice of slots used for equipment.
 type Slots []Slot
@@ -26,6 +41,15 @@ func (s Slots) String() string {
 		}
 	}
 	return str
+}
+
+func (s Slots) HasSlot(slot Slot) bool {
+	for _, s := range s {
+		if s == slot {
+			return true
+		}
+	}
+	return false
 }
 
 // SlotMap is a map of slots used by characters.

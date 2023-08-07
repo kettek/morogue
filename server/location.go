@@ -217,9 +217,9 @@ func (l *location) process() (events []game.Event) {
 					if t := l.ObjectByWID(d.WID); t != nil {
 						var e game.Event
 						if d.Apply {
-							e = c.Apply(t)
+							e = c.Apply(t, false)
 						} else {
-							e = c.Unapply(t)
+							e = c.Unapply(t, false)
 						}
 						if _, ok := e.(game.EventNotice); ok {
 							c.Events = append(c.Events, e)
