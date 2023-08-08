@@ -55,31 +55,11 @@ func makeDescription(ctx ifs.RunContext, txt string) *widget.TextArea {
 }
 
 func addObjectInfo(ctx ifs.RunContext, object game.Object, arch game.Archetype, container *widget.Container) {
-	noneColor := color.NRGBA{R: 200, G: 200, B: 200, A: 255}
-	lightColor := color.NRGBA{R: 100, G: 100, B: 200, A: 255}
-	mediumColor := color.NRGBA{R: 200, G: 200, B: 100, A: 255}
-	heavyColor := color.NRGBA{R: 200, G: 100, B: 100, A: 255}
-
-	unarmedColor := color.NRGBA{R: 250, G: 150, B: 50, A: 255}
-	rangedColor := color.NRGBA{R: 50, G: 250, B: 50, A: 255}
-	thrownColor := color.NRGBA{R: 50, G: 250, B: 150, A: 255}
-	meleeColor := color.NRGBA{R: 250, G: 50, B: 50, A: 255}
-
 	switch a := arch.(type) {
 	case game.WeaponArchetype:
-		weaponColor := noneColor
-		if a.WeaponType == game.WeaponTypeRange {
-			weaponColor = rangedColor
-		} else if a.WeaponType == game.WeaponTypeThrown {
-			weaponColor = thrownColor
-		} else if a.WeaponType == game.WeaponTypeMelee {
-			weaponColor = meleeColor
-		} else if a.WeaponType == game.WeaponTypeUnarmed {
-			weaponColor = unarmedColor
-		}
 
 		title := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s", a.Title), ctx.UI.BodyCopyFace, color.White))
-		values := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s %s", a.RangeString(), a.WeaponType), ctx.UI.BodyCopyFace, weaponColor))
+		values := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s %s", a.RangeString(), a.WeaponType), ctx.UI.BodyCopyFace, a.WeaponType.Color()))
 		slots := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s", a.Slots.String()), ctx.UI.BodyCopyFace, color.NRGBA{R: 200, G: 200, B: 200, A: 255}))
 		desc := makeDescription(ctx, a.Description)
 
@@ -102,17 +82,8 @@ func addObjectInfo(ctx ifs.RunContext, object game.Object, arch game.Archetype, 
 		container.AddChild(weaponLine)
 		container.AddChild(desc)
 	case game.ArmorArchetype:
-		armorColor := noneColor
-		if a.ArmorType == game.ArmorTypeLight {
-			armorColor = lightColor
-		} else if a.ArmorType == game.ArmorTypeMedium {
-			armorColor = mediumColor
-		} else if a.ArmorType == game.ArmorTypeHeavy {
-			armorColor = heavyColor
-		}
-
 		title := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s", a.Title), ctx.UI.BodyCopyFace, color.White))
-		values := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s %s", a.RangeString(), a.ArmorType), ctx.UI.BodyCopyFace, armorColor))
+		values := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s %s", a.RangeString(), a.ArmorType), ctx.UI.BodyCopyFace, a.ArmorType.Color()))
 		slots := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s", a.Slots.String()), ctx.UI.BodyCopyFace, color.NRGBA{R: 200, G: 200, B: 200, A: 255}))
 		desc := makeDescription(ctx, a.Description)
 

@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"image/color"
 
 	"github.com/kettek/morogue/id"
 )
@@ -10,7 +11,8 @@ import (
 type WeaponType uint8
 
 const (
-	WeaponTypeMelee WeaponType = iota
+	WeaponTypeNone WeaponType = iota
+	WeaponTypeMelee
 	WeaponTypeRange
 	WeaponTypeThrown
 	WeaponTypeUnarmed
@@ -28,6 +30,22 @@ func (a WeaponType) String() string {
 		return "unarmed"
 	default:
 		return ""
+	}
+}
+
+// Color returns the color associated with the weapon type.
+func (a WeaponType) Color() color.Color {
+	switch a {
+	case WeaponTypeRange:
+		return color.NRGBA{R: 50, G: 250, B: 50, A: 255}
+	case WeaponTypeThrown:
+		return color.NRGBA{R: 50, G: 250, B: 150, A: 255}
+	case WeaponTypeMelee:
+		return color.NRGBA{R: 250, G: 50, B: 50, A: 255}
+	case WeaponTypeUnarmed:
+		return color.NRGBA{R: 250, G: 150, B: 50, A: 255}
+	default:
+		return color.NRGBA{R: 200, G: 200, B: 200, A: 255}
 	}
 }
 

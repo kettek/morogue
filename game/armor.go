@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"image/color"
 
 	"github.com/kettek/morogue/id"
 )
@@ -28,6 +29,22 @@ func (a ArmorType) String() string {
 		return "heavy"
 	default:
 		return ""
+	}
+}
+
+// Color returns the color associated with the armor type.
+func (a ArmorType) Color() color.Color {
+	switch a {
+	case ArmorTypeNone:
+		return color.NRGBA{R: 200, G: 200, B: 200, A: 255}
+	case ArmorTypeLight:
+		return color.NRGBA{R: 100, G: 100, B: 200, A: 255}
+	case ArmorTypeMedium:
+		return color.NRGBA{R: 200, G: 200, B: 100, A: 255}
+	case ArmorTypeHeavy:
+		return color.NRGBA{R: 200, G: 100, B: 100, A: 255}
+	default:
+		return color.NRGBA{R: 200, G: 200, B: 200, A: 255}
 	}
 }
 
