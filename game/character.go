@@ -1,6 +1,8 @@
 package game
 
 import (
+	"fmt"
+
 	"github.com/kettek/morogue/id"
 )
 
@@ -274,13 +276,14 @@ func (c *Character) CacheDamages() {
 		}
 	}
 	// FIXME: Don't assume Swole, use the weapon's preferred attribute.
-	var mainMin, mainMax, offMin, offMax int
+	var mainMin, mainMax, mainExtra, offMin, offMax, offExtra int
 	if mainHand != nil {
 		mainMin = mainHand.Archetype.(WeaponArchetype).MinDamage
 		mainMax = mainHand.Archetype.(WeaponArchetype).MaxDamage
 		if c.Archetype.(CharacterArchetype).Swole > AttributeLevel(mainMin) {
 			if c.Archetype.(CharacterArchetype).Swole > AttributeLevel(mainMax) {
 				mainMin = mainMax
+				mainExtra = (int(c.Archetype.(CharacterArchetype).Swole) - mainMax) / 2
 			} else {
 				mainMin = int(c.Archetype.(CharacterArchetype).Swole)
 			}
@@ -289,6 +292,7 @@ func (c *Character) CacheDamages() {
 			Source:  mainHand.WID,
 			Min:     mainMin,
 			Max:     mainMax,
+			Extra:   mainExtra,
 			Reduced: false,
 		})
 	}
@@ -298,6 +302,7 @@ func (c *Character) CacheDamages() {
 		if c.Archetype.(CharacterArchetype).Swole > AttributeLevel(offMin) {
 			if c.Archetype.(CharacterArchetype).Swole > AttributeLevel(offMax) {
 				offMin = offMax
+				offExtra = (int(c.Archetype.(CharacterArchetype).Swole) - offMax) / 2
 			} else {
 				offMin = int(c.Archetype.(CharacterArchetype).Swole)
 			}
@@ -306,14 +311,16 @@ func (c *Character) CacheDamages() {
 			Source:  offHand.WID,
 			Min:     offMin,
 			Max:     offMax,
-			Reduced: false,
+			Extra:   offExtra,
+			Reduced: true,
 		})
 	}
 	if mainHand == nil && offHand == nil {
 		c.Damages = append(c.Damages, Damage{
 			Source:  c.WID,
 			Min:     0,
-			Max:     int(c.Archetype.(CharacterArchetype).Swole),
+			Max:     int(c.Archetype.(CharacterArchetype).Swole) / 2,
+			Extra:   0,
 			Reduced: true,
 		})
 	}
@@ -322,5 +329,22 @@ func (c *Character) CacheDamages() {
 type Damage struct {
 	Source   id.WID
 	Min, Max int
+	Extra    int
 	Reduced  bool
+}
+
+// RangeString returns a string representation of the damage range.
+func (d Damage) RangeString() string {
+	var s string
+	if d.Min == 0 {
+		s = fmt.Sprintf("〜%d", d.Max)
+	} else if d.Min == d.Max {
+		s = fmt.Sprintf("%d", d.Min)
+	} else {
+		s = fmt.Sprintf("%d〜%d", d.Min, d.Max)
+	}
+	if d.Extra > 0 {
+		s += fmt.Sprintf(" +%d", d.Extra)
+	}
+	return s
 }

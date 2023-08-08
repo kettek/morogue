@@ -187,14 +187,22 @@ func (state *Game) Begin(ctx ifs.RunContext) error {
 
 		hotbarContainer := widget.NewContainer(
 			widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
+			widget.ContainerOpts.WidgetOpts(
+				widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+					StretchHorizontal:  true,
+					StretchVertical:    false,
+					HorizontalPosition: widget.AnchorLayoutPositionCenter,
+					VerticalPosition:   widget.AnchorLayoutPositionEnd,
+				}),
+			),
 		)
 		hotbarContainerInner := widget.NewContainer(
 			widget.ContainerOpts.Layout(widget.NewAnchorLayout(
-				widget.AnchorLayoutOpts.Padding(widget.Insets{Bottom: 30}),
+				widget.AnchorLayoutOpts.Padding(widget.Insets{Bottom: 10}),
 			)),
 			widget.ContainerOpts.WidgetOpts(
 				widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
-					StretchHorizontal:  false,
+					StretchHorizontal:  true,
 					StretchVertical:    false,
 					HorizontalPosition: widget.AnchorLayoutPositionCenter,
 					VerticalPosition:   widget.AnchorLayoutPositionEnd,
