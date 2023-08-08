@@ -24,10 +24,12 @@ go run .
 
 ## Architectural Notes
 
-  * All network communication is done through msgpack using unmarshal/marshal functionality.
+  * Networking uses websockets and all communication is done through [msgpack](https://msgpack.org/index.html) using go's unmarshal/marshal functionality.
     * Interfaces, such as Archetypes, Objects, Events, and Messages, employ the use of wrappers to safely marshal and unmarshal interfaces to and from their concrete types.
-  * Networking uses websockets.
-  * Almost every distinct object in the world is of the *Object* type and contains a reference ID to an *Archetype* (and a cached pointer to said Archetype for efficiency). An Archetype contains the actual underlying data for an object, such as damage done, slots used, title. An Object is a "live" object that is used for actual world processing and interaction.
-  * Character objects are marshaled as JSON into a [bbolt](https://pkg.go.dev/go.etcd.io/bbolt#section-readme) database.
+  * A **World** represents a contained game instance. It runs it its own goroutine and can have characters join or leave the world. Each individual "map" in a World is known as a **Location**.
+  * Almost every distinct object in the world is of the **Object** type and contains a reference ID to an **Archetype** (and a cached pointer to said Archetype for efficiency). An Archetype contains the actual underlying data for an object, such as damage done, slots used, title. An Object is a "live" object that is used for actual world processing and interaction.
+  * **Accounts** and their Characters are marshaled as JSON into a [bbolt](https://pkg.go.dev/go.etcd.io/bbolt#section-readme) database.
   * All Archetypes are defined as JSON files in various directories in the `archetypes` directory.
   * All Archetypes are defined and referenced by a UUIDv5 identifier. This identifier can be provided either by an ASCII string, an array of bytes, or by a human-readable string that is converted to the actual UUID. This human-readable string is written as `morogue:type:thing`, where *type* would be *armor*, *weapon*, *item*, *character*, or *tile*, and *thing* would be whatever the actual archetype is called.
+  * Player controlled objects, such as Characters, receive commands from the player via a **Desire**. A desire can be to apply an item, drop an item, move in a direction, attack a target, and beyond. The result of a desire being processed will generally result in an **Event** being emitted to other clients or just the controlling player.
+  * Events are generally used to represent something happening in a *Location*, such as a character equipping an item, something taking damage, and beyond.
