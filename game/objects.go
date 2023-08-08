@@ -29,6 +29,16 @@ func (o *Objects) RemoveByWID(wid id.WID) Object {
 	return nil
 }
 
+// ObjectByWID returns an object by its WID.
+func (o *Objects) ObjectByWID(wid id.WID) Object {
+	for _, obj := range *o {
+		if obj.GetWID() == wid {
+			return obj
+		}
+	}
+	return nil
+}
+
 // MarshalMsgpack returns bytes as an ObjectsWrapper.
 func (o Objects) MarshalMsgpack() ([]byte, error) {
 	var ow []ObjectWrapper
