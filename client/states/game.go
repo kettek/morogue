@@ -12,6 +12,7 @@ import (
 	"github.com/kettek/morogue/game"
 	"github.com/kettek/morogue/id"
 	"github.com/kettek/morogue/net"
+	"github.com/tinne26/etxt"
 	"github.com/vmihailenco/msgpack/v5"
 )
 
@@ -581,6 +582,8 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 			}
 		}
 		// Draw characters
+		ctx.Txt.Save()
+		ctx.Txt.SetAlign(etxt.Center)
 		for _, o := range state.location.Objects {
 			// Ignore out of bounds objects.
 			pos := o.GetPosition()
@@ -595,7 +598,16 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 				opts.GeoM.Translate(float64(px), float64(py))
 				ctx.Screen.DrawImage(img, &opts)
 			}
+			switch o := o.(type) {
+			case *game.Character:
+				px := float64(pos.X*cw + cw/2)
+				py := float64(pos.Y*ch - ch/5)
+				ctx.Txt.SetOutlineColor(color.NRGBA{0, 0, 0, 128})
+				ctx.Txt.SetColor(color.NRGBA{255, 255, 255, 128})
+				ctx.Txt.DrawWithOutline(ctx.Screen, o.Name, int(px+float64(sx)), int(py+float64(sy)))
+			}
 		}
+		ctx.Txt.Restore()
 
 		state.sounds.Draw(ctx)
 	}
