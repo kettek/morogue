@@ -277,11 +277,10 @@ func (c *Character) CacheDamages() {
 	var mainMin, mainMax, offMin, offMax int
 	if mainHand != nil {
 		mainMin = mainHand.Archetype.(WeaponArchetype).MinDamage
-		mainMax = mainHand.Archetype.(WeaponArchetype).MinDamage
+		mainMax = mainHand.Archetype.(WeaponArchetype).MaxDamage
 		if c.Archetype.(CharacterArchetype).Swole > AttributeLevel(mainMin) {
 			if c.Archetype.(CharacterArchetype).Swole > AttributeLevel(mainMax) {
-				mainMin = int(c.Archetype.(CharacterArchetype).Swole)
-				mainMax = int(c.Archetype.(CharacterArchetype).Swole)
+				mainMin = mainMax
 			} else {
 				mainMin = int(c.Archetype.(CharacterArchetype).Swole)
 			}
@@ -295,11 +294,10 @@ func (c *Character) CacheDamages() {
 	}
 	if offHand != nil {
 		offMin = offHand.Archetype.(WeaponArchetype).MinDamage
-		offMax = offHand.Archetype.(WeaponArchetype).MinDamage
+		offMax = offHand.Archetype.(WeaponArchetype).MaxDamage
 		if c.Archetype.(CharacterArchetype).Swole > AttributeLevel(offMin) {
 			if c.Archetype.(CharacterArchetype).Swole > AttributeLevel(offMax) {
-				offMin = int(c.Archetype.(CharacterArchetype).Swole)
-				offMax = int(c.Archetype.(CharacterArchetype).Swole)
+				offMin = offMax
 			} else {
 				offMin = int(c.Archetype.(CharacterArchetype).Swole)
 			}
