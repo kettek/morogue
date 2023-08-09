@@ -13,9 +13,21 @@ import (
 
 type location struct {
 	game.Location
-	active     bool
-	removable  bool // destroyable is used to allow a location to be removed.
-	emptySince time.Time
+	playerCharacters   []*game.Character // List of active player characters
+	active             bool
+	removable          bool // destroyable is used to allow a location to be removed.
+	emptySince         time.Time
+	turnCount          int  // Current turn count.
+	turnActionCount    int  // Actions that have been taken by players this turn. OR, if the location is not in turns, a monotonic increment.
+	turnActionLatch    int  // Trigger for processing a complete turn.
+	turnActionOOCLatch int  // The latch for actions out of combat. This is generally equal to a second or 20 calls to process.
+	inTurns            bool // Whether or not the location is currently processing the world in turns.
+}
+
+func newLocation() *location {
+	return &location{
+		turnActionOOCLatch: 20,
+	}
 }
 
 func (l *location) addObject(o game.Object) {
@@ -58,6 +70,12 @@ func (l *location) addCharacter(character *game.Character) error {
 
 	l.active = true
 
+	// Add the character to the list of player characters.
+	l.playerCharacters = append(l.playerCharacters, character)
+
+	// Increase the turn latch.
+	l.turnActionLatch += 1
+
 	return nil
 }
 
@@ -75,6 +93,17 @@ func (l *location) removeCharacter(wid id.WID) error {
 				l.active = false
 				l.emptySince = time.Now()
 			}
+
+			// Remove the character from the list of player characters.
+			for i, c := range l.playerCharacters {
+				if c.WID == wid {
+					l.playerCharacters = append(l.playerCharacters[:i], l.playerCharacters[i+1:]...)
+					break
+				}
+			}
+
+			// Decreate the turn latch.
+			l.turnActionLatch -= 1
 
 			return nil
 		}
@@ -178,97 +207,140 @@ func (l *location) filterCells(cb func(c game.Cell) bool) (cells []cellLocation)
 }
 
 func (l *location) process() (events []game.Event) {
-	for _, o := range l.Objects {
-		switch c := o.(type) {
-		case *game.Character:
-			if c.Desire != nil {
-				switch d := c.Desire.(type) {
-				case game.DesireMove:
-					if err := l.moveCharacter(c.WID, d.Direction); err == nil {
-						events = append(events, game.EventPosition{
-							WID:      c.WID,
-							Position: c.Position,
-						})
-					} else {
-						// Make bump sounds if the character is moving in the same direction as their last desire.
-						if last, ok := c.LastDesire.(game.DesireMove); ok {
-							if last.Direction == d.Direction {
-								// Make the sfx come from the cell bumped into.
-								x, y := d.Direction.Position()
-								x += c.X
-								y += c.Y
-								if err == ErrMovementBlocked {
-									events = append(events, game.EventSound{
-										FromPosition: c.Position,
-										Position:     game.Position{X: x, Y: y},
-										Message:      "*bump*",
-									})
-								} else if err == game.ErrOutOfBoundCell {
-									events = append(events, game.EventSound{
-										FromPosition: c.Position,
-										Position:     game.Position{X: x, Y: y},
-										Message:      "*pmub*",
-									})
-								}
-							}
-						}
-					}
-				case game.DesireApply:
-					if t := l.ObjectByWID(d.WID); t != nil {
-						var e game.Event
-						if d.Apply {
-							e = c.Apply(t, false)
-						} else {
-							e = c.Unapply(t, false)
-						}
-						if _, ok := e.(game.EventNotice); ok {
-							c.Events = append(c.Events, e)
-						} else {
-							events = append(events, e)
-						}
-					}
-				case game.DesirePickup:
-					if t := l.ObjectByWID(d.WID); t != nil {
-						if l.isObjectContained(t) {
-							c.Events = append(c.Events, game.EventNotice{
-								Message: "You can't pick that up.",
-							})
-						} else {
-							if t.GetPosition() != c.GetPosition() {
-								c.Events = append(c.Events, game.EventNotice{
-									Message: "You can't reach that.",
-								})
-							} else {
-								events = append(events, c.Pickup(t))
-							}
-						}
-					}
-				case game.DesireDrop:
-					if t := l.ObjectByWID(d.WID); t != nil {
-						e := c.Drop(t)
-						if _, ok := e.(game.EventNotice); ok {
-							c.Events = append(c.Events, e)
-						} else {
-							events = append(events, e)
-							if e, ok := e.(game.EventDrop); ok {
-								t.SetPosition(e.Position)
-							}
-						}
-					}
-				case game.DesireBash:
-					if t := l.ObjectByWID(d.WID); t != nil {
-					} else {
-						c.Events = append(c.Events, game.EventNotice{
-							Message: "You kick at the air.",
-						})
-					}
-				}
-				c.LastDesire = c.Desire
-				c.Desire = nil
+	for _, c := range l.playerCharacters {
+		events = append(events, l.processCharacter(c)...)
+	}
+
+	if !l.inTurns {
+		l.turnActionCount++
+	}
+
+	if (!l.inTurns && l.turnActionCount >= l.turnActionOOCLatch) || (l.inTurns && l.turnActionCount >= l.turnActionLatch) {
+		// TODO: Process non-player characters.
+		for _, o := range l.Objects {
+			switch o.(type) {
+			default:
+				// TODO
 			}
+		}
+
+		l.turnActionCount = 0
+		l.turnCount++
+
+		// Only send turn events if we're actually in what we consider to be turns.
+		if l.inTurns {
+			events = append(events, game.EventTurn{
+				Turn: l.turnCount,
+			})
 		}
 	}
 	return events
+}
+
+func (l *location) processCharacter(c *game.Character) (events []game.Event) {
+	if c.Desire != nil {
+		if l.inTurns {
+			l.turnActionCount++
+		}
+		switch d := c.Desire.(type) {
+		case game.DesireMove:
+			if err := l.moveCharacter(c.WID, d.Direction); err == nil {
+				events = append(events, game.EventPosition{
+					WID:      c.WID,
+					Position: c.Position,
+				})
+			} else {
+				// Make bump sounds if the character is moving in the same direction as their last desire.
+				if last, ok := c.LastDesire.(game.DesireMove); ok {
+					if last.Direction == d.Direction {
+						// Make the sfx come from the cell bumped into.
+						x, y := d.Direction.Position()
+						x += c.X
+						y += c.Y
+						if err == ErrMovementBlocked {
+							events = append(events, game.EventSound{
+								FromPosition: c.Position,
+								Position:     game.Position{X: x, Y: y},
+								Message:      "*bump*",
+							})
+						} else if err == game.ErrOutOfBoundCell {
+							events = append(events, game.EventSound{
+								FromPosition: c.Position,
+								Position:     game.Position{X: x, Y: y},
+								Message:      "*pmub*",
+							})
+						}
+					}
+				}
+			}
+		case game.DesireApply:
+			if t := l.ObjectByWID(d.WID); t != nil {
+				var e game.Event
+				if d.Apply {
+					e = c.Apply(t, false)
+				} else {
+					e = c.Unapply(t, false)
+				}
+				if _, ok := e.(game.EventNotice); ok {
+					c.Events = append(c.Events, e)
+				} else {
+					events = append(events, e)
+				}
+			}
+		case game.DesirePickup:
+			if t := l.ObjectByWID(d.WID); t != nil {
+				if l.isObjectContained(t) {
+					c.Events = append(c.Events, game.EventNotice{
+						Message: "You can't pick that up.",
+					})
+				} else {
+					if t.GetPosition() != c.GetPosition() {
+						c.Events = append(c.Events, game.EventNotice{
+							Message: "You can't reach that.",
+						})
+					} else {
+						events = append(events, c.Pickup(t))
+					}
+				}
+			}
+		case game.DesireDrop:
+			if t := l.ObjectByWID(d.WID); t != nil {
+				e := c.Drop(t)
+				if _, ok := e.(game.EventNotice); ok {
+					c.Events = append(c.Events, e)
+				} else {
+					events = append(events, e)
+					if e, ok := e.(game.EventDrop); ok {
+						t.SetPosition(e.Position)
+					}
+				}
+			}
+		case game.DesireBash:
+			if t := l.ObjectByWID(d.WID); t != nil {
+			} else {
+				c.Events = append(c.Events, game.EventNotice{
+					Message: "You kick at the air.",
+				})
+			}
+		}
+		c.LastDesire = c.Desire
+		c.Desire = nil
+	}
+	return
+}
+
+// startTurns is called when the location should start processing the world in terms of turns. This should be done when the players begin combat.
+func (l *location) startTurns() {
+	l.inTurns = true
+	l.turnCount = 0
+	l.turnActionCount = 0
+}
+
+// stopTurns is called when the location should stop processing the world in terms of turns. This should be called when the players end combat.
+func (l *location) stopTurns() {
+	l.turnCount = 0
+	l.turnActionCount = 0
+	l.inTurns = false
 }
 
 func (l *location) isObjectContained(o game.Object) bool {

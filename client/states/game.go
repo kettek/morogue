@@ -518,6 +518,8 @@ func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 				}
 			}
 		}
+	case game.EventTurn:
+		fmt.Println("turn", evt.Turn)
 	case game.EventDamage:
 		fmt.Println("TODO: Handle damage", evt)
 	case game.EventHealth:

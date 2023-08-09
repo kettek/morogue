@@ -72,6 +72,10 @@ func (w *EventWrapper) Event() Event {
 		var d EventHealth
 		msgpack.Unmarshal(w.Data, &d)
 		return d
+	case (EventTurn{}).Type():
+		var d EventTurn
+		msgpack.Unmarshal(w.Data, &d)
+		return d
 	}
 	return nil
 }
@@ -274,4 +278,14 @@ type EventHealth struct {
 // Type returns "health"
 func (e EventHealth) Type() string {
 	return "health"
+}
+
+// EventTurn notifies the client that a location turn has occurred.
+type EventTurn struct {
+	Turn int `msgpack:"t,omitempty"`
+}
+
+// Type returns "turn"
+func (e EventTurn) Type() string {
+	return "turn"
 }
