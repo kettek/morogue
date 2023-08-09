@@ -64,6 +64,14 @@ func (w *EventWrapper) Event() Event {
 		var d EventNotice
 		msgpack.Unmarshal(w.Data, &d)
 		return d
+	case (EventDamage{}).Type():
+		var d EventDamage
+		msgpack.Unmarshal(w.Data, &d)
+		return d
+	case (EventHealth{}).Type():
+		var d EventHealth
+		msgpack.Unmarshal(w.Data, &d)
+		return d
 	}
 	return nil
 }
@@ -242,4 +250,28 @@ type EventNotice struct {
 // Type returns "notice"
 func (e EventNotice) Type() string {
 	return "notice"
+}
+
+// EventDamage notifies the client that the given object was damaged.
+type EventDamage struct {
+	From       id.WID `msgpack:"f,omitempty"`
+	Target     id.WID `msgpack:"t,omitempty"`
+	Damage     int    `msgpack:"d,omitempty"`
+	WeaponType string `msgpack:"w,omitempty"`
+}
+
+// Type returns "damage"
+func (e EventDamage) Type() string {
+	return "damage"
+}
+
+// EventHealth notifies the client that the given object's health changed.
+type EventHealth struct {
+	Target id.WID `msgpack:"t,omitempty"`
+	Health int    `msgpack:"h,omitempty"`
+}
+
+// Type returns "health"
+func (e EventHealth) Type() string {
+	return "health"
 }
