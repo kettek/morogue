@@ -49,6 +49,7 @@ type Character struct {
 	Skills      Skills    `msgpack:"-"`
 	Inventory   Objects   `msgpack:"-"`
 	//
+	Health  Health   `msgpack:"h,omitempty"`
 	Damages []Damage `msgpack:"d,omitempty"`
 }
 
@@ -326,6 +327,16 @@ func (c *Character) CacheDamages() {
 	}
 }
 
+func (c *Character) CacheHealth() {
+	// Baseline health is apparently 5.
+	health := 5
+	health += int(c.Archetype.(CharacterArchetype).Swole) * 2
+	t := (c.Archetype.(CharacterArchetype).Swole + c.Archetype.(CharacterArchetype).Zooms + c.Archetype.(CharacterArchetype).Brains + c.Archetype.(CharacterArchetype).Funk) / 4
+
+	c.Health.Max = health + int(t)
+	//c.Health.Current = int(float64(c.Health.Max) * (float64(c.Health.Current) / float64(c.Health.Max)))
+}
+
 type Damage struct {
 	Source   id.WID
 	Min, Max int
@@ -347,4 +358,13 @@ func (d Damage) RangeString() string {
 		s += fmt.Sprintf(" +%d", d.Extra)
 	}
 	return s
+}
+
+type Health struct {
+	Current int `webpack:"c,omitempty"`
+	Max     int `webpack:"m,omitempty"`
+}
+
+func (h Health) String() string {
+	return fmt.Sprintf("%d/%d", h.Current, h.Max)
 }
