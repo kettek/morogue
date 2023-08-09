@@ -360,6 +360,7 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 			}
 			// This isn't exactly efficient.
 			state.refreshInventory(ctx)
+			state.refreshStatbar(ctx)
 		case net.EventsMessage:
 			for _, evt := range m.Events {
 				state.handleEvent(evt.Event(), ctx)
