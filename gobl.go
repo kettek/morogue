@@ -25,14 +25,14 @@ func main() {
 	}
 	var goroot string
 	Task("build-client-wasm").
-		Chdir("client").
+		Chdir("cmd/client").
 		Exec("go", "env", "GOROOT").
 		Result(func(r interface{}) {
 			goroot = r.(string)[:len(r.(string))-1] + "/misc/wasm/wasm_exec.js"
 		}).
-		Exec("cp", &goroot, "../static/").
+		Exec("cp", &goroot, "../../static/").
 		Env("GOOS=js", "GOARCH=wasm").
-		Exec("go", "build", "-v", "-o", "../static/client.wasm")
+		Exec("go", "build", "-v", "-o", "../../static/client.wasm")
 
 	Task("watch-server").
 		Watch("cmd/server/*.go", "server/*.go", "server/*/*.go", "net/*.go", "game/*.go").
