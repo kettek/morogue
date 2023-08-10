@@ -283,7 +283,7 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 				}
 				if _, ok := e.(game.EventNotice); ok {
 					c.Events = append(c.Events, e)
-				} else {
+				} else if e != nil {
 					events = append(events, e)
 				}
 			}
