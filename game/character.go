@@ -26,10 +26,12 @@ type CharacterArchetype struct {
 	StartingSkills  map[string]float64 // Starting skills
 }
 
+// Type returns "character"
 func (c CharacterArchetype) Type() string {
 	return "character"
 }
 
+// GetID returns the ID.
 func (c CharacterArchetype) GetID() id.UUID {
 	return c.ID
 }
@@ -121,6 +123,7 @@ func (c *Character) Apply(o Object, force bool) Event {
 	return nil
 }
 
+// applyWeapon applies a weapon to the character.
 func (c *Character) applyWeapon(w *Weapon, force bool) Event {
 	if w.Archetype != nil {
 		if err := c.Slots.Apply(w.Archetype.(WeaponArchetype).Slots); err != nil {
@@ -140,6 +143,7 @@ func (c *Character) applyWeapon(w *Weapon, force bool) Event {
 	}
 }
 
+// applyArmor applies an armor to the character.
 func (c *Character) applyArmor(a *Armor, force bool) Event {
 	if a.Archetype != nil {
 		if err := c.Slots.Apply(a.Archetype.(ArmorArchetype).Slots); err != nil {
@@ -177,6 +181,7 @@ func (c *Character) Unapply(o Object, force bool) Event {
 	return nil
 }
 
+// unapplyWeapon unapplies a weapon from the character.
 func (c *Character) unapplyWeapon(w *Weapon, force bool) Event {
 	if w.Archetype != nil {
 		if err := c.Slots.Unapply(w.Archetype.(WeaponArchetype).Slots); err != nil {
@@ -196,6 +201,7 @@ func (c *Character) unapplyWeapon(w *Weapon, force bool) Event {
 	}
 }
 
+// unapplyArmor unapplies an armor from the character.
 func (c *Character) unapplyArmor(a *Armor, force bool) Event {
 	if a.Archetype != nil {
 		if err := c.Slots.Unapply(a.Archetype.(ArmorArchetype).Slots); err != nil {
@@ -261,6 +267,7 @@ func (c *Character) Drop(o Object) Event {
 	}
 }
 
+// CacheDamages caches the character's damage values from their main hand, off hand, or unarmed.
 func (c *Character) CacheDamages() {
 	c.Damages = []Damage{}
 	var mainHand, offHand *Weapon
@@ -327,6 +334,7 @@ func (c *Character) CacheDamages() {
 	}
 }
 
+// CacheHealth caches the character's health value.
 func (c *Character) CacheHealth() {
 	// Baseline health is apparently 5.
 	health := 5
@@ -337,6 +345,7 @@ func (c *Character) CacheHealth() {
 	//c.Health.Current = int(float64(c.Health.Max) * (float64(c.Health.Current) / float64(c.Health.Max)))
 }
 
+// Damage represents the damage range of an attack.
 type Damage struct {
 	Source   id.WID
 	Min, Max int
@@ -360,11 +369,13 @@ func (d Damage) RangeString() string {
 	return s
 }
 
+// Health represents a character's health.
 type Health struct {
 	Current int `webpack:"c,omitempty"`
 	Max     int `webpack:"m,omitempty"`
 }
 
+// String returns a string representation of the health.
 func (h Health) String() string {
 	return fmt.Sprintf("%d/%d", h.Current, h.Max)
 }

@@ -33,6 +33,7 @@ func (s Slots) ToMap() SlotMap {
 	return m
 }
 
+// String returns a string representation of the slice of slots, separated by " & ".
 func (s Slots) String() string {
 	var str string
 	for i, slot := range s {
@@ -44,6 +45,7 @@ func (s Slots) String() string {
 	return str
 }
 
+// HasSlot returns true if the slice of slots has the given slot.
 func (s Slots) HasSlot(slot Slot) bool {
 	for _, s := range s {
 		if s == slot {

@@ -18,6 +18,7 @@ const (
 	WeaponTypeUnarmed
 )
 
+// String returns the string representation of the weapon type.
 func (a WeaponType) String() string {
 	switch a {
 	case WeaponTypeRange:
@@ -49,6 +50,7 @@ func (a WeaponType) Color() color.Color {
 	}
 }
 
+// UnmarshalJSON unmarshals the JSON representation of the weapon type.
 func (a *WeaponType) UnmarshalJSON(b []byte) error {
 	switch string(b) {
 	case `"range"`:
@@ -79,14 +81,17 @@ type WeaponArchetype struct {
 	Slots              Slots      `msgpack:"S,omitempty"`
 }
 
+// Type returns the type of the archetype.
 func (a WeaponArchetype) Type() string {
 	return "weapon"
 }
 
+// GetID returns the ID of the archetype.
 func (a WeaponArchetype) GetID() id.UUID {
 	return a.ID
 }
 
+// RangeString returns the string representation of the damage range.
 func (a WeaponArchetype) RangeString() string {
 	if a.MinDamage == 0 {
 		return fmt.Sprintf("〜%d", a.MaxDamage)
@@ -107,14 +112,17 @@ type Weapon struct {
 	Applied     bool   `msgpack:"a,omitempty"`
 }
 
+// Type returns the type of the item.
 func (w Weapon) Type() ObjectType {
 	return "weapon"
 }
 
+// GetWID returns the WID of the item.
 func (w Weapon) GetWID() id.WID {
 	return w.WID
 }
 
+// SetWID sets the WID of the item.
 func (w *Weapon) SetWID(wid id.WID) {
 	w.WID = wid
 }
@@ -129,14 +137,17 @@ func (w *Weapon) SetPosition(p Position) {
 	w.Position = p
 }
 
+// GetArchetypeID returns the ID of the archetype.
 func (w *Weapon) GetArchetypeID() id.UUID {
 	return w.ArchetypeID
 }
 
+// GetArchetype returns the archetype.
 func (w *Weapon) GetArchetype() Archetype {
 	return w.Archetype
 }
 
+// SetArchetype sets the archetype.
 func (w *Weapon) SetArchetype(a Archetype) {
 	w.Archetype = a
 }

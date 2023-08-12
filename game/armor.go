@@ -17,6 +17,7 @@ const (
 	ArmorTypeHeavy
 )
 
+// String returns the string representation of the armor type.
 func (a ArmorType) String() string {
 	switch a {
 	case ArmorTypeNone:
@@ -48,6 +49,7 @@ func (a ArmorType) Color() color.Color {
 	}
 }
 
+// UnmarshalJSON unmarshals the JSON representation of the armor type.
 func (a *ArmorType) UnmarshalJSON(b []byte) error {
 	switch string(b) {
 	case `"petty"`:
@@ -77,14 +79,17 @@ type ArmorArchetype struct {
 	Slots       Slots `msgpack:"S,omitempty"`
 }
 
+// Type returns the type of the archetype.
 func (a ArmorArchetype) Type() string {
 	return "armor"
 }
 
+// GetID returns the ID of the archetype.
 func (a ArmorArchetype) GetID() id.UUID {
 	return a.ID
 }
 
+// RangeString returns the armor range of the archetype.
 func (a ArmorArchetype) RangeString() string {
 	if a.MinArmor == 0 {
 		return fmt.Sprintf("〜%d", a.MaxArmor)
@@ -105,34 +110,42 @@ type Armor struct {
 	Applied     bool   `msgpack:"a,omitempty"`
 }
 
+// Type returns the type of the object.
 func (a Armor) Type() ObjectType {
 	return "armor"
 }
 
+// GetWID returns the WID of the object.
 func (a Armor) GetWID() id.WID {
 	return a.WID
 }
 
+// SetWID sets the WID of the object.
 func (a *Armor) SetWID(wid id.WID) {
 	a.WID = wid
 }
 
+// GetPosition returns the position of the object.
 func (a Armor) GetPosition() Position {
 	return a.Position
 }
 
+// SetPosition sets the position of the object.
 func (a *Armor) SetPosition(p Position) {
 	a.Position = p
 }
 
+// GetArchetypeID returns the ID of the archetype.
 func (a *Armor) GetArchetypeID() id.UUID {
 	return a.ArchetypeID
 }
 
+// SetArchetype sets the archetype.
 func (a *Armor) SetArchetype(archetype Archetype) {
 	a.Archetype = archetype
 }
 
+// GetArchetype returns the archetype.
 func (a *Armor) GetArchetype() Archetype {
 	return a.Archetype
 }
