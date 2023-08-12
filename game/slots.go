@@ -2,6 +2,7 @@ package game
 
 import (
 	"errors"
+	"fmt"
 )
 
 // Slot is a slot used for equipment.
@@ -63,20 +64,41 @@ func (s SlotMap) HasSlot(slot Slot) bool {
 	return false
 }
 
-// HasSlots returns true if the slot map has all of the given slots.
-func (s SlotMap) HasSlots(slots Slots) bool {
-	for _, slot := range slots {
-		if !s.HasSlot(slot) {
-			return false
+// HasSlots returns nil if the slot map has all of the given slots. Returns ErrMissingSlots wrapping a list of missing slots otherwise.
+func (s SlotMap) HasSlots(slots Slots) error {
+	var err []error
+	for _, name := range slots {
+		if !s.HasSlot(name) {
+			err = append(err, fmt.Errorf("%s", name))
 		}
 	}
-	return true
+	if len(err) > 0 {
+		return errors.Join(append([]error{ErrMissingSlots}, err...)...)
+	}
+	return nil
+}
+
+// AreSlotsOpen returns nil if all of the slots in the slot map are open. Returns ErrUsedSlots wrapping a list of used slots otherwise.
+func (s SlotMap) AreSlotsOpen(slots Slots) error {
+	var err []error
+	for _, name := range slots {
+		if slot, ok := s[name]; ok && slot {
+			err = append(err, fmt.Errorf("%s", name))
+		}
+	}
+	if len(err) > 0 {
+		return errors.Join(append([]error{ErrUsedSlots}, err...)...)
+	}
+	return nil
 }
 
 // Apply adds the given slots to the slot map. If any slots are missing, an error will instead be returned.
 func (s SlotMap) Apply(slots Slots) error {
-	if !s.HasSlots(slots) {
-		return ErrMissingSlots
+	if err := s.HasSlots(slots); err != nil {
+		return err
+	}
+	if err := s.AreSlotsOpen(slots); err != nil {
+		return err
 	}
 	for _, slot := range slots {
 		s[slot] = true
@@ -103,4 +125,5 @@ func (s SlotMap) Unapply(slots Slots) error {
 var (
 	ErrMissingSlot  = errors.New("missing slot")
 	ErrMissingSlots = errors.New("missing slots")
+	ErrUsedSlots    = errors.New("used slots")
 )
