@@ -103,11 +103,11 @@ func (a ArmorArchetype) RangeString() string {
 // Armor is a weapon.
 type Armor struct {
 	Position
+	Appliable
 	ArchetypeID id.UUID   `msgpack:"A,omitempty"`
 	Archetype   Archetype `msgpack:"-" json:"-"`
 	WID         id.WID
 	Container   id.WID `msgpack:"c,omitempty"` // The container of the item, if any.
-	Applied     bool   `msgpack:"a,omitempty"`
 }
 
 // Type returns the type of the object.

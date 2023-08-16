@@ -6,6 +6,7 @@ import (
 
 	eimage "github.com/ebitenui/ebitenui/image"
 	"github.com/ebitenui/ebitenui/widget"
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kettek/morogue/client/embed"
 	"github.com/kettek/morogue/client/ifs"
 	"github.com/kettek/morogue/game"
@@ -66,8 +67,22 @@ func addObjectInfo(ctx ifs.RunContext, object game.Object, arch game.Archetype, 
 		weaponLine := widget.NewContainer(
 			widget.ContainerOpts.Layout(widget.NewRowLayout(widget.RowLayoutOpts.Direction(widget.DirectionHorizontal))),
 		)
+
+		var icon *ebiten.Image
+
+		switch a.WeaponType {
+		case game.WeaponTypeMelee:
+			icon = embed.IconOffenseMelee
+		case game.WeaponTypeRange:
+			icon = embed.IconOffenseRanged
+		case game.WeaponTypeThrown:
+			icon = embed.IconOffenseThrown
+		case game.WeaponTypeUnarmed:
+			icon = embed.IconOffenseUnarmed
+		}
+
 		graphic := widget.NewGraphic(
-			widget.GraphicOpts.Image(embed.IconOffense),
+			widget.GraphicOpts.Image(icon),
 			widget.GraphicOpts.WidgetOpts(
 				widget.WidgetOpts.LayoutData(widget.RowLayoutData{
 					Position: widget.RowLayoutPositionCenter,

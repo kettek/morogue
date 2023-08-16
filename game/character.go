@@ -39,6 +39,8 @@ func (c CharacterArchetype) GetID() id.UUID {
 // Character represents a character. This can be a player or an NPC.
 type Character struct {
 	Position
+	Hurtable
+	Damager
 	Events      []Event   `msgpack:"-" json:"-"` // Events that have happened to the character. These are only sent to the owning client.
 	Desire      Desire    `msgpack:"-" json:"-"` // The current desire of the character. Used server-side.
 	LastDesire  Desire    `msgpack:"-" json:"-"` // Last desire processed. Used server-side.
@@ -51,8 +53,6 @@ type Character struct {
 	Skills      Skills    `msgpack:"-"`
 	Inventory   Objects   `msgpack:"-"`
 	//
-	Health  Health   `msgpack:"h,omitempty"`
-	Damages []Damage `msgpack:"d,omitempty"`
 }
 
 // Type returns "character"
@@ -267,90 +267,13 @@ func (c *Character) Drop(o Object) Event {
 	}
 }
 
-// CacheDamages caches the character's damage values from their main hand, off hand, or unarmed.
-func (c *Character) CacheDamages() {
-	c.Damages = []Damage{}
-	var mainHand, offHand *Weapon
-	for _, w := range c.Inventory {
-		if w, ok := w.(*Weapon); ok {
-			if !w.Applied || w.Archetype == nil {
-				continue
-			}
-			if w.Archetype.(WeaponArchetype).Slots.HasSlot(SlotMainHand) {
-				mainHand = w
-			} else if w.Archetype.(WeaponArchetype).Slots.HasSlot(SlotOffHand) {
-				offHand = w
-			}
-		}
-	}
-	// FIXME: Don't assume Swole, use the weapon's preferred attribute.
-	var mainMin, mainMax, mainExtra, offMin, offMax, offExtra int
-	if mainHand != nil {
-		mainMin = mainHand.Archetype.(WeaponArchetype).MinDamage
-		mainMax = mainHand.Archetype.(WeaponArchetype).MaxDamage
-		if c.Archetype.(CharacterArchetype).Swole > AttributeLevel(mainMin) {
-			if c.Archetype.(CharacterArchetype).Swole > AttributeLevel(mainMax) {
-				mainMin = mainMax
-				mainExtra = (int(c.Archetype.(CharacterArchetype).Swole) - mainMax) / 2
-			} else {
-				mainMin = int(c.Archetype.(CharacterArchetype).Swole)
-			}
-		}
-		c.Damages = append(c.Damages, Damage{
-			Source:  mainHand.WID,
-			Min:     mainMin,
-			Max:     mainMax,
-			Extra:   mainExtra,
-			Reduced: false,
-		})
-	}
-	if offHand != nil {
-		offMin = offHand.Archetype.(WeaponArchetype).MinDamage
-		offMax = offHand.Archetype.(WeaponArchetype).MaxDamage
-		if c.Archetype.(CharacterArchetype).Swole > AttributeLevel(offMin) {
-			if c.Archetype.(CharacterArchetype).Swole > AttributeLevel(offMax) {
-				offMin = offMax
-				offExtra = (int(c.Archetype.(CharacterArchetype).Swole) - offMax) / 2
-			} else {
-				offMin = int(c.Archetype.(CharacterArchetype).Swole)
-			}
-		}
-		c.Damages = append(c.Damages, Damage{
-			Source:  offHand.WID,
-			Min:     offMin,
-			Max:     offMax,
-			Extra:   offExtra,
-			Reduced: true,
-		})
-	}
-	if mainHand == nil && offHand == nil {
-		c.Damages = append(c.Damages, Damage{
-			Source:  c.WID,
-			Min:     0,
-			Max:     int(c.Archetype.(CharacterArchetype).Swole) / 2,
-			Extra:   0,
-			Reduced: true,
-		})
-	}
-}
-
-// CacheHealth caches the character's health value.
-func (c *Character) CacheHealth() {
-	// Baseline health is apparently 5.
-	health := 5
-	health += int(c.Archetype.(CharacterArchetype).Swole) * 2
-	t := (c.Archetype.(CharacterArchetype).Swole + c.Archetype.(CharacterArchetype).Zooms + c.Archetype.(CharacterArchetype).Brains + c.Archetype.(CharacterArchetype).Funk) / 4
-
-	c.Health.Max = health + int(t)
-	//c.Health.Current = int(float64(c.Health.Max) * (float64(c.Health.Current) / float64(c.Health.Max)))
-}
-
 // Damage represents the damage range of an attack.
 type Damage struct {
 	Source   id.WID
 	Min, Max int
 	Extra    int
 	Reduced  bool
+	Weapon   WeaponType
 }
 
 // RangeString returns a string representation of the damage range.

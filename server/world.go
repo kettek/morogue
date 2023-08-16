@@ -57,8 +57,8 @@ func (w *world) assignWIDs(o game.Object) {
 		for _, o2 := range o.Inventory {
 			w.assignWIDs(o2)
 		}
-		o.CacheDamages()
-		o.CacheHealth()
+		o.Damager.CalculateFromCharacter(o)
+		o.Hurtable.CalculateFromCharacter(o)
 		/*case *game.Container:
 		for _, i := range o.GetItems() {
 			w.assignWIDs(i)
