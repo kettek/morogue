@@ -30,8 +30,12 @@ var IndicatorImage *ebiten.Image
 var IndicatorApplied *ebiten.Image
 var IndicatorCursed *ebiten.Image
 
-var IconOffense *ebiten.Image
+var IconOffenseMelee *ebiten.Image
+var IconOffenseRanged *ebiten.Image
+var IconOffenseThrown *ebiten.Image
+var IconOffenseUnarmed *ebiten.Image
 var IconDefense *ebiten.Image
+var IconHealth *ebiten.Image
 
 func Setup() {
 	f, err := Assets.Open("images/icon.png")
@@ -89,12 +93,40 @@ func Setup() {
 	defer f.Close()
 	IconDefense, _, _ = ebitenutil.NewImageFromReader(f)
 
-	f, err = Assets.Open("images/offense.png")
+	f, err = Assets.Open("images/offense-melee.png")
 	if err != nil {
 		panic(err)
 	}
 	defer f.Close()
-	IconOffense, _, _ = ebitenutil.NewImageFromReader(f)
+	IconOffenseMelee, _, _ = ebitenutil.NewImageFromReader(f)
+
+	f, err = Assets.Open("images/offense-thrown.png")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	IconOffenseThrown, _, _ = ebitenutil.NewImageFromReader(f)
+
+	f, err = Assets.Open("images/offense-ranged.png")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	IconOffenseRanged, _, _ = ebitenutil.NewImageFromReader(f)
+
+	f, err = Assets.Open("images/offense-unarmed.png")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	IconOffenseUnarmed, _, _ = ebitenutil.NewImageFromReader(f)
+
+	f, err = Assets.Open("images/health.png")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	IconHealth, _, _ = ebitenutil.NewImageFromReader(f)
 
 	//
 	b, err := Assets.ReadFile("fonts/x12y16pxMaruMonica.ttf")
