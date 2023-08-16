@@ -1,0 +1,8 @@
+{
+  "id": "morogue:tile:stone-door",
+  "title": "stone door",
+  "image": "stone-door.png",
+  "blockType": "solid",
+  "health": 10,
+  "maxHealth": 10
+}
