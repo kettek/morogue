@@ -2,6 +2,7 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -317,9 +318,49 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 			}
 		case game.DesireBash:
 			if t := l.ObjectByWID(d.WID); t != nil {
+				if t, ok := t.(Hurtable); ok {
+					results := t.Damage(c.Damager.Damages...)
+					c.Events = append(c.Events, game.EventNotice{
+						Message: fmt.Sprintf("You bash for %d.", results),
+					})
+				}
 			} else {
 				c.Events = append(c.Events, game.EventNotice{
 					Message: "You kick at the air.",
+				})
+			}
+		case game.DesireOpen:
+			if t := l.ObjectByWID(d.WID); t != nil {
+				if t, ok := t.(*game.Door); ok {
+					if d.Open {
+						if t.IsLocked() {
+							c.Events = append(c.Events, game.EventNotice{
+								Message: "It's locked.",
+							})
+						} else if err := t.Open(&t.Blockable); err == nil {
+							c.Events = append(c.Events, game.EventNotice{
+								Message: "You open the door.",
+							})
+						} else if errors.Is(err, game.ErrAlreadyOpen) {
+							c.Events = append(c.Events, game.EventNotice{
+								Message: "It's already open.",
+							})
+						}
+					} else {
+						if err := t.Close(&t.Blockable); err == nil {
+							c.Events = append(c.Events, game.EventNotice{
+								Message: "You close the door.",
+							})
+						} else if errors.Is(err, game.ErrAlreadyClosed) {
+							c.Events = append(c.Events, game.EventNotice{
+								Message: "It's already closed.",
+							})
+						}
+					}
+				}
+			} else {
+				c.Events = append(c.Events, game.EventNotice{
+					Message: "There is nothing there to open.",
 				})
 			}
 		}

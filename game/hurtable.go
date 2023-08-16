@@ -1,6 +1,8 @@
 package game
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Hurtable struct {
 	Health    int `msgpack:"h,omitempty"`
@@ -33,8 +35,15 @@ func (h Hurtable) String() string {
 	return fmt.Sprintf("%d/%d", h.Health, h.MaxHealth)
 }
 
-func (h *Hurtable) Damage(damage int) {
-	h.Health -= damage
+func (h *Hurtable) Damage(damages ...Damage) (results []DamageResult) {
+	for _, damage := range damages {
+		dmg := damage.Roll()
+		h.Health -= dmg
+		results = append(results, DamageResult{
+			Damage: dmg,
+		})
+	}
+	return results
 }
 
 func (h *Hurtable) Heal(heal int) {

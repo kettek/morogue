@@ -40,6 +40,7 @@ func (c CharacterArchetype) GetID() id.UUID {
 // Character represents a character. This can be a player or an NPC.
 type Character struct {
 	Position
+	Blockable
 	Hurtable
 	Damager
 	Events      []Event   `msgpack:"-" json:"-"` // Events that have happened to the character. These are only sent to the owning client.
@@ -288,31 +289,6 @@ func (c *Character) Drop(o Object) Event {
 		Object:   o,
 		Position: c.GetPosition(),
 	}
-}
-
-// Damage represents the damage range of an attack.
-type Damage struct {
-	Source   id.WID
-	Min, Max int
-	Extra    int
-	Reduced  bool
-	Weapon   WeaponType
-}
-
-// RangeString returns a string representation of the damage range.
-func (d Damage) RangeString() string {
-	var s string
-	if d.Min == 0 {
-		s = fmt.Sprintf("〜%d", d.Max)
-	} else if d.Min == d.Max {
-		s = fmt.Sprintf("%d", d.Min)
-	} else {
-		s = fmt.Sprintf("%d〜%d", d.Min, d.Max)
-	}
-	if d.Extra > 0 {
-		s += fmt.Sprintf(" +%d", d.Extra)
-	}
-	return s
 }
 
 // Health represents a character's health.

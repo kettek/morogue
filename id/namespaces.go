@@ -9,6 +9,7 @@ import (
 const (
 	KeyCharacter = "morogue:character"
 	KeyTile      = "morogue:tile"
+	KeyDoor      = "morogue:door"
 	KeyMob       = "morogue:mob"
 	KeyItem      = "morogue:item"
 	KeyWeapon    = "morogue:weapon"
@@ -18,6 +19,7 @@ const (
 var (
 	Character UUID
 	Tile      UUID
+	Door      UUID
 	Mob       UUID
 	Item      UUID
 	Weapon    UUID
@@ -48,6 +50,15 @@ func init() {
 		Tile = UUID(uuid.Must(uuid.FromBytes(sha[:16])))
 		NamespaceToKey[Tile] = KeyTile
 		KeyToNamespace[KeyTile] = Tile
+	}
+	{
+		hasher := sha1.New()
+		hasher.Write([]byte(KeyDoor))
+		sha := hasher.Sum(nil)
+
+		Door = UUID(uuid.Must(uuid.FromBytes(sha[:16])))
+		NamespaceToKey[Door] = KeyDoor
+		KeyToNamespace[KeyDoor] = Door
 	}
 	{
 		hasher := sha1.New()

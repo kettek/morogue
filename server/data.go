@@ -113,6 +113,8 @@ func (d *Data) LoadArchetypes() error {
 				kind = "items"
 			case "tiles":
 				kind = "tiles"
+			case "doors":
+				kind = "doors"
 			}
 			if kind == "" {
 				continue
@@ -175,6 +177,15 @@ func (d *Data) LoadArchetypes() error {
 							}
 							t.Image = "tiles/" + t.Image
 							d.Archetypes = append(d.Archetypes, t)
+						} else if kind == "doors" {
+							var a game.DoorArchetype
+							err = json.Unmarshal(bytes, &a)
+							if err != nil {
+								log.Println(err)
+								continue
+							}
+							a.Image = "doors/" + a.Image
+							d.Archetypes = append(d.Archetypes, a)
 						}
 					}
 				}

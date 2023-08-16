@@ -39,6 +39,10 @@ func (w *DesireWrapper) Desire() Desire {
 		var d DesireBash
 		msgpack.Unmarshal(w.Data, &d)
 		return d
+	case (DesireOpen{}).Type():
+		var d DesireOpen
+		msgpack.Unmarshal(w.Data, &d)
+		return d
 	}
 	return nil
 }
@@ -88,4 +92,14 @@ type DesireBash struct {
 
 func (d DesireBash) Type() string {
 	return "bash"
+}
+
+// DesireOpen represents the desire to open or close a particular object.
+type DesireOpen struct {
+	WID  id.WID `msgpack:"wid,omitempty"`
+	Open bool   `msgpack:"o,omitempty"` // Whether to open or close.
+}
+
+func (d DesireOpen) Type() string {
+	return "open"
 }

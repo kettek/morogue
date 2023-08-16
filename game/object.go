@@ -43,6 +43,14 @@ func CreateObjectFromArchetype(a Archetype) Object {
 			ArchetypeID: a.GetID(),
 			Archetype:   a,
 		}
+	case DoorArchetype:
+		return &Door{
+			ArchetypeID: a.GetID(),
+			Archetype:   a,
+			Blockable: Blockable{
+				BlockType: a.BlockType,
+			},
+		}
 	}
 	return nil
 }

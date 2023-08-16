@@ -6,9 +6,12 @@ import (
 
 // DoorArchetype is the archetype for a door.
 type DoorArchetype struct {
-	ID    id.UUID
-	Title string `msgpack:"T,omitempty"`
-	Image string `msgpack:"i,omitempty"`
+	ID        id.UUID
+	Title     string    `msgpack:"T,omitempty"`
+	Image     string    `msgpack:"i,omitempty"`
+	BlockType BlockType `msgpack:"-"`
+	Health    int       `msgpack:"-"`
+	MaxHealth int       `msgpack:"-"`
 }
 
 // Type returns the type of this archetype.
@@ -24,8 +27,10 @@ func (d DoorArchetype) GetID() id.UUID {
 // Door is a door.
 type Door struct {
 	Position
-	Lockable
 	Hurtable
+	Lockable
+	Blockable
+	Openable
 	ArchetypeID id.UUID   `msgpack:"A,omitempty"`
 	Archetype   Archetype `msgpack:"-" json:"-"`
 	WID         id.WID    // ID assigned when entering da world.
