@@ -6,7 +6,7 @@
   "zooms": 4,
   "brains": 1,
   "funk": 2,
-  "traits": ["unarmed x2 damage"],
+  "traits": ["kung fu"],
   "startingObjects": ["morogue:armor:handwraps", "morogue:armor:han-fu", "morogue:armor:han-ku", "morogue:armor:han-xie"],
   "slots": [
     "head",
