@@ -742,7 +742,7 @@ func (state *Create) refreshArchetypes(ctx ifs.RunContext) {
 
 			var d string
 			for _, t := range arch.Archetype.Traits {
-				d += t + "\n"
+				d += t.String() + "\n"
 			}
 			desc := makeWidget(d, color.NRGBA{32, 32, 32, 0}, 200)
 

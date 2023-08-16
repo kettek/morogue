@@ -16,11 +16,12 @@ type CharacterArchetype struct {
 
 	Image string `msgpack:"i,omitempty"` // Image for the archetype. Should be requested via HTTP to the resources backend.
 	//
-	Swole           AttributeLevel     // Raw Strength + Health
-	Zooms           AttributeLevel     // Dex, basically
-	Brains          AttributeLevel     // Thinkin' and spell-related
-	Funk            AttributeLevel     // Charm and god-related
-	Traits          []string           // Traits
+	Swole  AttributeLevel // Raw Strength + Health
+	Zooms  AttributeLevel // Dex, basically
+	Brains AttributeLevel // Thinkin' and spell-related
+	Funk   AttributeLevel // Charm and god-related
+	//Traits          []string           // Traits
+	Traits          TraitList
 	Slots           Slots              // Slots
 	StartingObjects []id.UUID          // Starting objects
 	StartingSkills  map[string]float64 // Starting skills
@@ -126,6 +127,14 @@ func (c *Character) Apply(o Object, force bool) Event {
 // applyWeapon applies a weapon to the character.
 func (c *Character) applyWeapon(w *Weapon, force bool) Event {
 	if w.Archetype != nil {
+		for _, trait := range c.Archetype.(CharacterArchetype).Traits {
+			if !trait.CanApply(w) {
+				return EventNotice{
+					Message: fmt.Sprintf("You can't use %s.", w.Archetype.(WeaponArchetype).Title),
+				}
+			}
+		}
+
 		if err := c.Slots.Apply(w.Archetype.(WeaponArchetype).Slots); err != nil {
 			if !force {
 				return EventNotice{
@@ -136,6 +145,9 @@ func (c *Character) applyWeapon(w *Weapon, force bool) Event {
 	}
 
 	w.Applied = true
+
+	c.Damager.CalculateFromCharacter(c)
+
 	return EventApply{
 		Applier: c.WID,
 		WID:     w.WID,
@@ -146,6 +158,14 @@ func (c *Character) applyWeapon(w *Weapon, force bool) Event {
 // applyArmor applies an armor to the character.
 func (c *Character) applyArmor(a *Armor, force bool) Event {
 	if a.Archetype != nil {
+		for _, trait := range c.Archetype.(CharacterArchetype).Traits {
+			if !trait.CanApply(a) {
+				return EventNotice{
+					Message: fmt.Sprintf("You can't use %s.", a.Archetype.(ArmorArchetype).Title),
+				}
+			}
+		}
+
 		if err := c.Slots.Apply(a.Archetype.(ArmorArchetype).Slots); err != nil {
 			if !force {
 				return EventNotice{
@@ -194,6 +214,9 @@ func (c *Character) unapplyWeapon(w *Weapon, force bool) Event {
 	}
 
 	w.Applied = false
+
+	c.Damager.CalculateFromCharacter(c)
+
 	return EventApply{
 		Applier: c.WID,
 		WID:     w.WID,

@@ -74,4 +74,8 @@ func (d *Damager) CalculateFromCharacter(c *Character) {
 			Weapon:  WeaponTypeUnarmed,
 		})
 	}
+
+	for _, t := range c.Archetype.(CharacterArchetype).Traits {
+		d.Damages = t.AdjustDamages(d.Damages)
+	}
 }

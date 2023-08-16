@@ -242,6 +242,7 @@ func (u *universe) updateClient(cl *client) error {
 					} else {
 						// Add the character's starting gear.
 						if arch, ok := u.data.Archetype(char.ArchetypeID).(game.CharacterArchetype); ok {
+							char.Archetype = arch
 							char.Slots = arch.Slots.ToMap()
 							for _, au := range arch.StartingObjects {
 								if a := u.data.Archetype(au); a != nil {
