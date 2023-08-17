@@ -2,7 +2,6 @@ package server
 
 import (
 	"errors"
-	"fmt"
 	"math/rand"
 	"time"
 
@@ -301,6 +300,11 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 						})
 					} else {
 						events = append(events, c.Pickup(t))
+						events = append(events, game.EventSound{
+							FromPosition: c.Position,
+							Position:     c.Position,
+							Message:      "*snarf*",
+						})
 					}
 				}
 			}
@@ -313,15 +317,29 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 					events = append(events, e)
 					if e, ok := e.(game.EventDrop); ok {
 						t.SetPosition(e.Position)
+						events = append(events, game.EventSound{
+							FromPosition: c.Position,
+							Position:     c.Position,
+							Message:      "*whump*",
+						})
 					}
 				}
 			}
 		case game.DesireBash:
 			if t := l.ObjectByWID(d.WID); t != nil {
-				if t, ok := t.(Hurtable); ok {
-					results := t.Damage(c.Damager.Damages...)
-					c.Events = append(c.Events, game.EventNotice{
-						Message: fmt.Sprintf("You bash for %d.", results),
+				if hurtable, ok := t.(Hurtable); ok {
+					// TODO: Maybe only take unarmed damage?
+					damages := c.RollDamages()
+					hurtable.TakeDamages(damages)
+					events = append(events, game.EventDamages{
+						From:    c.WID,
+						Target:  d.WID,
+						Damages: damages,
+					})
+					events = append(events, game.EventSound{
+						FromPosition: c.Position,
+						Position:     t.GetPosition(),
+						Message:      "*thud*",
 					})
 				}
 			} else {
@@ -331,29 +349,40 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 			}
 		case game.DesireOpen:
 			if t := l.ObjectByWID(d.WID); t != nil {
-				if t, ok := t.(*game.Door); ok {
-					if d.Open {
-						if t.IsLocked() {
-							c.Events = append(c.Events, game.EventNotice{
-								Message: "It's locked.",
+				if openable, isOpenable := t.(Openable); isOpenable {
+					lockable, isLockable := t.(Lockable)
+					if openable.IsOpened() {
+						if err := openable.Close(); err == nil {
+							events = append(events, game.EventSound{
+								FromPosition: c.Position,
+								Position:     t.GetPosition(),
+								Message:      "*click*",
 							})
-						} else if err := t.Open(&t.Blockable); err == nil {
-							c.Events = append(c.Events, game.EventNotice{
-								Message: "You open the door.",
-							})
-						} else if errors.Is(err, game.ErrAlreadyOpen) {
-							c.Events = append(c.Events, game.EventNotice{
-								Message: "It's already open.",
-							})
-						}
-					} else {
-						if err := t.Close(&t.Blockable); err == nil {
 							c.Events = append(c.Events, game.EventNotice{
 								Message: "You close the door.",
 							})
 						} else if errors.Is(err, game.ErrAlreadyClosed) {
 							c.Events = append(c.Events, game.EventNotice{
 								Message: "It's already closed.",
+							})
+						}
+					} else if !openable.IsOpened() {
+						if isLockable && lockable.IsLocked() {
+							c.Events = append(c.Events, game.EventNotice{
+								Message: "It's locked.",
+							})
+						} else if err := openable.Open(); err == nil {
+							c.Events = append(c.Events, game.EventNotice{
+								Message: "You open the door.",
+							})
+							events = append(events, game.EventSound{
+								FromPosition: c.Position,
+								Position:     t.GetPosition(),
+								Message:      "*creak*",
+							})
+						} else if errors.Is(err, game.ErrAlreadyOpen) {
+							c.Events = append(c.Events, game.EventNotice{
+								Message: "It's already open.",
 							})
 						}
 					}

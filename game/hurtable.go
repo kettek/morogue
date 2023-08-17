@@ -35,19 +35,17 @@ func (h Hurtable) String() string {
 	return fmt.Sprintf("%d/%d", h.Health, h.MaxHealth)
 }
 
-func (h *Hurtable) Damage(damages ...Damage) (results []DamageResult) {
-	for _, damage := range damages {
-		dmg := damage.Roll()
-		h.Health -= dmg
-		results = append(results, DamageResult{
-			Damage: dmg,
-		})
-	}
-	return results
+func (h *Hurtable) TakeHeal(heal int) {
+	h.Health += heal
 }
 
-func (h *Hurtable) Heal(heal int) {
-	h.Health += heal
+func (h *Hurtable) TakeDamages(damages []DamageResult) {
+	for _, damage := range damages {
+		h.Health -= damage.Damage
+	}
+	if h.Health < 0 {
+		h.Downs++
+	}
 }
 
 func (h *Hurtable) IsDead() bool {

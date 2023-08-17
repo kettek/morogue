@@ -3,22 +3,27 @@ package game
 import "errors"
 
 type Openable struct {
+	Opened bool
 }
 
-func (o *Openable) Open(b *Blockable) error {
-	if b.BlockType == BlockTypeSolid {
-		b.BlockType = BlockTypeNone
-		return nil
-	}
-	return ErrAlreadyOpen
+func (o *Openable) IsOpened() bool {
+	return o.Opened
 }
 
-func (o *Openable) Close(b *Blockable) error {
-	if b.BlockType == BlockTypeNone {
-		b.BlockType = BlockTypeSolid
-		return nil
+func (o *Openable) Open() error {
+	if o.Opened {
+		return ErrAlreadyOpen
 	}
-	return ErrAlreadyClosed
+	o.Opened = true
+	return nil
+}
+
+func (o *Openable) Close() error {
+	if !o.Opened {
+		return ErrAlreadyClosed
+	}
+	o.Opened = false
+	return nil
 }
 
 var (

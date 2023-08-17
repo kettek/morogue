@@ -4,6 +4,16 @@ type Damager struct {
 	Damages []Damage
 }
 
+func (d *Damager) RollDamages() (results []DamageResult) {
+	for _, damage := range d.Damages {
+		dmg := damage.Roll()
+		results = append(results, DamageResult{
+			Damage: dmg,
+		})
+	}
+	return
+}
+
 func (d *Damager) CalculateFromCharacter(c *Character) {
 	d.Damages = []Damage{}
 	var mainHand, offHand *Weapon

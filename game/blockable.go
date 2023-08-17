@@ -33,6 +33,10 @@ func (b *BlockType) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (b *Blockable) IsBlocked() bool {
+	return b.BlockType != BlockTypeNone
+}
+
 var (
 	ErrInvalidBlockType = errors.New("invalid block type")
 )
