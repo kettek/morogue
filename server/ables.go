@@ -9,6 +9,12 @@ type Hurtable interface {
 	IsDead() bool
 }
 
+type Appliable interface {
+	Apply()
+	Unapply()
+	IsApplied() bool
+}
+
 type Damager interface {
 	CalculateFromCharacter(c *game.Character)
 	RollDamages() []game.DamageResult

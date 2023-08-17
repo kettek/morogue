@@ -275,16 +275,22 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 			}
 		case game.DesireApply:
 			if t := l.ObjectByWID(d.WID); t != nil {
-				var e game.Event
-				if d.Apply {
-					e = c.Apply(t, false)
+				if _, isAppliable := t.(Appliable); isAppliable {
+					var e game.Event
+					if d.Apply {
+						e = c.Apply(t, false)
+					} else {
+						e = c.Unapply(t, false)
+					}
+					if _, ok := e.(game.EventNotice); ok {
+						c.Events = append(c.Events, e)
+					} else if e != nil {
+						events = append(events, e)
+					}
 				} else {
-					e = c.Unapply(t, false)
-				}
-				if _, ok := e.(game.EventNotice); ok {
-					c.Events = append(c.Events, e)
-				} else if e != nil {
-					events = append(events, e)
+					c.Events = append(c.Events, game.EventNotice{
+						Message: "You can't apply that.",
+					})
 				}
 			}
 		case game.DesirePickup:

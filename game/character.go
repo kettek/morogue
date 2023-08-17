@@ -145,7 +145,7 @@ func (c *Character) applyWeapon(w *Weapon, force bool) Event {
 		}
 	}
 
-	w.Applied = true
+	w.Apply()
 
 	c.Damager.CalculateFromCharacter(c)
 
@@ -176,7 +176,8 @@ func (c *Character) applyArmor(a *Armor, force bool) Event {
 		}
 	}
 
-	a.Applied = true
+	a.Apply()
+
 	return EventApply{
 		Applier: c.WID,
 		WID:     a.WID,
@@ -214,7 +215,7 @@ func (c *Character) unapplyWeapon(w *Weapon, force bool) Event {
 		}
 	}
 
-	w.Applied = false
+	w.Unapply()
 
 	c.Damager.CalculateFromCharacter(c)
 
@@ -237,7 +238,8 @@ func (c *Character) unapplyArmor(a *Armor, force bool) Event {
 		}
 	}
 
-	a.Applied = false
+	a.Unapply()
+
 	return EventApply{
 		Applier: c.WID,
 		WID:     a.WID,
