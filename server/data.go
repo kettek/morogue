@@ -1,8 +1,8 @@
 package server
 
 import (
-	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -94,103 +94,38 @@ func (d *Data) ArmorArchetypes() []game.ArmorArchetype {
 }
 
 func (d *Data) LoadArchetypes() error {
-	entries, err := os.ReadDir("archetypes")
-	if err != nil {
-		return err
-	}
+	var iterate func(string, string) error
 
-	for _, entry := range entries {
-		if entry.IsDir() {
-			var kind string
-			switch entry.Name() {
-			case "characters":
-				kind = "characters"
-			case "weapons":
-				kind = "weapons"
-			case "armors":
-				kind = "armors"
-			case "items":
-				kind = "items"
-			case "tiles":
-				kind = "tiles"
-			case "doors":
-				kind = "doors"
-			}
-			if kind == "" {
-				continue
-			}
-
-			fullpath := filepath.Join("archetypes", entry.Name())
-			entries, err := os.ReadDir(fullpath)
-			if err == nil {
-				for _, entry := range entries {
-					if strings.HasSuffix(entry.Name(), ".json") {
-						bytes, err := os.ReadFile(filepath.Join(fullpath, entry.Name()))
-						if err != nil {
-							log.Println(err)
-							continue
-						}
-
-						if kind == "characters" {
-							var c game.CharacterArchetype
-							err = json.Unmarshal(bytes, &c)
-							if err != nil {
-								log.Println(err)
-								continue
-							}
-							c.PlayerOnly = true
-							c.Image = "characters/" + c.Image
-							d.Archetypes = append(d.Archetypes, c)
-						} else if kind == "weapons" {
-							var w game.WeaponArchetype
-							err = json.Unmarshal(bytes, &w)
-							if err != nil {
-								log.Println(err)
-								continue
-							}
-							w.Image = "weapons/" + w.Image
-							d.Archetypes = append(d.Archetypes, w)
-						} else if kind == "armors" {
-							var a game.ArmorArchetype
-							err = json.Unmarshal(bytes, &a)
-							if err != nil {
-								log.Println(err)
-								continue
-							}
-							a.Image = "armors/" + a.Image
-							d.Archetypes = append(d.Archetypes, a)
-						} else if kind == "items" {
-							var i game.ItemArchetype
-							err = json.Unmarshal(bytes, &i)
-							if err != nil {
-								log.Println(err)
-								continue
-							}
-							i.Image = "items/" + i.Image
-							d.Archetypes = append(d.Archetypes, i)
-						} else if kind == "tiles" {
-							var t game.TileArchetype
-							err = json.Unmarshal(bytes, &t)
-							if err != nil {
-								log.Println(err)
-								continue
-							}
-							t.Image = "tiles/" + t.Image
-							d.Archetypes = append(d.Archetypes, t)
-						} else if kind == "doors" {
-							var a game.DoorArchetype
-							err = json.Unmarshal(bytes, &a)
-							if err != nil {
-								log.Println(err)
-								continue
-							}
-							a.Image = "doors/" + a.Image
-							d.Archetypes = append(d.Archetypes, a)
-						}
+	iterate = func(fulldir string, partialdir string) error {
+		entries, err := os.ReadDir(fulldir)
+		if err != nil {
+			return err
+		}
+		for _, entry := range entries {
+			if entry.IsDir() {
+				if err := iterate(filepath.Join(fulldir, entry.Name()), filepath.Join(partialdir, entry.Name())); err != nil {
+					log.Println(err)
+				}
+			} else {
+				fullpath := filepath.Join(fulldir, entry.Name())
+				if strings.HasSuffix(entry.Name(), ".json") {
+					bytes, err := os.ReadFile(fullpath)
+					if err != nil {
+						log.Println(err)
+						continue
+					}
+					if a, err := game.DecodeArchetype(bytes, partialdir); err != nil {
+						log.Println(errors.Join(fmt.Errorf("failed to decode archetype %s", filepath.Join(fullpath, entry.Name())), err))
+					} else {
+						d.Archetypes = append(d.Archetypes, a)
 					}
 				}
 			}
 		}
+		return nil
 	}
+
+	iterate("archetypes", "")
+
 	return nil
 }
