@@ -33,3 +33,8 @@ go run .
   * All Archetypes are defined and referenced by a UUIDv5 identifier. This identifier can be provided either by an ASCII string, an array of bytes, or by a human-readable string that is converted to the actual UUID. This human-readable string is written as `morogue:type:thing`, where *type* would be *armor*, *weapon*, *item*, *character*, or *tile*, and *thing* would be whatever the actual archetype is called.
   * Player controlled objects, such as Characters, receive commands from the player via a **Desire**. A desire can be to apply an item, drop an item, move in a direction, attack a target, and beyond. The result of a desire being processed will generally result in an **Event** being emitted to other clients or just the controlling player.
   * Events are generally used to represent something happening in a *Location*, such as a character equipping an item, something taking damage, and beyond.
+
+## Adding New Archetypes Types
+First add a new Archetype type, such as `FancyArchetype` in a corresponding file in the `game` subdir. Ensure it adheres to the `game.Archetype` interface and has a unique return value from Type(). Add a new Key, UUID, and its setup in init() within `id/namespaces.go`. Finally, add a new case entry to unmarshal in `*ArchetypeMessage UnmarshalMsgpack` within `net/message.go`.
+
+Now you just need to update or add new features/logic wherever you wish the archetype to be used. At minimum, an object using the archetype can be picked up and dropped.
