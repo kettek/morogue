@@ -271,6 +271,7 @@ func (e EventDamages) Type() string {
 
 // EventHealth notifies the client that the given object's health changed.
 type EventHealth struct {
+	From   id.WID `msgpack:"f,omitempty"`
 	Target id.WID `msgpack:"t,omitempty"`
 	Health int    `msgpack:"h,omitempty"`
 }
