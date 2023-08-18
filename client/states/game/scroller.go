@@ -116,10 +116,10 @@ func (scroller *Scroller) Limit() (int, int) {
 	return scroller.limitX, scroller.limitY
 }
 
-// CenterTo is supposed to center the scroller on the given coordinate, but
-// currently just called SetScroll.
+// CenterTo centers the scroller to the given coordinates.
 func (scroller *Scroller) CenterTo(x, y int) {
-	scroller.SetScroll(x, y)
+	w, h := ebiten.WindowSize()
+	scroller.SetScroll(x+w/2, y+h/2)
 }
 
 // SetHandler sets the scroller's handler.
