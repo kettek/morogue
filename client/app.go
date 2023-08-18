@@ -47,6 +47,7 @@ func NewApp() *app {
 	renderer.SetColor(color.RGBA{239, 91, 91, 255})
 	renderer.SetAlign(etxt.Center)
 	renderer.SetSize(16)
+	renderer.Fract().SetHorzQuantization(etxt.QtFull)
 
 	a.runContext.Txt = ifs.NewTextRenderer(renderer)
 	a.drawContext.Txt = a.runContext.Txt
@@ -97,7 +98,7 @@ func (a *app) Draw(screen *ebiten.Image) {
 		b := screen.Bounds()
 		fs := a.drawContext.Txt.GetSize()
 		al := a.drawContext.Txt.GetAlign()
-		a.drawContext.Txt.Renderer.SetAlign(etxt.TopBaseline | etxt.Right)
+		a.drawContext.Txt.Renderer.SetAlign(etxt.Baseline | etxt.Right)
 		a.drawContext.Txt.Renderer.SetSize(16)
 		a.drawContext.Txt.Renderer.Draw(screen, versioninfo.Short(), b.Dx(), b.Dy()-4)
 		a.drawContext.Txt.Renderer.SetSize(fs)

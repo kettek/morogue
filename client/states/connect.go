@@ -81,7 +81,7 @@ func (state *Connect) Draw(ctx ifs.DrawContext) {
 	x, y := 2, bounds.Dy()-4
 
 	al := ctx.Txt.Renderer.GetAlign()
-	ctx.Txt.Renderer.SetAlign(etxt.TopBaseline | etxt.Left)
+	ctx.Txt.Renderer.SetAlign(etxt.Baseline | etxt.Left)
 
 	// draw the text
 	ctx.Txt.Draw(ctx.Screen, state.mode, x, y)

@@ -625,7 +625,7 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 		}
 		// Draw characters
 		ctx.Txt.Save()
-		ctx.Txt.SetAlign(etxt.Center)
+		ctx.Txt.SetAlign(etxt.VertCenter | etxt.HorzCenter)
 		for _, o := range state.location.Objects {
 			// Ignore out of bounds objects.
 			pos := o.GetPosition()

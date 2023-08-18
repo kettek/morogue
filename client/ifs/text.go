@@ -60,22 +60,12 @@ func (t *TextRenderer) GetOutlineColor() color.Color {
 
 // Save saves the text renderer's state. This includes font, color, size, scale, blend mode, align, and outline color.
 func (t *TextRenderer) Save() {
-	t.savedFont = t.GetFont()
-	t.savedColor = t.GetColor()
-	t.savedSize = t.GetSize()
-	t.savedScale = t.GetScale()
-	t.savedBlendMode = t.GetBlendMode()
-	t.savedAlign = t.GetAlign()
+	t.Utils().StoreState()
 	t.savedOutlineColor = t.GetOutlineColor()
 }
 
 // Restore restores any saved state.
 func (t *TextRenderer) Restore() {
-	t.SetFont(t.savedFont)
-	t.SetColor(t.savedColor)
-	t.SetSize(t.savedSize)
-	t.SetScale(t.savedScale)
-	t.SetBlendMode(t.savedBlendMode)
-	t.SetAlign(t.savedAlign)
+	t.Utils().RestoreState()
 	t.SetOutlineColor(t.outlineColor)
 }

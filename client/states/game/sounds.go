@@ -5,6 +5,7 @@ import (
 
 	"github.com/kettek/morogue/client/ifs"
 	"github.com/kettek/morogue/game"
+	"github.com/tinne26/etxt"
 )
 
 // Sounds provides a visual rendering of sounds in the game world.
@@ -77,7 +78,7 @@ func (sounds *Sounds) Draw(ctx ifs.DrawContext) {
 	ch := int(float64(ctx.Game.CellHeight) * ctx.Game.Zoom)
 
 	ctx.Txt.Save()
-	ctx.Txt.SetSize(16)
+	ctx.Txt.SetAlign(etxt.VertCenter | etxt.HorzCenter)
 	for _, sound := range sounds.sounds {
 		clr := color.NRGBA{225, 225, 225, 255}
 		oclr := color.NRGBA{0, 0, 0, 100}

@@ -9,12 +9,12 @@ require (
 	github.com/hajimehoshi/ebiten/v2 v2.5.5
 	github.com/kettek/gobl v0.1.1-0.20221216032959-8e9d1fcdf8ee
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
-	github.com/tinne26/etxt v0.0.9-alpha.5
+	github.com/tinne26/etxt v0.0.9-alpha.6.0.20230815074041-d84cad9c7b2f
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	go.etcd.io/bbolt v1.3.7
 	golang.org/x/crypto v0.11.0
 	golang.org/x/exp v0.0.0-20230724220655-d98519c11495
-	golang.org/x/image v0.7.0
+	golang.org/x/image v0.9.0
 	nhooyr.io/websocket v1.8.7
 )
 
