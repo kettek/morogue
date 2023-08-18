@@ -28,8 +28,9 @@ type Game struct {
 	locations map[id.UUID]*game.Location
 	location  *game.Location // current
 	//
-	characterWID        id.WID
-	objectsMissingArchs []id.WID
+	characterWID          id.WID
+	objectsMissingArchs   []id.WID
+	lockCameraToCharacter bool
 	//
 	binds    clgame.Binds
 	scroller clgame.Scroller
@@ -312,6 +313,13 @@ func (state *Game) assignObjectArchetype(obj game.Object) {
 	}
 }
 
+func (state *Game) centerCameraOn(ctx ifs.RunContext, o game.Object) {
+	pos := o.GetPosition()
+	x := -int(float64(pos.X*ctx.Game.CellWidth) * ctx.Game.Zoom)
+	y := -int(float64(pos.Y*ctx.Game.CellHeight) * ctx.Game.Zoom)
+	state.scroller.CenterTo(x, y)
+}
+
 func (state *Game) ensureObjects(objects game.Objects) {
 	var missingArchetypes []id.UUID
 	for _, obj := range objects {
@@ -336,6 +344,9 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 			state.setLocationFromMessage(m)
 			state.travelTo(m.ID)
 			state.syncUIToLocation(ctx)
+			if ch := state.Character(); ch != nil {
+				state.centerCameraOn(ctx, ch)
+			}
 		case net.ArchetypeMessage:
 			fmt.Println(msg)
 		case net.ArchetypesMessage:
@@ -394,6 +405,9 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 				state.refreshStatbar(ctx)
 
 				character.Skills = m.Skills
+
+				// Center the camera on the character.
+				state.centerCameraOn(ctx, character)
 			}
 		default:
 			fmt.Println("TODO: Handle", m.Type())
@@ -411,9 +425,16 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 
 	if state.location != nil {
 		if character := state.Character(); character != nil {
+			if state.binds.IsActionHeld("lock-camera") == 0 {
+				state.lockCameraToCharacter = !state.lockCameraToCharacter
+			}
+			if state.binds.IsActionHeld("snap-camera") >= 0 {
+				state.centerCameraOn(ctx, character)
+			}
 			if desire := state.actioner.Update(state.binds); desire != nil {
 				state.sendDesire(state.characterWID, desire)
 			}
+
 			// This isn't great, but whatever.
 			var belowObjects game.Objects
 			for _, o := range state.location.Objects {
@@ -451,6 +472,12 @@ func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 		if c := state.location.Character(evt.WID); c != nil {
 			c.X = evt.X
 			c.Y = evt.Y
+			if c == state.Character() && state.lockCameraToCharacter {
+				pos := c.GetPosition()
+				x := -int(float64(pos.X*ctx.Game.CellWidth) * ctx.Game.Zoom)
+				y := -int(float64(pos.Y*ctx.Game.CellHeight) * ctx.Game.Zoom)
+				state.scroller.CenterTo(x, y)
+			}
 		}
 	case game.EventSound:
 		state.sounds.Add(evt.Message, evt.Position, evt.FromPosition)

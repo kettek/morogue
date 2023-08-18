@@ -30,6 +30,8 @@ func (b *Binds) Init() {
 	b.SetActionKeys("move-down", []ebiten.Key{ebiten.KeyArrowDown, ebiten.KeyS, ebiten.KeyJ})
 	b.SetActionKeys("bash", []ebiten.Key{ebiten.KeyB})
 	b.SetActionKeys("pickup", []ebiten.Key{ebiten.KeyComma})
+	b.SetActionKeys("lock-camera", []ebiten.Key{ebiten.KeyC})
+	b.SetActionKeys("snap-camera", []ebiten.Key{ebiten.KeySpace})
 	b.SetMultiAction("move-upleft", []Action{"move-left", "move-up"})
 	b.SetMultiAction("move-upright", []Action{"move-right", "move-up"})
 	b.SetMultiAction("move-downleft", []Action{"move-left", "move-down"})
