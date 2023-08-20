@@ -8,6 +8,7 @@ import (
 	"github.com/ebitenui/ebitenui/image"
 	"github.com/ebitenui/ebitenui/widget"
 	"github.com/kettek/morogue/client/ifs"
+	"github.com/kettek/morogue/config"
 	"github.com/kettek/morogue/net"
 )
 
@@ -80,8 +81,11 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 		widget.TextInputOpts.Placeholder("username"),
 		widget.TextInputOpts.ChangedHandler(func(args *widget.TextInputChangedEventArgs) {
 			state.checkInputs()
+			ctx.Cfg.LastUsername = args.InputText
+			config.Save()
 		}),
 	)
+	state.usernameInput.InputText = ctx.Cfg.LastUsername
 
 	state.passwordInput = widget.NewTextInput(
 		widget.TextInputOpts.WidgetOpts(
@@ -102,8 +106,11 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 		widget.TextInputOpts.Placeholder("password"),
 		widget.TextInputOpts.ChangedHandler(func(args *widget.TextInputChangedEventArgs) {
 			state.checkInputs()
+			ctx.Cfg.LastPassword = args.InputText
+			config.Save()
 		}),
 	)
+	state.passwordInput.InputText = ctx.Cfg.LastPassword // FIXME: Only store the hash and send it to the server.
 
 	state.inputs = widget.NewContainer(
 		widget.ContainerOpts.Layout(widget.NewRowLayout(

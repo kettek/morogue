@@ -25,13 +25,14 @@ type app struct {
 	runContext   ifs.RunContext
 }
 
-func NewApp() *app {
+func NewApp(c *ifs.Configuration) *app {
 	a := &app{}
 	a.runContext.Sm = a
+	a.runContext.Cfg = c
 
 	ebiten.SetWindowSize(1280, 720)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
-	ebiten.SetWindowTitle("morogue")
+	ebiten.SetWindowTitle(c.Name)
 
 	embed.Setup()
 
