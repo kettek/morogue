@@ -71,6 +71,9 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 		state.sounds.SetOffset(x, y)
 	})
 	state.grid.SetColor(color.NRGBA{255, 255, 255, 15})
+	state.grid.SetClickHandler(func(x, y int) {
+		fmt.Printf("TODO: Use %d,%d for a target value to move towards per movement speed limited tick.\n", x, y)
+	})
 
 	state.inventory.Data = data
 	state.inventory.DropItem = func(wid id.WID) {
@@ -337,6 +340,7 @@ func (state *Game) ensureObjects(objects game.Objects) {
 
 func (state *Game) Update(ctx ifs.RunContext) error {
 	state.ui.Update()
+	state.grid.Update(ctx)
 	select {
 	case msg := <-state.messageChan:
 		switch m := msg.(type) {

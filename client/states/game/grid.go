@@ -4,6 +4,7 @@ import (
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"github.com/kettek/morogue/client/ifs"
 )
@@ -15,6 +16,7 @@ type Grid struct {
 	cellWidth, cellHeight int
 	color                 color.Color
 	image                 *ebiten.Image
+	clickHandler          func(x, y int)
 }
 
 func (grid *Grid) makeImage() {
@@ -75,6 +77,29 @@ func (grid *Grid) Color() color.Color {
 // SetColor sets the grid's line color.
 func (grid *Grid) SetColor(c color.Color) {
 	grid.color = c
+}
+
+// SetClickHandler sets the grid's click handler.
+func (grid *Grid) SetClickHandler(cb func(x, y int)) {
+	grid.clickHandler = cb
+}
+
+func (grid *Grid) Update(ctx ifs.RunContext) {
+	if grid.clickHandler == nil {
+		return
+	}
+	if !inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {
+		return
+	}
+	x, y := ebiten.CursorPosition()
+	x -= grid.offsetX
+	y -= grid.offsetY
+	if x < 0 || y < 0 {
+		return
+	}
+	x /= grid.cellWidth
+	y /= grid.cellHeight
+	grid.clickHandler(x, y)
 }
 
 // Draw draws the grid to the screen.
