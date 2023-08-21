@@ -12,7 +12,7 @@ var data any
 func Init[K any](a string, v K) K {
 	app = a
 	if err := Load(v); err != nil {
-		if err := SaveIt(v); err != nil {
+		if err := Save(); err != nil {
 			panic(err)
 		}
 	}
