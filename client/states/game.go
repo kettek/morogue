@@ -33,11 +33,13 @@ type Game struct {
 	objectsMissingArchs   []id.WID
 	lockCameraToCharacter bool
 	pendingDesire         game.Desire
+	pathingSteps          []pathing.Step
 	//
 	binds    clgame.Binds
 	scroller clgame.Scroller
 	grid     clgame.Grid
 	actioner clgame.Actioner
+	pather   clgame.Pather
 	sounds   clgame.Sounds
 	//
 	inventory clgame.Inventory
@@ -71,9 +73,10 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 	state.scroller.SetHandler(func(x, y int) {
 		state.grid.SetOffset(x, y)
 		state.sounds.SetOffset(x, y)
+		state.pather.SetOffset(x, y)
 	})
 	state.grid.SetColor(color.NRGBA{255, 255, 255, 15})
-	state.grid.SetClickHandler(func(x, y int) {
+	state.grid.SetHeldHandler(func(x, y int) {
 		path := pathing.NewPathFromFunc(len(state.location.Cells), len(state.location.Cells[0]), func(x, y int) uint32 {
 			cell := state.location.Cells[x][y]
 			if cell.Blocks == game.MovementWalk || cell.Blocks == game.MovementAll {
@@ -82,8 +85,7 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 			return 0
 		}, pathing.AlgorithmAStar)
 		path.AllowDiagonals(true)
-		steps := path.Compute(state.Character().X, state.Character().Y, x, y)
-		fmt.Println("steps are", steps)
+		state.pather.Steps = path.Compute(state.Character().X, state.Character().Y, x, y)
 	})
 
 	state.inventory.Data = data
@@ -448,6 +450,9 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 			}
 			if desire := state.actioner.Update(state.binds); desire != nil {
 				state.sendDesire(state.characterWID, desire)
+				state.pather.Steps = nil
+			} else if desire := state.pather.Update(character); desire != nil {
+				state.sendDesire(state.characterWID, desire)
 			}
 
 			// This isn't great, but whatever.
@@ -638,6 +643,11 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 				}
 			}
 		}
+		// Draw pathinu
+		if state.Character() != nil {
+			state.pather.Draw(ctx, state.Character())
+		}
+
 		// Draw characters
 		ctx.Txt.Save()
 		ctx.Txt.SetAlign(etxt.VertCenter | etxt.HorzCenter)

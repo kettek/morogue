@@ -17,6 +17,7 @@ type Grid struct {
 	color                 color.Color
 	image                 *ebiten.Image
 	clickHandler          func(x, y int)
+	heldHandler           func(x, y int)
 }
 
 func (grid *Grid) makeImage() {
@@ -84,11 +85,16 @@ func (grid *Grid) SetClickHandler(cb func(x, y int)) {
 	grid.clickHandler = cb
 }
 
+// SetHeldHandler sets the grid's held handler.
+func (grid *Grid) SetHeldHandler(cb func(x, y int)) {
+	grid.heldHandler = cb
+}
+
 func (grid *Grid) Update(ctx ifs.RunContext) {
-	if grid.clickHandler == nil {
+	if grid.clickHandler == nil && grid.heldHandler == nil {
 		return
 	}
-	if !inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {
+	if !ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
 		return
 	}
 	x, y := ebiten.CursorPosition()
@@ -99,7 +105,12 @@ func (grid *Grid) Update(ctx ifs.RunContext) {
 	}
 	x /= grid.cellWidth
 	y /= grid.cellHeight
-	grid.clickHandler(x, y)
+	if grid.clickHandler != nil && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {
+		grid.clickHandler(x, y)
+	}
+	if grid.heldHandler != nil {
+		grid.heldHandler(x, y)
+	}
 }
 
 // Draw draws the grid to the screen.
