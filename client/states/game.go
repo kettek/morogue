@@ -7,6 +7,7 @@ import (
 	"github.com/ebitenui/ebitenui"
 	"github.com/ebitenui/ebitenui/widget"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/kettek/goro/pathing"
 	"github.com/kettek/morogue/client/ifs"
 	clgame "github.com/kettek/morogue/client/states/game"
 	"github.com/kettek/morogue/game"
@@ -31,6 +32,7 @@ type Game struct {
 	characterWID          id.WID
 	objectsMissingArchs   []id.WID
 	lockCameraToCharacter bool
+	pendingDesire         game.Desire
 	//
 	binds    clgame.Binds
 	scroller clgame.Scroller
@@ -72,7 +74,16 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 	})
 	state.grid.SetColor(color.NRGBA{255, 255, 255, 15})
 	state.grid.SetClickHandler(func(x, y int) {
-		fmt.Printf("TODO: Use %d,%d for a target value to move towards per movement speed limited tick.\n", x, y)
+		path := pathing.NewPathFromFunc(len(state.location.Cells), len(state.location.Cells[0]), func(x, y int) uint32 {
+			cell := state.location.Cells[x][y]
+			if cell.Blocks == game.MovementWalk || cell.Blocks == game.MovementAll {
+				return pathing.MaximumCost
+			}
+			return 0
+		}, pathing.AlgorithmAStar)
+		path.AllowDiagonals(true)
+		steps := path.Compute(state.Character().X, state.Character().Y, x, y)
+		fmt.Println("steps are", steps)
 	})
 
 	state.inventory.Data = data

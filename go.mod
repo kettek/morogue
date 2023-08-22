@@ -22,6 +22,7 @@ require (
 	github.com/ebitengine/purego v0.3.2 // indirect
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20221017161538-93cebf72946b // indirect
 	github.com/jezek/xgb v1.1.0 // indirect
+	github.com/kettek/goro v0.0.0-20220620073715-117f8520bffd // indirect
 	github.com/klauspost/compress v1.10.3 // indirect
 	github.com/radovskyb/watcher v1.0.7 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
