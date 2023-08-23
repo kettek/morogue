@@ -59,6 +59,7 @@ func (w *world) assignWIDs(o game.Object) {
 		}
 		o.Damager.CalculateFromCharacter(o)
 		o.Hurtable.CalculateFromCharacter(o)
+		o.Movable.CalculateFromCharacter(o)
 		/*case *game.Container:
 		for _, i := range o.GetItems() {
 			w.assignWIDs(i)
