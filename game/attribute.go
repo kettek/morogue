@@ -23,6 +23,13 @@ const (
 	AttributeFunkDescription   = "Funk determines luck and area of effect bonuses"
 )
 
+type Attributes struct {
+	Swole  AttributeLevel `msgpack:"s,omitempty"`
+	Zooms  AttributeLevel `msgpack:"z,omitempty"`
+	Brains AttributeLevel `msgpack:"b,omitempty"`
+	Funk   AttributeLevel `msgpack:"f,omitempty"`
+}
+
 // AttributeLevel represents the level of an attribute, with the whole number
 // representing the level and the fractional representing the experience until
 // the next level.

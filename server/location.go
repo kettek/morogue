@@ -240,7 +240,15 @@ func (l *location) process() (events []game.Event) {
 func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 	if c.Desire != nil {
 		if l.inTurns {
-			l.turnActionCount++
+			if c.SpentActions >= c.Actions {
+				return nil
+			}
+			if c.SpentActions < c.Actions {
+				c.SpentActions++
+			}
+			if c.SpentActions >= c.Actions {
+				l.turnActionCount++
+			}
 		}
 		switch d := c.Desire.(type) {
 		case game.DesireMove:
@@ -410,6 +418,9 @@ func (l *location) startTurns() {
 	l.inTurns = true
 	l.turnCount = 0
 	l.turnActionCount = 0
+	for _, c := range l.playerCharacters {
+		c.SpentActions = 0
+	}
 }
 
 // stopTurns is called when the location should stop processing the world in terms of turns. This should be called when the players end combat.

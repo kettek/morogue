@@ -43,18 +43,21 @@ type Character struct {
 	Blockable
 	Hurtable
 	Damager
-	Events      []Event   `msgpack:"-" json:"-"` // Events that have happened to the character. These are only sent to the owning client.
-	Desire      Desire    `msgpack:"-" json:"-"` // The current desire of the character. Used server-side.
-	LastDesire  Desire    `msgpack:"-" json:"-"` // Last desire processed. Used server-side.
-	WID         id.WID    // ID assigned when entering da world.
-	Archetype   Archetype `msgpack:"-" json:"-"` // Archetype of the character. This is likely a pointer.
-	ArchetypeID id.UUID   `msgpack:"A,omitempty"`
-	Name        string    `msgpack:"n,omitempty"`
-	Level       int       `msgpack:"l,omitempty"`
-	Slots       SlotMap   `msgpack:"-"`
-	Skills      Skills    `msgpack:"-"`
-	Inventory   Objects   `msgpack:"-"`
+	Movable
+	Events      []Event    `msgpack:"-" json:"-"` // Events that have happened to the character. These are only sent to the owning client.
+	Desire      Desire     `msgpack:"-" json:"-"` // The current desire of the character. Used server-side.
+	LastDesire  Desire     `msgpack:"-" json:"-"` // Last desire processed. Used server-side.
+	WID         id.WID     // ID assigned when entering da world.
+	Archetype   Archetype  `msgpack:"-" json:"-"` // Archetype of the character. This is likely a pointer.
+	ArchetypeID id.UUID    `msgpack:"A,omitempty"`
+	Name        string     `msgpack:"n,omitempty"`
+	Level       int        `msgpack:"l,omitempty"`
+	Attributes  Attributes `msgpack:"t,omitempty"`
+	Slots       SlotMap    `msgpack:"-"`
+	Skills      Skills     `msgpack:"-"`
+	Inventory   Objects    `msgpack:"-"`
 	//
+	SpentActions int
 }
 
 // Type returns "character"
@@ -87,7 +90,7 @@ func (c *Character) GetArchetypeID() id.UUID {
 	return c.ArchetypeID
 }
 
-// SetArchetypeID sets the archetype.
+// SetArchetype sets the archetype.
 func (c *Character) SetArchetype(a Archetype) {
 	c.Archetype = a
 }
