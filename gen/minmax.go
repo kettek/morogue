@@ -13,5 +13,8 @@ func (m MinMax) Max() int {
 }
 
 func (m MinMax) Roll() int {
+	if m[0] == m[1] {
+		return m[0]
+	}
 	return m[0] + rand.Intn(m[1]-m[0])
 }
