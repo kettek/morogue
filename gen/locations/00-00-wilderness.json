@@ -5,11 +5,26 @@
   "height": 100,
   "fixtures": [
     {
-      "id": "morogue:fixtures:cave",
-      "minX": 0,
-      "minY": 20,
-      "maxX": 20,
-      "maxY": 80
+      "targets": [
+        {
+          "id": "morogue:fixtures:cave-outside-entrance"
+        }
+      ],
+      "minTargets": 1,
+      "maxTargets": 3,
+      "minX": 10,
+      "minY": 10,
+      "maxX": 90,
+      "maxY": 90
+    },
+    {
+      "targets": [
+        {
+          "id": "morogue:fixtures:tree-forest"
+        }
+      ],
+      "minTargets": 3,
+      "maxTargets": 5
     }
   ],
   "wfc": [
