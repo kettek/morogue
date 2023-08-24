@@ -2,6 +2,8 @@ package server
 
 import (
 	"errors"
+	"fmt"
+	"log"
 	"math/rand"
 	"time"
 
@@ -131,58 +133,75 @@ func (l *location) moveCharacter(wid id.WID, dir game.MoveDirection) error {
 	return nil
 }
 
-func (l *location) generate(data *Data, wids *id.WIDGenerator) error {
-	// FIXME: Pull from somewhere.
-	for x := 0; x < 60; x++ {
+func (l *location) generate(pid id.UUID, data *Data, wids *id.WIDGenerator) error {
+	place, err := data.Places.ById(pid)
+	if err != nil {
+		return err
+	}
+
+	w := place.Width.Roll()
+	h := place.Height.Roll()
+
+	for x := 0; x < w; x++ {
 		l.Cells = append(l.Cells, make([]game.Cell, 0))
-		for y := 0; y < 60; y++ {
+		for y := 0; y < h; y++ {
 			l.Cells[x] = append(l.Cells[x], game.Cell{})
 		}
 	}
 
-	gen.Generate(gen.Styles[gen.StyleRooms], gen.ConfigRooms{
-		Width:           60,
-		Height:          60,
-		MinRoomSize:     5,
-		MaxRoomSize:     7,
-		MaxRooms:        20,
-		OverlapPadding:  -1,
-		JoinSharedWalls: true,
-		Cell: func(x, y int) gen.Cell {
-			if x < 0 || x >= 60 || y < 0 || y >= 60 {
-				return nil
-			}
-			return &l.Cells[x][y]
-		},
-		SetCell: func(x, y int, cell gen.Cell) {
-			if cell.Flags().Has("wall") {
-				l.Cells[x][y].Blocks = game.MovementAll
-				if tid, err := id.UID(id.Tile, "stone-wall"); err == nil {
-					l.Cells[x][y].TileID = &tid
-				}
-			} else if cell.Flags().Has("floor") {
-				if tid, err := id.UID(id.Tile, "cobblestone-floor"); err == nil {
-					l.Cells[x][y].TileID = &tid
-				}
-			}
-		},
-	})
+	placeFixture := func(f gen.Fixture, px, py int) error {
+		w := f.Width()
+		h := f.Height()
 
-	/*gen.Generate(gen.Styles[gen.StyleBox], gen.ConfigBox{
-		Width:  10,
-		Height: 10,
-		Cell: func(x, y int) gen.Cell {
-			return &l.Cells[x][y]
-		},
-		SetCell: func(x, y int, cell gen.Cell) {
-			if cell.Flags().Has("blocked") {
-				l.Cells[x][y].Blocks = game.MovementAll
-				if tid, err := id.UID(id.Tile, "stone-wall"); err == nil {
-					l.Cells[x][y].TileID = &tid
+		if px+w > len(l.Cells) || py+h > len(l.Cells[0]) {
+			return game.ErrOutOfBoundCell
+		}
+
+		for y, r := range f.Rows {
+			for x, c := range r {
+				if cid, ok := f.Keys[string(c)]; ok {
+					l.Cells[px+x][py+y].TileID = &cid
 				}
 			}
-		},
-	})*/
+		}
+		return nil
+	}
+
+	for _, f := range place.Fixtures {
+		count := f.Count.Roll()
+		for i := 0; i < count; i++ {
+			for tries := 0; tries < 10; tries++ {
+				// TODO: Make this weighted.
+				target := f.Targets[rand.Intn(len(f.Targets))]
+				fixture, err := data.Fixtures.ById(target.ID)
+				if err != nil {
+					return err
+				}
+				var x int
+				var y int
+				if f.X.Max() == 0 {
+					x = rand.Intn(w)
+				} else {
+					x = f.X.Roll()
+				}
+				if f.Y.Max() == 0 {
+					y = rand.Intn(h)
+				} else {
+					y = f.Y.Roll()
+				}
+				if x >= 0 && x < w && y >= 0 && y < h {
+					if err := placeFixture(fixture, x, y); err != nil {
+						log.Println(errors.Join(err, fmt.Errorf("%s attempt %d", target.ID, tries)))
+					} else {
+						break
+					}
+				} else if tries+1 >= 10 {
+					return fmt.Errorf("could not place fixture %s", target.ID)
+				}
+			}
+		}
+	}
+
 	return nil
 }
 

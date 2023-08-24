@@ -13,22 +13,22 @@
     {
       "targets": [
         {
-          "id": "morogue:fixture:cave-outside",
-          "rotate": true
+          "id": "morogue:fixture:forest-patch",
+          "rotate": true,
+          "intersect": true
         }
       ],
-      "count": [1, 3],
-      "x": [10, 10],
-      "y": [90, 90]
+      "count": [10, 30]
     },
     {
       "targets": [
         {
-          "id": "morogue:fixture:forest-patch",
-          "rotate": true
+          "id": "morogue:fixture:cave-outside",
+          "rotate": true,
+          "overlap": true
         }
       ],
-      "count": [3, 6]
+      "count": [1, 3]
     }
   ],
   "wfc": [
