@@ -1,5 +1,5 @@
 {
-  "id": "morogue:fixtures:cave-outside-entrance",
+  "id": "morogue:fixtures:cave-outside",
   "keys": {
     "#": "morogue:tiles:cave-wall",
     ".": "morogue:tiles:cave-floor",
