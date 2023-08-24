@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -9,11 +10,14 @@ import (
 	"strings"
 
 	"github.com/kettek/morogue/game"
+	"github.com/kettek/morogue/gen"
 	"github.com/kettek/morogue/id"
 )
 
 type Data struct {
 	Archetypes []game.Archetype
+	Places     []gen.Place
+	Fixtures   []gen.Fixture
 }
 
 func (d *Data) hasArchetype(uuid id.UUID) bool {
@@ -126,6 +130,82 @@ func (d *Data) LoadArchetypes() error {
 	}
 
 	iterate("archetypes", "")
+
+	return nil
+}
+
+func (d *Data) LoadPlaces() error {
+	var iterate func(string, string) error
+
+	iterate = func(fulldir string, partialdir string) error {
+		entries, err := os.ReadDir(fulldir)
+		if err != nil {
+			return err
+		}
+		for _, entry := range entries {
+			if entry.IsDir() {
+				if err := iterate(filepath.Join(fulldir, entry.Name()), filepath.Join(partialdir, entry.Name())); err != nil {
+					log.Println(err)
+				}
+			} else {
+				fullpath := filepath.Join(fulldir, entry.Name())
+				if strings.HasSuffix(entry.Name(), ".json") {
+					bytes, err := os.ReadFile(fullpath)
+					if err != nil {
+						log.Println(err)
+						continue
+					}
+					var p gen.Place
+					if err := json.Unmarshal(bytes, &p); err != nil {
+						log.Println(errors.Join(fmt.Errorf("failed to decode place %s", fullpath), err))
+					} else {
+						d.Places = append(d.Places, p)
+					}
+				}
+			}
+		}
+		return nil
+	}
+
+	iterate("places", "")
+
+	return nil
+}
+
+func (d *Data) LoadFixtures() error {
+	var iterate func(string, string) error
+
+	iterate = func(fulldir string, partialdir string) error {
+		entries, err := os.ReadDir(fulldir)
+		if err != nil {
+			return err
+		}
+		for _, entry := range entries {
+			if entry.IsDir() {
+				if err := iterate(filepath.Join(fulldir, entry.Name()), filepath.Join(partialdir, entry.Name())); err != nil {
+					log.Println(err)
+				}
+			} else {
+				fullpath := filepath.Join(fulldir, entry.Name())
+				if strings.HasSuffix(entry.Name(), ".json") {
+					bytes, err := os.ReadFile(fullpath)
+					if err != nil {
+						log.Println(err)
+						continue
+					}
+					var f gen.Fixture
+					if err := json.Unmarshal(bytes, &f); err != nil {
+						log.Println(errors.Join(fmt.Errorf("failed to decode place %s", fullpath), err))
+					} else {
+						d.Fixtures = append(d.Fixtures, f)
+					}
+				}
+			}
+		}
+		return nil
+	}
+
+	iterate("fixtures", "")
 
 	return nil
 }

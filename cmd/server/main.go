@@ -34,6 +34,15 @@ func run() error {
 	if err := data.LoadArchetypes(); err != nil {
 		return err
 	}
+	log.Println(len(data.Archetypes), "archetypes")
+	if err := data.LoadPlaces(); err != nil {
+		return err
+	}
+	log.Println(len(data.Places), "places")
+	if err := data.LoadFixtures(); err != nil {
+		return err
+	}
+	log.Println(len(data.Fixtures), "fixtures")
 
 	accounts, err := server.NewAccounts("accounts")
 	if err != nil {

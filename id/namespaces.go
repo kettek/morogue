@@ -14,6 +14,9 @@ const (
 	KeyItem      = "morogue:item"
 	KeyWeapon    = "morogue:weapon"
 	KeyArmor     = "morogue:armor"
+	//
+	KeyPlace   = "morogue:place"
+	KeyFixture = "morogue:fixture"
 )
 
 var (
@@ -24,6 +27,9 @@ var (
 	Item      UUID
 	Weapon    UUID
 	Armor     UUID
+	//
+	Place   UUID
+	Fixture UUID
 )
 
 // NamespaceToKey provides a mapping of morogue's UUIDv5s to their string keys.
@@ -95,5 +101,24 @@ func init() {
 		Armor = UUID(uuid.Must(uuid.FromBytes(sha[:16])))
 		NamespaceToKey[Armor] = KeyArmor
 		KeyToNamespace[KeyArmor] = Armor
+	}
+	//
+	{
+		hasher := sha1.New()
+		hasher.Write([]byte(KeyPlace))
+		sha := hasher.Sum(nil)
+
+		Place = UUID(uuid.Must(uuid.FromBytes(sha[:16])))
+		NamespaceToKey[Place] = KeyPlace
+		KeyToNamespace[KeyPlace] = Place
+	}
+	{
+		hasher := sha1.New()
+		hasher.Write([]byte(KeyFixture))
+		sha := hasher.Sum(nil)
+
+		Fixture = UUID(uuid.Must(uuid.FromBytes(sha[:16])))
+		NamespaceToKey[Fixture] = KeyFixture
+		KeyToNamespace[KeyFixture] = Fixture
 	}
 }

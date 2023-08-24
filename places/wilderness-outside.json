@@ -1,0 +1,75 @@
+{
+  "title": "Wilderness",
+  "id": "morogue:place:wilderness-outside",
+  "width": [
+    100,
+    100
+  ],
+  "height": [
+    100,
+    100
+  ],
+  "fixtures": [
+    {
+      "targets": [
+        {
+          "id": "morogue:fixture:cave-outside",
+          "rotate": true
+        }
+      ],
+      "count": [1, 3],
+      "x": [10, 10],
+      "y": [90, 90]
+    },
+    {
+      "targets": [
+        {
+          "id": "morogue:fixture:forest-patch",
+          "rotate": true
+        }
+      ],
+      "count": [3, 6]
+    }
+  ],
+  "wfc": [
+    {
+      "id": "morogue:tile:cave-wall",
+      "adjacent": [
+        "morogue:tile:cave-wall",
+        "morogue:tile:cave-floor",
+        "morogue:tile:dirt-ground"
+      ]
+    },
+    {
+      "id": "morogue:tile:cave-floor",
+      "adjacent": [
+        "morogue:tile:cave-wall",
+        "morogue:tile:cave-floor",
+        "morogue:tile:dirt-ground"
+      ]
+    },
+    {
+      "id": "morogue:tile:dirt-ground",
+      "adjacent": [
+        "morogue:tile:cave-floor",
+        "morogue:tile:dirt-ground",
+        "morogue:tile:grass-ground"
+      ]
+    },
+    {
+      "id": "morogue:tile:grass-ground",
+      "adjacent": [
+        "morogue:tile:tree",
+        "morogue:tile:grass-ground",
+        "morogue:tile:dirt-ground"
+      ]
+    },
+    {
+      "id": "morogue:tile:tree",
+      "adjacent": [
+        "morogue:tile:tree",
+        "morogue:tile:grass-ground"
+      ]
+    }
+  ]
+}

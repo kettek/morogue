@@ -1,0 +1,14 @@
+{
+  "id": "morogue:fixture:forest-patch",
+  "keys": {
+    "*": "morogue:tile:tree",
+    ".": "morogue:tile:grass-ground"
+  },
+  "rows": [
+    ".***.",
+    "*****",
+    "*****",
+    "*****",
+    ".***."
+  ]
+}

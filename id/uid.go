@@ -3,6 +3,7 @@ package id
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/gofrs/uuid/v5"
@@ -36,11 +37,11 @@ func (u *UUID) UnmarshalJSON(data []byte) error {
 			return errors.New("bad namespace length")
 		}
 		if ns, ok := KeyToNamespace[strs[0]+":"+strs[1]]; !ok {
-			return errors.New("no namespace")
+			return errors.New("no such namespace: " + strs[0] + ":" + strs[1])
 		} else {
 			uid, err := UID(ns, strs[2])
 			if err != nil {
-				return err
+				return errors.Join(err, fmt.Errorf("%s", strs))
 			}
 			*u = uid
 		}
@@ -63,9 +64,9 @@ func (u UUID) String() string {
 	return uuid.UUID(u).String()
 }
 
-// UID generates a unique identifier for the given name in the given morogue namespace. The namespace must be NSArchetype, NSMob, or NSItem.
+// UID generates a unique identifier for the given name in the given morogue namespace. The namespace must be one this is defined in namespaces.
 func UID(ns UUID, name string) (UUID, error) {
-	if ns != Character && ns != Tile && ns != Mob && ns != Item && ns != Weapon && ns != Armor {
+	if ns != Character && ns != Tile && ns != Mob && ns != Item && ns != Weapon && ns != Armor && ns != Place && ns != Fixture {
 		return UUID{}, errors.New("namespace not morogue")
 	}
 	return UUID(uuid.NewV5(uuid.UUID(ns), name)), nil

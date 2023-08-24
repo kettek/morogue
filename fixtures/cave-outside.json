@@ -1,11 +1,11 @@
 {
-  "id": "morogue:fixtures:cave-outside",
+  "id": "morogue:fixture:cave-outside",
   "keys": {
-    "#": "morogue:tiles:cave-wall",
-    ".": "morogue:tiles:cave-floor",
-    ",": "morogue:tiles:dirt-ground",
-    "$": "morogue:random:treasure",
-    "e": "morogue:random:mob"
+    "#": "morogue:tile:cave-wall",
+    ".": "morogue:tile:cave-floor",
+    ",": "morogue:tile:dirt-ground",
+    "$": "morogue:item:random-treasure",
+    "e": "morogue:mob:random-mob"
   },
   "rows": [
     ",,########,,,,#########,",
