@@ -19,8 +19,10 @@ type FixtureEntry struct {
 }
 
 type FixtureTarget struct {
-	ID     id.UUID
-	Rotate bool
+	ID        id.UUID
+	Rotate    bool
+	Overlap   bool
+	Intersect bool
 }
 
 type WFCEntry struct {
