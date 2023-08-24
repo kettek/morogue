@@ -14,10 +14,32 @@ import (
 	"github.com/kettek/morogue/id"
 )
 
+type Places []gen.Place
+
+func (p Places) ById(uid id.UUID) (gen.Place, error) {
+	for _, place := range p {
+		if place.ID == uid {
+			return place, nil
+		}
+	}
+	return gen.Place{}, errors.New("no such place")
+}
+
+type Fixtures []gen.Fixture
+
+func (f Fixtures) ById(uid id.UUID) (gen.Fixture, error) {
+	for _, fixture := range f {
+		if fixture.ID == uid {
+			return fixture, nil
+		}
+	}
+	return gen.Fixture{}, errors.New("no such fixture")
+}
+
 type Data struct {
 	Archetypes []game.Archetype
-	Places     []gen.Place
-	Fixtures   []gen.Fixture
+	Places     Places
+	Fixtures   Fixtures
 }
 
 func (d *Data) hasArchetype(uuid id.UUID) bool {
