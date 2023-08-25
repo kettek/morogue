@@ -133,19 +133,67 @@ func (l *location) moveCharacter(wid id.WID, dir game.MoveDirection) error {
 	return nil
 }
 
+type wfcTile struct {
+	ID     id.UUID
+	Domain []id.UUID
+}
+
 func (l *location) generate(pid id.UUID, data *Data, wids *id.WIDGenerator) error {
 	place, err := data.Places.ById(pid)
 	if err != nil {
 		return err
 	}
 
+	allPossibleTiles := []id.UUID{}
+
+	for _, w := range place.WFC {
+		allPossibleTiles = append(allPossibleTiles, w.ID)
+	}
+
 	w := place.Width.Roll()
 	h := place.Height.Roll()
 
+	var wfcTiles [][]wfcTile
+
+	/*removeDomain := func(x, y int, id id.UUID) {
+		if x < 0 || y < 0 || x >= len(wfcTiles) || y >= len(wfcTiles[0]) {
+			return
+		}
+		for i, d := range wfcTiles[x][y].Domain {
+			if d == id {
+				wfcTiles[x][y].Domain = append(wfcTiles[x][y].Domain[:i], wfcTiles[x][y].Domain[i+1:]...)
+				return
+			}
+		}
+	}*/
+
+	getLeastEntropy := func() (ex, ey int) {
+		leastEntropy := 9999
+		for x := 0; x < w; x++ {
+			for y := 0; y < h; y++ {
+				if len(wfcTiles[x][y].Domain) > 0 {
+					if len(wfcTiles[x][y].Domain) < leastEntropy {
+						leastEntropy = len(wfcTiles[x][y].Domain)
+						ex = x
+						ey = y
+					}
+				}
+			}
+		}
+		if leastEntropy == 9999 {
+			return -1, -1
+		}
+		return
+	}
+
 	for x := 0; x < w; x++ {
 		l.Cells = append(l.Cells, make([]game.Cell, 0))
+		wfcTiles = append(wfcTiles, make([]wfcTile, 0))
 		for y := 0; y < h; y++ {
 			l.Cells[x] = append(l.Cells[x], game.Cell{})
+			wfcTiles[x] = append(wfcTiles[x], wfcTile{
+				Domain: allPossibleTiles,
+			})
 		}
 	}
 
@@ -161,6 +209,9 @@ func (l *location) generate(pid id.UUID, data *Data, wids *id.WIDGenerator) erro
 			for x, c := range r {
 				if cid, ok := f.Keys[string(c)]; ok {
 					l.Cells[px+x][py+y].TileID = &cid
+					// Mark the tile as done for WFC purposes.
+					wfcTiles[px+x][py+y].ID = cid
+					wfcTiles[px+x][py+y].Domain = []id.UUID{}
 				}
 			}
 		}
@@ -200,6 +251,17 @@ func (l *location) generate(pid id.UUID, data *Data, wids *id.WIDGenerator) erro
 				}
 			}
 		}
+	}
+
+	for {
+		x, y := getLeastEntropy()
+		if x == -1 && y == -1 {
+			break
+		}
+
+		wfcTiles[x][y].ID = wfcTiles[x][y].Domain[rand.Intn(len(wfcTiles[x][y].Domain))]
+		wfcTiles[x][y].Domain = []id.UUID{}
+		l.Cells[x][y].TileID = &wfcTiles[x][y].ID
 	}
 
 	return nil

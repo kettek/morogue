@@ -59,15 +59,15 @@
     {
       "id": "morogue:tile:grass-ground",
       "adjacent": [
-        "morogue:tile:tree",
+        "morogue:tile:fir-tree",
         "morogue:tile:grass-ground",
         "morogue:tile:dirt-ground"
       ]
     },
     {
-      "id": "morogue:tile:tree",
+      "id": "morogue:tile:fir-tree",
       "adjacent": [
-        "morogue:tile:tree",
+        "morogue:tile:fir-tree",
         "morogue:tile:grass-ground"
       ]
     }

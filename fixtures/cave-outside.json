@@ -1,9 +1,8 @@
 {
   "id": "morogue:fixture:cave-outside",
   "keys": {
-    "#": "morogue:tile:stone-wall",
-    ".": "morogue:tile:cobblestone-floor",
-    ",": "morogue:tile:dirt-ground",
+    "#": "morogue:tile:cave-wall",
+    ".": "morogue:tile:cave-floor",
     "$": "morogue:item:random-treasure",
     "e": "morogue:mob:random-mob"
   },
