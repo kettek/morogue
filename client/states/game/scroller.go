@@ -83,15 +83,17 @@ func (scroller *Scroller) SetScroll(x, y int) {
 		maxY = scroller.maxH - scroller.limitY
 	}
 
-	if x < minX {
-		x = minX
-	} else if x > maxX {
-		x = maxX
+	padding := (scroller.maxW + scroller.maxH) / 2 / 4
+
+	if x < minX-padding {
+		x = minX - padding
+	} else if x > maxX+padding {
+		x = maxX + padding
 	}
-	if y < minY {
-		y = minY
-	} else if y > maxY {
-		y = maxY
+	if y < minY-padding {
+		y = minY - padding
+	} else if y > maxY+padding {
+		y = maxY + padding
 	}
 	scroller.x = x
 	scroller.y = y
