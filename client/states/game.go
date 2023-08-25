@@ -32,6 +32,7 @@ type Game struct {
 	characterWID          id.WID
 	objectsMissingArchs   []id.WID
 	lockCameraToCharacter bool
+	showGrid              bool
 	pendingDesire         game.Desire
 	pathingSteps          []pathing.Step
 	//
@@ -75,7 +76,7 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 		state.sounds.SetOffset(x, y)
 		state.pather.SetOffset(x, y)
 	})
-	state.grid.SetColor(color.NRGBA{255, 255, 255, 15})
+	state.grid.SetColor(color.NRGBA{255, 255, 255, 30})
 	state.grid.SetHeldHandler(func(x, y int) {
 		path := pathing.NewPathFromFunc(len(state.location.Cells), len(state.location.Cells[0]), func(x, y int) uint32 {
 			cell := state.location.Cells[x][y]
@@ -448,6 +449,9 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 			if state.binds.IsActionHeld("snap-camera") >= 0 {
 				state.centerCameraOn(ctx, character)
 			}
+			if state.binds.IsActionHeld("toggle-grid") == 0 {
+				state.showGrid = !state.showGrid
+			}
 			if desire := state.actioner.Update(state.binds); desire != nil {
 				state.sendDesire(state.characterWID, desire)
 				state.pather.Steps = nil
@@ -617,12 +621,11 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 	scrollOpts.Translate(float64(sx), float64(sy))
 
 	if state.location != nil {
-		state.grid.Draw(ctx)
-
 		cw := int(float64(ctx.Game.CellWidth) * ctx.Game.Zoom)
 		ch := int(float64(ctx.Game.CellHeight) * ctx.Game.Zoom)
 
 		// TODO: Replace map access and cells with a client-centric cell wrapper that contains the ebiten.image ptr directly for efficiency.
+		// Draw tiles.
 		for x, col := range state.location.Cells {
 			for y, cell := range col {
 				if cell.TileID == nil {
@@ -643,7 +646,13 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 				}
 			}
 		}
-		// Draw pathinu
+
+		// Draw grid
+		if state.showGrid {
+			state.grid.Draw(ctx)
+		}
+
+		// Draw pathing
 		if state.Character() != nil {
 			state.pather.Draw(ctx, state.Character())
 		}
