@@ -1,0 +1,7 @@
+{
+  "id": "morogue:food:pie",
+  "title": "Pie",
+  "image": "pie.png",
+  "description": "A delicious pie.",
+  "calories": 2000
+}
