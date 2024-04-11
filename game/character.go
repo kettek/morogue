@@ -85,6 +85,8 @@ func (c *Character) Apply(o Object, force bool) Event {
 		return c.applyWeapon(o, force)
 	case *Armor:
 		return c.applyArmor(o, force)
+	case *Food:
+		return c.applyFood(o)
 	case *Item:
 		// TODO
 	}
@@ -148,6 +150,16 @@ func (c *Character) applyArmor(a *Armor, force bool) Event {
 		Applier: c.WID,
 		WID:     a.WID,
 		Applied: true,
+	}
+}
+
+// applyFood consumes a food.
+func (c *Character) applyFood(f *Food) Event {
+	f.Eat()
+	// TODO: Apply effects of food.
+	return EventConsume{
+		Consumer: c.WID,
+		WID:      f.WID,
 	}
 }
 

@@ -376,6 +376,19 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 					} else if e != nil {
 						events = append(events, e)
 					}
+				} else if _, isEdible := t.(Edible); isEdible {
+					e := c.Apply(t, true)
+					if _, ok := e.(game.EventNotice); ok {
+						c.Events = append(c.Events, e)
+					} else if e != nil {
+						events = append(events, e)
+					}
+					// TODO: Make eating foods make different sounds, such as "slurp", "crunch", "burp", etc.
+					events = append(events, game.EventSound{
+						FromPosition: c.GetPosition(),
+						Position:     c.GetPosition(),
+						Message:      "*munch*",
+					})
 				} else {
 					c.Events = append(c.Events, game.EventNotice{
 						Message: "You can't apply that.",

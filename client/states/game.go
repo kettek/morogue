@@ -533,6 +533,22 @@ func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 				}
 			}
 		}
+	case game.EventConsume:
+		if o := state.location.ObjectByWID(evt.WID); o != nil {
+			if consumer := state.location.ObjectByWID(evt.Consumer); consumer != nil {
+				if ch, ok := consumer.(*game.Character); ok {
+					if food, ok := o.GetArchetype().(game.FoodArchetype); ok {
+						ch.Apply(o, true)
+						if ch == state.Character() {
+							fmt.Printf("You consumed %s\n", food.Title)
+							state.refreshInventory(ctx)
+						} else {
+							fmt.Printf("%s consumed %s\n", ch.Name, food.Title)
+						}
+					}
+				}
+			}
+		}
 	case game.EventPickup:
 		if o := state.location.ObjectByWID(evt.WID); o != nil {
 			if picker := state.location.ObjectByWID(evt.Picker); picker != nil {
