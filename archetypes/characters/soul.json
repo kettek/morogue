@@ -6,6 +6,7 @@
   "zooms": 2,
   "brains": 1,
   "funk": 5,
+  "startingObjects": ["morogue:food:soulfood"],
   "slots": [
     "head",
     "neck",

@@ -7,7 +7,7 @@
   "brains": 1,
   "funk": 1,
   "traits": ["wilder-only helmets", "wilder-only boots"],
-  "startingObjects": ["morogue:armor:hide-armor", "morogue:armor:hide-leggings", "morogue:weapon:bow", "morogue:weapon:bone-shank"],
+  "startingObjects": ["morogue:armor:hide-armor", "morogue:armor:hide-leggings", "morogue:weapon:bow", "morogue:weapon:bone-shank", "morogue:food:jerky"],
   "slots": [
     "wilder-head",
     "neck",
