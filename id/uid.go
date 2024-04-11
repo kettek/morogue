@@ -66,7 +66,7 @@ func (u UUID) String() string {
 
 // UID generates a unique identifier for the given name in the given morogue namespace. The namespace must be one this is defined in namespaces.
 func UID(ns UUID, name string) (UUID, error) {
-	if ns != Character && ns != Tile && ns != Mob && ns != Item && ns != Weapon && ns != Armor && ns != Place && ns != Fixture {
+	if ns != Character && ns != Tile && ns != Mob && ns != Item && ns != Weapon && ns != Armor && ns != Food && ns != Place && ns != Fixture {
 		return UUID{}, errors.New("namespace not morogue")
 	}
 	return UUID(uuid.NewV5(uuid.UUID(ns), name)), nil

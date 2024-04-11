@@ -217,6 +217,12 @@ func (m *ArchetypesMessage) UnmarshalMsgpack(data []byte) error {
 				panic(err)
 			}
 			m.Archetypes = append(m.Archetypes, archetype)
+		case (game.FoodArchetype{}).Type():
+			var archetype game.FoodArchetype
+			if err := msgpack.Unmarshal(a.Data, &archetype); err != nil {
+				panic(err)
+			}
+			m.Archetypes = append(m.Archetypes, archetype)
 		}
 	}
 

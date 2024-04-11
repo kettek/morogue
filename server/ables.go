@@ -35,3 +35,8 @@ type Lockable interface {
 	Unlock()
 	IsLocked() bool
 }
+
+type Edible interface {
+	Eat()
+	Throw()
+}

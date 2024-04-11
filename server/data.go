@@ -119,6 +119,16 @@ func (d *Data) ArmorArchetypes() []game.ArmorArchetype {
 	return archetypes
 }
 
+func (d *Data) FoodArchetypes() []game.FoodArchetype {
+	var archetypes []game.FoodArchetype
+	for _, a := range d.Archetypes {
+		if f, ok := a.(game.FoodArchetype); ok {
+			archetypes = append(archetypes, f)
+		}
+	}
+	return archetypes
+}
+
 func (d *Data) LoadArchetypes() error {
 	var iterate func(string, string) error
 

@@ -14,6 +14,7 @@ const (
 	KeyItem      = "morogue:item"
 	KeyWeapon    = "morogue:weapon"
 	KeyArmor     = "morogue:armor"
+	KeyFood      = "morogue:food"
 	//
 	KeyPlace   = "morogue:place"
 	KeyFixture = "morogue:fixture"
@@ -27,6 +28,7 @@ var (
 	Item      UUID
 	Weapon    UUID
 	Armor     UUID
+	Food      UUID
 	//
 	Place   UUID
 	Fixture UUID
@@ -101,6 +103,15 @@ func init() {
 		Armor = UUID(uuid.Must(uuid.FromBytes(sha[:16])))
 		NamespaceToKey[Armor] = KeyArmor
 		KeyToNamespace[KeyArmor] = Armor
+	}
+	{
+		hasher := sha1.New()
+		hasher.Write([]byte(KeyFood))
+		sha := hasher.Sum(nil)
+
+		Food = UUID(uuid.Must(uuid.FromBytes(sha[:16])))
+		NamespaceToKey[Food] = KeyFood
+		KeyToNamespace[KeyFood] = Food
 	}
 	//
 	{
