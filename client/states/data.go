@@ -79,6 +79,13 @@ func (d *Data) EnsureImage(archetype game.Archetype, zoom float64) (*ebiten.Imag
 		} else {
 			return nil, err
 		}
+	case game.FoodArchetype:
+		if img, err := d.LoadImage("archetypes/"+a.Image, zoom); err == nil {
+			d.archetypeImages[a.GetID()] = img
+			return img, nil
+		} else {
+			return nil, err
+		}
 	default:
 		return nil, fmt.Errorf("unknown archetype type: %T", archetype)
 	}

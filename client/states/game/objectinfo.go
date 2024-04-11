@@ -120,6 +120,19 @@ func addObjectInfo(ctx ifs.RunContext, object game.Object, arch game.Archetype, 
 		container.AddChild(slots)
 		container.AddChild(armorLine)
 		container.AddChild(desc)
+	case game.FoodArchetype:
+		title := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s", a.Title), ctx.UI.BodyCopyFace, color.White))
+		calories := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%d kcal", a.Calories), ctx.UI.BodyCopyFace, color.NRGBA{R: 200, G: 200, B: 200, A: 255}))
+		desc := makeDescription(ctx, a.Description)
+
+		foodLine := widget.NewContainer(
+			widget.ContainerOpts.Layout(widget.NewRowLayout(widget.RowLayoutOpts.Direction(widget.DirectionHorizontal))),
+		)
+		foodLine.AddChild(calories)
+
+		container.AddChild(title)
+		container.AddChild(foodLine)
+		container.AddChild(desc)
 	case game.ItemArchetype:
 		// TODO
 	}

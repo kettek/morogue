@@ -4,10 +4,11 @@ import "github.com/kettek/morogue/id"
 
 // FoodArchetype is effectively a blueprint for food.
 type FoodArchetype struct {
-	ID       id.UUID
-	Title    string `msgpack:"T,omitempty"`
-	Image    string `msgpack:"i,omitempty"`
-	Calories int    `msgpack:"c,omitempty"`
+	ID          id.UUID
+	Title       string `msgpack:"T,omitempty"`
+	Description string `msgpack:"d,omitempty"`
+	Image       string `msgpack:"i,omitempty"`
+	Calories    int    `msgpack:"c,omitempty"`
 }
 
 func (a FoodArchetype) Type() string {
