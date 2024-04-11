@@ -102,50 +102,12 @@ func (a ArmorArchetype) RangeString() string {
 
 // Armor is a weapon.
 type Armor struct {
+	WorldObject
 	Position
 	Appliable
-	ArchetypeID id.UUID   `msgpack:"A,omitempty"`
-	Archetype   Archetype `msgpack:"-" json:"-"`
-	WID         id.WID
-	Container   id.WID `msgpack:"c,omitempty"` // The container of the item, if any.
 }
 
 // Type returns the type of the object.
 func (a Armor) Type() ObjectType {
 	return "armor"
-}
-
-// GetWID returns the WID of the object.
-func (a Armor) GetWID() id.WID {
-	return a.WID
-}
-
-// SetWID sets the WID of the object.
-func (a *Armor) SetWID(wid id.WID) {
-	a.WID = wid
-}
-
-// GetPosition returns the position of the object.
-func (a Armor) GetPosition() Position {
-	return a.Position
-}
-
-// SetPosition sets the position of the object.
-func (a *Armor) SetPosition(p Position) {
-	a.Position = p
-}
-
-// GetArchetypeID returns the ID of the archetype.
-func (a *Armor) GetArchetypeID() id.UUID {
-	return a.ArchetypeID
-}
-
-// SetArchetype sets the archetype.
-func (a *Armor) SetArchetype(archetype Archetype) {
-	a.Archetype = archetype
-}
-
-// GetArchetype returns the archetype.
-func (a *Armor) GetArchetype() Archetype {
-	return a.Archetype
 }

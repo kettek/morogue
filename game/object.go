@@ -29,26 +29,41 @@ func CreateObjectFromArchetype(a Archetype) Object {
 	switch a := a.(type) {
 	case CharacterArchetype:
 		return &Character{
-			ArchetypeID: a.GetID(),
-			Slots:       a.Slots.ToMap(),
-			Archetype:   a,
+			WorldObject: WorldObject{
+				ArchetypeID: a.GetID(),
+				Archetype:   a,
+			},
+			Slots: a.Slots.ToMap(),
 		}
 	case WeaponArchetype:
 		return &Weapon{
-			ArchetypeID: a.GetID(),
-			Archetype:   a,
+			WorldObject: WorldObject{
+				ArchetypeID: a.GetID(),
+				Archetype:   a,
+			},
 		}
 	case ArmorArchetype:
 		return &Armor{
-			ArchetypeID: a.GetID(),
-			Archetype:   a,
+			WorldObject: WorldObject{
+				ArchetypeID: a.GetID(),
+				Archetype:   a,
+			},
 		}
 	case DoorArchetype:
 		return &Door{
-			ArchetypeID: a.GetID(),
-			Archetype:   a,
+			WorldObject: WorldObject{
+				ArchetypeID: a.GetID(),
+				Archetype:   a,
+			},
 			Blockable: Blockable{
 				BlockType: a.BlockType,
+			},
+		}
+	case FoodArchetype:
+		return &Food{
+			WorldObject: WorldObject{
+				ArchetypeID: a.GetID(),
+				Archetype:   a,
 			},
 		}
 	}
@@ -107,6 +122,12 @@ func (ow ObjectWrapper) Object() (Object, error) {
 			return nil, err
 		}
 		return a, nil
+	case (Food{}).Type():
+		var f *Food
+		if err := msgpack.Unmarshal(ow.Data, &f); err != nil {
+			return nil, err
+		}
+		return f, nil
 	}
 	return nil, errors.New("unknown object type: " + string(ow.Type))
 }
@@ -139,6 +160,12 @@ func (ow ObjectWrapper) ObjectJSON() (Object, error) {
 			return nil, err
 		}
 		return a, nil
+	case (Food{}).Type():
+		var f *Food
+		if err := json.Unmarshal(ow.Data, &f); err != nil {
+			return nil, err
+		}
+		return f, nil
 	}
 	return nil, errors.New("unknown object type: " + string(ow.Type))
 }

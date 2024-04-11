@@ -39,23 +39,21 @@ func (c CharacterArchetype) GetID() id.UUID {
 
 // Character represents a character. This can be a player or an NPC.
 type Character struct {
+	WorldObject
 	Position
 	Blockable
 	Hurtable
 	Damager
 	Movable
-	Events      []Event    `msgpack:"-" json:"-"` // Events that have happened to the character. These are only sent to the owning client.
-	Desire      Desire     `msgpack:"-" json:"-"` // The current desire of the character. Used server-side.
-	LastDesire  Desire     `msgpack:"-" json:"-"` // Last desire processed. Used server-side.
-	WID         id.WID     // ID assigned when entering da world.
-	Archetype   Archetype  `msgpack:"-" json:"-"` // Archetype of the character. This is likely a pointer.
-	ArchetypeID id.UUID    `msgpack:"A,omitempty"`
-	Name        string     `msgpack:"n,omitempty"`
-	Level       int        `msgpack:"l,omitempty"`
-	Attributes  Attributes `msgpack:"t,omitempty"`
-	Slots       SlotMap    `msgpack:"-"`
-	Skills      Skills     `msgpack:"-"`
-	Inventory   Objects    `msgpack:"-"`
+	Events     []Event    `msgpack:"-" json:"-"` // Events that have happened to the character. These are only sent to the owning client.
+	Desire     Desire     `msgpack:"-" json:"-"` // The current desire of the character. Used server-side.
+	LastDesire Desire     `msgpack:"-" json:"-"` // Last desire processed. Used server-side.
+	Name       string     `msgpack:"n,omitempty"`
+	Level      int        `msgpack:"l,omitempty"`
+	Attributes Attributes `msgpack:"t,omitempty"`
+	Slots      SlotMap    `msgpack:"-"`
+	Skills     Skills     `msgpack:"-"`
+	Inventory  Objects    `msgpack:"-"`
 	//
 	SpentActions int
 }
@@ -63,41 +61,6 @@ type Character struct {
 // Type returns "character"
 func (c Character) Type() ObjectType {
 	return "character"
-}
-
-// GetWID returns the WID.
-func (c Character) GetWID() id.WID {
-	return c.WID
-}
-
-// SetWID sets the WID.
-func (c *Character) SetWID(wid id.WID) {
-	c.WID = wid
-}
-
-// GetPosition returns the position.
-func (c Character) GetPosition() Position {
-	return c.Position
-}
-
-// SetPosition sets the position.
-func (c *Character) SetPosition(p Position) {
-	c.Position = p
-}
-
-// GetArchetypeID returns the archetype.
-func (c *Character) GetArchetypeID() id.UUID {
-	return c.ArchetypeID
-}
-
-// SetArchetype sets the archetype.
-func (c *Character) SetArchetype(a Archetype) {
-	c.Archetype = a
-}
-
-// GetArchetype returns the archetype.
-func (c *Character) GetArchetype() Archetype {
-	return c.Archetype
 }
 
 // InInventory returns true if the character has the object in their inventory.
