@@ -85,7 +85,7 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 			config.Save()
 		}),
 	)
-	state.usernameInput.InputText = ctx.Cfg.LastUsername
+	state.usernameInput.SetText(ctx.Cfg.LastUsername)
 
 	state.passwordInput = widget.NewTextInput(
 		widget.TextInputOpts.WidgetOpts(
@@ -110,7 +110,7 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 			config.Save()
 		}),
 	)
-	state.passwordInput.InputText = ctx.Cfg.LastPassword // FIXME: Only store the hash and send it to the server.
+	state.passwordInput.SetText(ctx.Cfg.LastPassword) // FIXME: Only store the hash and send it to the server.
 
 	state.inputs = widget.NewContainer(
 		widget.ContainerOpts.Layout(widget.NewRowLayout(
@@ -230,11 +230,11 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 }
 
 func (state *Login) checkInputs() {
-	if state.usernameInput.InputText == "" {
+	if state.usernameInput.GetText() == "" {
 		state.resultText.Label = "username must not be empty"
 		return
 	}
-	if state.passwordInput.InputText == "" {
+	if state.passwordInput.GetText() == "" {
 		state.resultText.Label = "password must not be empty"
 		return
 	}
@@ -245,7 +245,7 @@ func (state *Login) checkInputs() {
 			break
 		}
 	}
-	if hasConfirm && state.passwordInput.InputText != state.confirmInput.InputText {
+	if hasConfirm && state.passwordInput.GetText() != state.confirmInput.GetText() {
 		state.resultText.Label = "passwords must match"
 		return
 	}
@@ -253,24 +253,24 @@ func (state *Login) checkInputs() {
 }
 
 func (state *Login) doLogin() {
-	if state.usernameInput.InputText == "" || state.passwordInput.InputText == "" {
+	if state.usernameInput.GetText() == "" || state.passwordInput.GetText() == "" {
 		return
 	}
 	state.resultText.Label = "logging in..."
 	state.connection.Write(net.LoginMessage{
-		User:     state.usernameInput.InputText,
-		Password: state.passwordInput.InputText,
+		User:     state.usernameInput.GetText(),
+		Password: state.passwordInput.GetText(),
 	})
 }
 
 func (state *Login) doRegister() {
-	if state.usernameInput.InputText == "" || state.passwordInput.InputText == "" || state.passwordInput.InputText != state.confirmInput.InputText {
+	if state.usernameInput.GetText() == "" || state.passwordInput.GetText() == "" || state.passwordInput.GetText() != state.confirmInput.GetText() {
 		return
 	}
 	state.resultText.Label = "registering..."
 	state.connection.Write(net.RegisterMessage{
-		User:     state.usernameInput.InputText,
-		Password: state.passwordInput.InputText,
+		User:     state.usernameInput.GetText(),
+		Password: state.passwordInput.GetText(),
 	})
 }
 

@@ -628,19 +628,39 @@ func (state *Create) refreshArchetypes(ctx ifs.RunContext) {
 
 	var rowButtons []widget.RadioGroupElement
 
-	slices.SortFunc(state.archetypes, func(a, b archetype) bool {
+	slices.SortFunc(state.archetypes, func(a, b archetype) int {
 		if state.sortBy == "Archetype" {
-			return a.Archetype.Title > b.Archetype.Title
+			if a.Archetype.Title > b.Archetype.Title {
+				return 1
+			} else if a.Archetype.Title < b.Archetype.Title {
+				return -1
+			}
 		} else if state.sortBy == "Swole" {
-			return a.Archetype.Swole > b.Archetype.Swole
+			if a.Archetype.Swole > b.Archetype.Swole {
+				return 1
+			} else if a.Archetype.Swole < b.Archetype.Swole {
+				return -1
+			}
 		} else if state.sortBy == "Zooms" {
-			return a.Archetype.Zooms > b.Archetype.Zooms
+			if a.Archetype.Zooms > b.Archetype.Zooms {
+				return 1
+			} else if a.Archetype.Zooms < b.Archetype.Zooms {
+				return -1
+			}
 		} else if state.sortBy == "Brains" {
-			return a.Archetype.Brains > b.Archetype.Brains
+			if a.Archetype.Brains > b.Archetype.Brains {
+				return 1
+			} else if a.Archetype.Brains < b.Archetype.Brains {
+				return -1
+			}
 		} else if state.sortBy == "Funk" {
-			return a.Archetype.Funk > b.Archetype.Funk
+			if a.Archetype.Funk > b.Archetype.Funk {
+				return 1
+			} else if a.Archetype.Funk < b.Archetype.Funk {
+				return -1
+			}
 		}
-		return false
+		return 0
 	})
 
 	for _, arch := range state.archetypes {
@@ -829,7 +849,7 @@ func (state *Create) syncUI() {
 }
 
 func (state *Create) doCreate() {
-	name := state.archetypesCreateName.InputText
+	name := state.archetypesCreateName.GetText()
 	id := state.selectedArchetype
 
 	if name == "" {
@@ -881,8 +901,8 @@ func (state *Create) Update(ctx ifs.RunContext) error {
 		case net.CreateCharacterMessage:
 			if m.ResultCode == 200 {
 				// Set selected character on success and clear name field.
-				state.selectedCharacter = state.archetypesCreateName.InputText
-				state.archetypesCreateName.InputText = ""
+				state.selectedCharacter = state.archetypesCreateName.GetText()
+				state.archetypesCreateName.SetText("")
 			}
 			if m.Result != "" {
 				state.resultText.Label = m.Result
