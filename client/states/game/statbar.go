@@ -17,6 +17,7 @@ type Statbar struct {
 	innerContainer   *widget.Container
 	damagesContainer *widget.Container
 	healthContainer  *widget.Container
+	hungerContainer  *widget.Container
 }
 
 func (hb *Statbar) Init(container *widget.Container, ctx ifs.RunContext) {
@@ -67,6 +68,19 @@ func (hb *Statbar) Init(container *widget.Container, ctx ifs.RunContext) {
 		),
 	)
 	hb.innerContainer.AddChild(hb.healthContainer)
+
+	hb.hungerContainer = widget.NewContainer(
+		widget.ContainerOpts.Layout(widget.NewRowLayout(
+			widget.RowLayoutOpts.Direction(widget.DirectionHorizontal),
+		)),
+		widget.ContainerOpts.WidgetOpts(
+			widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+				StretchHorizontal:  false,
+				HorizontalPosition: widget.AnchorLayoutPositionStart,
+			}),
+		),
+	)
+	hb.innerContainer.AddChild(hb.hungerContainer)
 
 	hb.container.AddChild(hb.innerContainer)
 }
@@ -147,6 +161,32 @@ func (hb *Statbar) Refresh(ctx ifs.RunContext, c *game.Character, a game.Charact
 			container.AddChild(graphic)
 
 			hb.healthContainer.AddChild(container)
+		}
+
+		{
+			hb.hungerContainer.RemoveChildren()
+			// TODO: Implement hunger
+			container := widget.NewContainer(
+				widget.ContainerOpts.Layout(widget.NewRowLayout(
+					widget.RowLayoutOpts.Direction(widget.DirectionHorizontal),
+					widget.RowLayoutOpts.Padding(widget.Insets{Left: 8, Right: 8}),
+				)),
+			)
+			value := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text("1000", ctx.UI.BodyCopyFace, color.RGBA{255, 255, 32, 255}))
+
+			graphic := widget.NewGraphic(
+				widget.GraphicOpts.Image(embed.IconHunger),
+				widget.GraphicOpts.WidgetOpts(
+					widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+						Position: widget.RowLayoutPositionCenter,
+					}),
+				),
+			)
+
+			container.AddChild(value)
+			container.AddChild(graphic)
+
+			hb.hungerContainer.AddChild(container)
 		}
 	}
 }

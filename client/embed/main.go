@@ -36,6 +36,7 @@ var IconOffenseThrown *ebiten.Image
 var IconOffenseUnarmed *ebiten.Image
 var IconDefense *ebiten.Image
 var IconHealth *ebiten.Image
+var IconHunger *ebiten.Image
 
 func Setup() {
 	f, err := Assets.Open("images/icon.png")
@@ -127,6 +128,13 @@ func Setup() {
 	}
 	defer f.Close()
 	IconHealth, _, _ = ebitenutil.NewImageFromReader(f)
+
+	f, err = Assets.Open("images/hunger.png")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	IconHunger, _, _ = ebitenutil.NewImageFromReader(f)
 
 	//
 	b, err := Assets.ReadFile("fonts/x12y16pxMaruMonica.ttf")
