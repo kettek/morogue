@@ -40,7 +40,7 @@ func (a *Account) CreateCharacter(name string, archetype id.UUID) (*game.Charact
 
 	a.Characters = append(a.Characters, &game.Character{
 		Name: name,
-		WorldObject: game.WorldObject{
+		Objectable: game.Objectable{
 			ArchetypeID: archetype,
 		},
 	})

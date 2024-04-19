@@ -37,6 +37,6 @@ type Lockable interface {
 }
 
 type Edible interface {
-	Eat()
+	Eat() int
 	Throw()
 }

@@ -104,7 +104,7 @@ func (a WeaponArchetype) RangeString() string {
 
 // Weapon is a weapon.
 type Weapon struct {
-	WorldObject
+	Objectable
 	Position
 	Appliable
 }

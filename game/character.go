@@ -39,7 +39,7 @@ func (c CharacterArchetype) GetID() id.UUID {
 
 // Character represents a character. This can be a player or an NPC.
 type Character struct {
-	WorldObject
+	Objectable
 	Position
 	Blockable
 	Hurtable
@@ -155,11 +155,12 @@ func (c *Character) applyArmor(a *Armor, force bool) Event {
 
 // applyFood consumes a food.
 func (c *Character) applyFood(f *Food) Event {
-	f.Eat()
+	kcals := f.Eat()
 	// TODO: Apply effects of food.
 	return EventConsume{
 		Consumer: c.WID,
 		WID:      f.WID,
+		Finished: kcals == 0,
 	}
 }
 
@@ -229,6 +230,9 @@ func (c *Character) unapplyArmor(a *Armor, force bool) Event {
 func (c *Character) Pickup(o Object) Event {
 	c.Inventory = append(c.Inventory, o)
 
+	// Set container to the character.
+	o.SetContainerWID(c.WID)
+
 	// It's a bit cheesy, but we use -1/-1 to signify off the map.
 	o.SetPosition(Position{-1, -1})
 
@@ -263,6 +267,9 @@ func (c *Character) Drop(o Object) Event {
 			break
 		}
 	}
+
+	// Clear the container.
+	o.SetContainerWID(0)
 
 	return EventDrop{
 		Dropper:  c.WID,

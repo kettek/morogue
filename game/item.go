@@ -19,7 +19,7 @@ func (a ItemArchetype) GetID() id.UUID {
 
 // Item represents a generic item in the world.
 type Item struct {
-	WorldObject
+	Objectable
 	Position
 	Name string `msgpack:"n,omitempty"`
 }

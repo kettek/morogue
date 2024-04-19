@@ -23,13 +23,15 @@ type Object interface {
 	GetArchetypeID() id.UUID
 	SetArchetype(a Archetype)
 	GetArchetype() Archetype
+	GetContainerWID() id.WID
+	SetContainerWID(id.WID)
 }
 
 func CreateObjectFromArchetype(a Archetype) Object {
 	switch a := a.(type) {
 	case CharacterArchetype:
 		return &Character{
-			WorldObject: WorldObject{
+			Objectable: Objectable{
 				ArchetypeID: a.GetID(),
 				Archetype:   a,
 			},
@@ -37,21 +39,21 @@ func CreateObjectFromArchetype(a Archetype) Object {
 		}
 	case WeaponArchetype:
 		return &Weapon{
-			WorldObject: WorldObject{
+			Objectable: Objectable{
 				ArchetypeID: a.GetID(),
 				Archetype:   a,
 			},
 		}
 	case ArmorArchetype:
 		return &Armor{
-			WorldObject: WorldObject{
+			Objectable: Objectable{
 				ArchetypeID: a.GetID(),
 				Archetype:   a,
 			},
 		}
 	case DoorArchetype:
 		return &Door{
-			WorldObject: WorldObject{
+			Objectable: Objectable{
 				ArchetypeID: a.GetID(),
 				Archetype:   a,
 			},
@@ -61,7 +63,7 @@ func CreateObjectFromArchetype(a Archetype) Object {
 		}
 	case FoodArchetype:
 		return &Food{
-			WorldObject: WorldObject{
+			Objectable: Objectable{
 				ArchetypeID: a.GetID(),
 				Archetype:   a,
 			},

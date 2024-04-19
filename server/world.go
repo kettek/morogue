@@ -41,6 +41,9 @@ func newWorld(d *Data) *world {
 		clientChan: make(chan *client, 2),
 	}
 
+	// Increment the WID generator to start at 1, as we use 0 to represent no WID.
+	w.wids.Next()
+
 	return w
 }
 
@@ -127,6 +130,11 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 			w.assignWIDs(char)
 			cl.currentLocation = start
 			cl.currentCharacter = char
+
+			// Set container WIDs for the character's inventory items.
+			for _, o := range char.Inventory {
+				o.SetContainerWID(char.WID)
+			}
 
 			// Send starting location to client.
 			cl.conn.Write(net.LocationMessage{

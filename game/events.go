@@ -187,6 +187,7 @@ func (e EventApply) Type() string {
 type EventConsume struct {
 	Consumer id.WID `msgpack:"c,omitempty"`
 	WID      id.WID
+	Finished bool
 }
 
 // Type returns "consume"

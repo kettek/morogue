@@ -26,7 +26,7 @@ func (d DoorArchetype) GetID() id.UUID {
 
 // Door is a door.
 type Door struct {
-	WorldObject
+	Objectable
 	Position
 	Hurtable
 	Lockable

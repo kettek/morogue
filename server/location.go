@@ -364,6 +364,7 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 			}
 		case game.DesireApply:
 			if t := l.ObjectByWID(d.WID); t != nil {
+				// The separation of edible from appliable logic is a bit annoying since they share so much.
 				if _, isAppliable := t.(Appliable); isAppliable {
 					var e game.Event
 					if d.Apply {
@@ -383,12 +384,24 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 					} else if e != nil {
 						events = append(events, e)
 					}
-					// TODO: Make eating foods make different sounds, such as "slurp", "crunch", "burp", etc.
-					events = append(events, game.EventSound{
-						FromPosition: c.GetPosition(),
-						Position:     c.GetPosition(),
-						Message:      "*munch*",
-					})
+					if e, ok := e.(game.EventConsume); ok {
+						if e.Finished {
+							events = append(events, game.EventSound{
+								FromPosition: c.GetPosition(),
+								Position:     c.GetPosition(),
+								Message:      "*burp*",
+							})
+							// Destroy the item.
+							events = append(events, l.DestroyObject(t))
+						} else {
+							// TODO: Make eating foods make different sounds, such as "slurp", "crunch", etc.
+							events = append(events, game.EventSound{
+								FromPosition: c.GetPosition(),
+								Position:     c.GetPosition(),
+								Message:      "*munch*",
+							})
+						}
+					}
 				} else {
 					c.Events = append(c.Events, game.EventNotice{
 						Message: "You can't apply that.",
@@ -397,7 +410,7 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 			}
 		case game.DesirePickup:
 			if t := l.ObjectByWID(d.WID); t != nil {
-				if l.isObjectContained(t) {
+				if t.GetContainerWID() > 0 {
 					c.Events = append(c.Events, game.EventNotice{
 						Message: "You can't pick that up.",
 					})
@@ -524,22 +537,17 @@ func (l *location) stopTurns() {
 	l.inTurns = false
 }
 
-func (l *location) isObjectContained(o game.Object) bool {
-	switch t := o.(type) {
-	case *game.Item:
-		if t.Container != 0 {
-			return true
-		}
-	case *game.Armor:
-		if t.Container != 0 {
-			return true
-		}
-	case *game.Weapon:
-		if t.Container != 0 {
-			return true
+// DestroyObject removes the given object from the location and any container it may be in. EventRemove is returned, which should be sent from the server to the client.
+func (l *location) DestroyObject(target game.Object) game.Event {
+	if container := target.GetContainerWID(); container > 0 {
+		if c := l.Character(container); c != nil {
+			c.Drop(target)
 		}
 	}
-	return false
+	l.removeObject(target)
+	return game.EventRemove{
+		WID: target.GetWID(),
+	}
 }
 
 // TODO: Allow returning world-munging requests.

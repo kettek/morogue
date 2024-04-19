@@ -21,7 +21,7 @@ func (a FoodArchetype) GetID() id.UUID {
 
 // Food represents a food object in the world.
 type Food struct {
-	WorldObject
+	Objectable
 	Position
 	Edible
 	Name string `msgpack:"n,omitempty"`

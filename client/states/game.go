@@ -405,6 +405,8 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 				for i, o := range character.Inventory {
 					realObj := state.location.ObjectByWID(o.GetWID())
 					character.Inventory[i] = realObj
+					// Also assign the object's container to be the player.
+					o.SetContainerWID(state.characterWID)
 				}
 				state.refreshInventory(ctx)
 			}
@@ -418,6 +420,8 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 				for i, o := range character.Inventory {
 					realObj := state.location.ObjectByWID(o.GetWID())
 					character.Inventory[i] = realObj
+					// Also assign the object's container to be the player.
+					o.SetContainerWID(state.characterWID)
 				}
 				state.refreshInventory(ctx)
 				state.refreshStatbar(ctx)
@@ -491,6 +495,21 @@ func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 			state.assignObjectArchetype(evt.Object)
 		}
 	case game.EventRemove:
+		if o := state.location.ObjectByWID(evt.WID); o != nil {
+			if co := o.GetContainerWID(); co > 0 {
+				if c := state.location.ObjectByWID(co); c != nil {
+					switch c := c.(type) {
+					case *game.Character:
+						// Just use drop to remove from character.
+						c.Drop(o)
+						// Refresh the inventory if its the current player.
+						if c == state.Character() {
+							state.refreshInventory(ctx)
+						}
+					}
+				}
+			}
+		}
 		state.location.Objects.RemoveByWID(evt.WID)
 	case game.EventPosition:
 		if c := state.location.Character(evt.WID); c != nil {

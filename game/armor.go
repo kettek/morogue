@@ -102,7 +102,7 @@ func (a ArmorArchetype) RangeString() string {
 
 // Armor is a weapon.
 type Armor struct {
-	WorldObject
+	Objectable
 	Position
 	Appliable
 }
