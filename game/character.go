@@ -146,6 +146,8 @@ func (c *Character) applyArmor(a *Armor, force bool) Event {
 
 	a.Apply()
 
+	c.Hurtable.CalculateArmorFromCharacter(c)
+
 	return EventApply{
 		Applier: c.WID,
 		WID:     a.WID,
@@ -218,6 +220,8 @@ func (c *Character) unapplyArmor(a *Armor, force bool) Event {
 	}
 
 	a.Unapply()
+
+	c.Hurtable.CalculateArmorFromCharacter(c)
 
 	return EventApply{
 		Applier: c.WID,

@@ -15,6 +15,7 @@ import (
 type Statbar struct {
 	container        *widget.Container
 	innerContainer   *widget.Container
+	armorsContainer  *widget.Container
 	damagesContainer *widget.Container
 	healthContainer  *widget.Container
 	hungerContainer  *widget.Container
@@ -42,6 +43,19 @@ func (hb *Statbar) Init(container *widget.Container, ctx ifs.RunContext) {
 			}),
 		),
 	)
+
+	hb.armorsContainer = widget.NewContainer(
+		widget.ContainerOpts.Layout(widget.NewRowLayout(
+			widget.RowLayoutOpts.Direction(widget.DirectionHorizontal),
+		)),
+		widget.ContainerOpts.WidgetOpts(
+			widget.WidgetOpts.LayoutData(widget.AnchorLayoutData{
+				StretchHorizontal:  false,
+				HorizontalPosition: widget.AnchorLayoutPositionStart,
+			}),
+		),
+	)
+	hb.innerContainer.AddChild(hb.armorsContainer)
 
 	hb.damagesContainer = widget.NewContainer(
 		widget.ContainerOpts.Layout(widget.NewRowLayout(
@@ -87,6 +101,38 @@ func (hb *Statbar) Init(container *widget.Container, ctx ifs.RunContext) {
 
 func (hb *Statbar) Refresh(ctx ifs.RunContext, c *game.Character, a game.CharacterArchetype) {
 	if c.Archetype != nil {
+		{
+			hb.armorsContainer.RemoveChildren()
+			c.Hurtable.CalculateArmorFromCharacter(c)
+
+			container := widget.NewContainer(
+				widget.ContainerOpts.Layout(widget.NewRowLayout(
+					widget.RowLayoutOpts.Direction(widget.DirectionHorizontal),
+					widget.RowLayoutOpts.Padding(widget.Insets{Left: 8, Right: 8}),
+				)),
+			)
+
+			value := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(c.Hurtable.ArmorRangeString(), ctx.UI.BodyCopyFace, game.ArmorTypeNone.Color()))
+
+			var icon *ebiten.Image
+
+			icon = embed.IconDefense
+			// TODO: Properly show armor type...
+
+			graphic := widget.NewGraphic(
+				widget.GraphicOpts.Image(icon),
+				widget.GraphicOpts.WidgetOpts(
+					widget.WidgetOpts.LayoutData(widget.RowLayoutData{
+						Position: widget.RowLayoutPositionCenter,
+					}),
+				),
+			)
+
+			container.AddChild(value)
+			container.AddChild(graphic)
+			hb.armorsContainer.AddChild(container)
+		}
+
 		hb.damagesContainer.RemoveChildren()
 		c.Damager.CalculateFromCharacter(c)
 		for _, d := range c.Damages {

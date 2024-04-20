@@ -9,6 +9,8 @@ type Hurtable struct {
 	MaxHealth int `msgpack:"H,omitempty"`
 	Downs     int `msgpack:"d,omitempty"`
 	MaxDowns  int `msgpack:"D,omitempty"`
+	MinArmor  int `msgpack:"a,omitempty"`
+	MaxArmor  int `msgpack:"A,omitempty"`
 }
 
 func (h *Hurtable) CalculateFromObject(o Object) {
@@ -30,9 +32,34 @@ func (h *Hurtable) CalculateFromCharacter(c *Character) {
 	h.MaxDowns = 1 + int(c.Archetype.(CharacterArchetype).Funk/4)
 }
 
+func (h *Hurtable) CalculateArmorFromCharacter(c *Character) {
+	h.MinArmor = int(c.Archetype.(CharacterArchetype).Swole) / 2
+	h.MaxArmor = int(c.Archetype.(CharacterArchetype).Zooms) / 2
+
+	for _, a := range c.Inventory {
+		if a, ok := a.(*Armor); ok {
+			if !a.Applied || a.Archetype == nil {
+				continue
+			}
+			h.MinArmor += a.Archetype.(ArmorArchetype).MinArmor
+			h.MaxArmor += a.Archetype.(ArmorArchetype).MaxArmor
+		}
+	}
+}
+
 // String returns a string representation of the health.
 func (h Hurtable) String() string {
 	return fmt.Sprintf("%d/%d", h.Health, h.MaxHealth)
+}
+
+func (h Hurtable) ArmorRangeString() string {
+	if h.MinArmor == 0 {
+		return fmt.Sprintf("〜%d", h.MaxArmor)
+	}
+	if h.MinArmor == h.MaxArmor {
+		return fmt.Sprintf("%d", h.MaxArmor)
+	}
+	return fmt.Sprintf("%d〜%d", h.MinArmor, h.MaxArmor)
 }
 
 func (h *Hurtable) TakeHeal(heal int) {
