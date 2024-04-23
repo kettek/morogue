@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math/rand"
 	"time"
 
 	"github.com/kettek/morogue/game"
@@ -259,6 +260,9 @@ func (u *universe) updateClient(cl *client) error {
 								}
 							}
 						}
+						// Calculate default hunger (half of max + random half max).
+						char.Hungerable.CalculateFromCharacter(char)
+						char.Hungerable.Hunger = char.Hungerable.MaxHunger/2 + rand.Intn(char.Hungerable.MaxHunger/2)
 						// Save the changes.
 						u.accounts.SaveAccount(cl.account)
 						// Let 'em know it went ok

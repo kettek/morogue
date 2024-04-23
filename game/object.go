@@ -67,6 +67,10 @@ func CreateObjectFromArchetype(a Archetype) Object {
 				ArchetypeID: a.GetID(),
 				Archetype:   a,
 			},
+			Edible: Edible{
+				Calories:        a.Calories,
+				CurrentCalories: a.Calories,
+			},
 		}
 	}
 	return nil

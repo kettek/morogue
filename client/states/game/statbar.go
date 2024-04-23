@@ -210,6 +210,8 @@ func (hb *Statbar) Refresh(ctx ifs.RunContext, c *game.Character, a game.Charact
 		}
 
 		{
+			c.Hungerable.CalculateFromCharacter(c)
+
 			hb.hungerContainer.RemoveChildren()
 			// TODO: Implement hunger
 			container := widget.NewContainer(
@@ -218,7 +220,17 @@ func (hb *Statbar) Refresh(ctx ifs.RunContext, c *game.Character, a game.Charact
 					widget.RowLayoutOpts.Padding(widget.Insets{Left: 8, Right: 8}),
 				)),
 			)
-			value := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text("1000", ctx.UI.BodyCopyFace, color.RGBA{255, 255, 32, 255}))
+
+			minText := fmt.Sprintf("%d", c.Hungerable.Hunger)
+			for i := len(minText); i < 4; i++ {
+				minText = " " + minText
+			}
+			maxText := fmt.Sprintf("%d", c.Hungerable.MaxHunger)
+			for i := len(maxText); i < 4; i++ {
+				maxText = maxText + " "
+			}
+
+			value := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s/%s", minText, maxText), ctx.UI.BodyCopyFace, color.RGBA{255, 255, 32, 255}))
 
 			graphic := widget.NewGraphic(
 				widget.GraphicOpts.Image(embed.IconHunger),
