@@ -415,6 +415,8 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 			if character := state.Character(); character != nil {
 				state.ensureObjects(m.Inventory)
 
+				character.Attributes = m.Attributes
+
 				character.Inventory = m.Inventory
 				// Transform the inventory to reference our local objects.
 				for i, o := range character.Inventory {

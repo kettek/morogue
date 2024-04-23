@@ -89,6 +89,10 @@ func (w *Wrapper) Message() Message {
 		var m SkillsMessage
 		msgpack.Unmarshal(w.Data, &m)
 		return m
+	case (AttributesMessage{}).Type():
+		var m AttributesMessage
+		msgpack.Unmarshal(w.Data, &m)
+		return m
 	case (EventMessage{}).Type():
 		var m EventMessage
 		msgpack.Unmarshal(w.Data, &m)
@@ -346,9 +350,10 @@ func (m LocationMessage) Type() string {
 }
 
 type OwnerMessage struct {
-	WID       id.WID       `msgpack:"wid,omitempty"`
-	Inventory game.Objects `msgpack:"i,omitempty"`
-	Skills    game.Skills  `msgpack:"s,omitempty"`
+	WID        id.WID          `msgpack:"wid,omitempty"`
+	Inventory  game.Objects    `msgpack:"i,omitempty"`
+	Skills     game.Skills     `msgpack:"s,omitempty"`
+	Attributes game.Attributes `msgpack:"a,omitempty"`
 }
 
 func (m OwnerMessage) Type() string {
@@ -371,6 +376,14 @@ type SkillsMessage struct {
 
 func (m SkillsMessage) Type() string {
 	return "skills"
+}
+
+type AttributesMessage struct {
+	Attributes game.Attributes `msgpack:"a,omitempty"`
+}
+
+func (m AttributesMessage) Type() string {
+	return "attributes"
 }
 
 type DesireMessage struct {

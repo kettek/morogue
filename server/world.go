@@ -145,9 +145,10 @@ func (w *world) loop(addToUniverseChan chan *client, clientRemoveChan chan *clie
 
 			// Send client their character owner message
 			cl.conn.Write(net.OwnerMessage{
-				WID:       char.WID,
-				Inventory: char.Inventory,
-				Skills:    char.Skills,
+				WID:        char.WID,
+				Inventory:  char.Inventory,
+				Skills:     char.Skills,
+				Attributes: char.Attributes,
 			})
 
 			// Send create to clients in location.
