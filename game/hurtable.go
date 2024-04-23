@@ -25,16 +25,16 @@ func (h *Hurtable) CalculateFromObject(o Object) {
 
 func (h *Hurtable) CalculateFromCharacter(c *Character) {
 	health := 5
-	health += int(c.Archetype.(CharacterArchetype).Swole) * 2
-	t := (c.Archetype.(CharacterArchetype).Swole + c.Archetype.(CharacterArchetype).Zooms + c.Archetype.(CharacterArchetype).Brains + c.Archetype.(CharacterArchetype).Funk) / 4
+	health += int(c.Swole()) * 2
+	t := (c.Swole() + c.Zooms() + c.Brains() + c.Funk()) / 4
 
 	h.MaxHealth = health + int(t)
-	h.MaxDowns = 1 + int(c.Archetype.(CharacterArchetype).Funk/4)
+	h.MaxDowns = 1 + int(c.Funk()/4)
 }
 
 func (h *Hurtable) CalculateArmorFromCharacter(c *Character) {
-	h.MinArmor = int(c.Archetype.(CharacterArchetype).Swole) / 2
-	h.MaxArmor = int(c.Archetype.(CharacterArchetype).Zooms) / 2
+	h.MinArmor = int(c.Swole()) / 2
+	h.MaxArmor = int(c.Zooms()) / 2
 
 	for _, a := range c.Inventory {
 		if a, ok := a.(*Armor); ok {
