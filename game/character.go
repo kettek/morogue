@@ -45,6 +45,7 @@ type Character struct {
 	Hurtable
 	Damager
 	Movable
+	Hungerable
 	Events     []Event    `msgpack:"-" json:"-"` // Events that have happened to the character. These are only sent to the owning client.
 	Desire     Desire     `msgpack:"-" json:"-"` // The current desire of the character. Used server-side.
 	LastDesire Desire     `msgpack:"-" json:"-"` // Last desire processed. Used server-side.
@@ -280,6 +281,26 @@ func (c *Character) Drop(o Object) Event {
 		Object:   o,
 		Position: c.GetPosition(),
 	}
+}
+
+// Swole returns the calculated swole of the character.
+func (c *Character) Swole() AttributeLevel {
+	return c.Attributes.Swole + c.Archetype.(CharacterArchetype).Swole
+}
+
+// Zooms returns the calculated zooms of the character.
+func (c *Character) Zooms() AttributeLevel {
+	return c.Attributes.Zooms + c.Archetype.(CharacterArchetype).Zooms
+}
+
+// Brains returns the calculated brains of the character.
+func (c *Character) Brains() AttributeLevel {
+	return c.Attributes.Brains + c.Archetype.(CharacterArchetype).Brains
+}
+
+// Funk returns the calculated funk of the character.
+func (c *Character) Funk() AttributeLevel {
+	return c.Attributes.Funk + c.Archetype.(CharacterArchetype).Funk
 }
 
 // Health represents a character's health.
