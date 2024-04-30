@@ -133,9 +133,13 @@ func (l *location) moveCharacter(wid id.WID, dir game.MoveDirection) error {
 
 	// FIXME: This isn't the right place for this. There should be some sort of "actions" economy that is used to increase hunger.
 	ch.Movable.MoveCounter++
-	if ch.Movable.MoveCounter > 10 { // I guess 10 steps are reasonable enough for 1 calorie.
+	if ch.Movable.MoveCounter > 10 { // I guess 10 steps are reasonable enough for energy checks.
 		ch.Movable.MoveCounter = 0
-		ch.UseEnergy(1) // FIXME: Maybe this should be based upon player stats and terrain.
+		energy := 1 + int(ch.Attributes.Swole/2) - int(ch.Attributes.Zooms/4)
+		if energy < 1 {
+			energy = 1
+		}
+		ch.UseEnergy(energy)
 	}
 
 	return nil
