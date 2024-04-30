@@ -121,8 +121,9 @@ func addObjectInfo(ctx ifs.RunContext, object game.Object, arch game.Archetype, 
 		container.AddChild(armorLine)
 		container.AddChild(desc)
 	case game.FoodArchetype:
+		o := object.(*game.Food)
 		title := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%s", a.Title), ctx.UI.BodyCopyFace, color.White))
-		calories := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%d kcal", a.Calories), ctx.UI.BodyCopyFace, color.NRGBA{R: 200, G: 200, B: 200, A: 255}))
+		calories := widget.NewText(widget.TextOpts.ProcessBBCode(true), widget.TextOpts.Text(fmt.Sprintf("%d/%d kcal", o.CurrentCalories, a.Calories), ctx.UI.BodyCopyFace, color.NRGBA{R: 200, G: 200, B: 200, A: 255}))
 		desc := makeDescription(ctx, a.Description)
 
 		foodLine := widget.NewContainer(

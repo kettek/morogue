@@ -186,9 +186,10 @@ func (e EventApply) Type() string {
 // EventConsume notifies the client that the given food was consumed.
 type EventConsume struct {
 	Consumer          id.WID `msgpack:"c,omitempty"`
-	WID               id.WID
-	RemainingCalories int `msgpack:"r,omitempty"`
-	Finished          bool
+	WID               id.WID `msgpack:"w,omitempty"`
+	Calories          int    `msgpack:"C,omitempty"`
+	RemainingCalories int    `msgpack:"r,omitempty"`
+	Finished          bool   `msgpack:"f,omitempty"`
 }
 
 // Type returns "consume"

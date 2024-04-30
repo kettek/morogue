@@ -563,6 +563,7 @@ func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 						if ch == state.Character() {
 							fmt.Printf("You consumed %s\n", food.Title)
 							state.refreshInventory(ctx)
+							state.refreshStatbar(ctx)
 						} else {
 							fmt.Printf("%s consumed %s\n", ch.Name, food.Title)
 						}

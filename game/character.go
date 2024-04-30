@@ -158,12 +158,35 @@ func (c *Character) applyArmor(a *Armor, force bool) Event {
 
 // applyFood consumes a food.
 func (c *Character) applyFood(f *Food) Event {
-	kcals := f.Eat()
+	// Allow overeating up to 30% over max hunger.
+	max := c.MaxHunger + (c.MaxHunger / 3)
+
+	next := f.NextCalories()
+
+	if c.Hunger+next >= max {
+		next -= (c.Hunger + next) - max
+		if next <= 0 {
+			// Cannot eat, too full.
+			return EventNotice{
+				Message: "You're too full to eat that.",
+			}
+		}
+	}
+
+	if c.Hunger+next >= c.MaxHunger {
+		fmt.Println("TODO: Show overeating")
+	}
+
+	f.CurrentCalories -= next
+	c.Hunger += next
+
 	// TODO: Apply effects of food.
 	return EventConsume{
-		Consumer: c.WID,
-		WID:      f.WID,
-		Finished: kcals == 0,
+		Consumer:          c.WID,
+		WID:               f.WID,
+		Calories:          next,
+		RemainingCalories: f.CurrentCalories,
+		Finished:          f.CurrentCalories <= 0,
 	}
 }
 
