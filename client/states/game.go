@@ -571,6 +571,15 @@ func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 				}
 			}
 		}
+	case game.EventHunger:
+		if o := state.location.ObjectByWID(evt.WID); o != nil {
+			if ch := state.location.Character(evt.WID); ch != nil {
+				ch.Hunger = evt.Hunger
+				if ch == state.Character() {
+					state.refreshStatbar(ctx)
+				}
+			}
+		}
 	case game.EventPickup:
 		if o := state.location.ObjectByWID(evt.WID); o != nil {
 			if picker := state.location.ObjectByWID(evt.Picker); picker != nil {

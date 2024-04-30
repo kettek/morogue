@@ -16,3 +16,11 @@ func (h *Hungerable) CalculateFromCharacter(c *Character) {
 	}
 	h.MaxHunger = maxHunger
 }
+
+func (h *Hungerable) UseEnergy(amount int) bool {
+	h.Hunger -= amount
+	if h.Hunger < 0 {
+		h.Hunger = 0
+	}
+	return h.Hunger == 0
+}

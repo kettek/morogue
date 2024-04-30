@@ -64,6 +64,10 @@ func (w *EventWrapper) Event() Event {
 		var d EventConsume
 		msgpack.Unmarshal(w.Data, &d)
 		return d
+	case (EventHunger{}).Type():
+		var d EventHunger
+		msgpack.Unmarshal(w.Data, &d)
+		return d
 	case (EventNotice{}).Type():
 		var d EventNotice
 		msgpack.Unmarshal(w.Data, &d)
@@ -195,6 +199,17 @@ type EventConsume struct {
 // Type returns "consume"
 func (e EventConsume) Type() string {
 	return "consume"
+}
+
+// EventHunger notifies the client that the given object is hungry.
+type EventHunger struct {
+	WID    id.WID `msgpack:"w,omitempty"`
+	Hunger int    `msgpack:"h,omitempty"`
+}
+
+// Type returns "hunger"
+func (e EventHunger) Type() string {
+	return "hunger"
 }
 
 // EventPickup notifies the client that the given item was picked up.

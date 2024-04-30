@@ -130,6 +130,14 @@ func (l *location) moveCharacter(wid id.WID, dir game.MoveDirection) error {
 
 	ch.X = x
 	ch.Y = y
+
+	// FIXME: This isn't the right place for this. There should be some sort of "actions" economy that is used to increase hunger.
+	ch.Movable.MoveCounter++
+	if ch.Movable.MoveCounter > 10 { // I guess 10 steps are reasonable enough for 1 calorie.
+		ch.Movable.MoveCounter = 0
+		ch.UseEnergy(1) // FIXME: Maybe this should be based upon player stats and terrain.
+	}
+
 	return nil
 }
 
@@ -338,6 +346,12 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 					WID:      c.WID,
 					Position: c.Position,
 				})
+				if c.MoveCounter == 0 {
+					events = append(events, game.EventHunger{
+						WID:    c.WID,
+						Hunger: c.Hungerable.Hunger,
+					})
+				}
 			} else {
 				// Make bump sounds if the character is moving in the same direction as their last desire.
 				if last, ok := c.LastDesire.(game.DesireMove); ok {
