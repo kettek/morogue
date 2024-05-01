@@ -685,10 +685,14 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 					continue
 				}
 
+				// This is kind of goofy, but modulate the color of the tile based on its position.
+				v := float32((x+y)%8) / 70.0
+
 				if img := state.data.archetypeImages[*cell.TileID]; img != nil {
 					opts := ebiten.DrawImageOptions{}
 					opts.GeoM.Concat(scrollOpts)
 					opts.GeoM.Translate(float64(px), float64(py))
+					opts.ColorScale.Scale(1.0-v, 1.0-v, 1.0-v, 1.0)
 					ctx.Screen.DrawImage(img, &opts)
 				}
 			}
