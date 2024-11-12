@@ -103,3 +103,13 @@ type DesireOpen struct {
 func (d DesireOpen) Type() string {
 	return "open"
 }
+
+// DesirePing represents the desire to ping a location or WID to other players.
+type DesirePing struct {
+	WID      id.WID   `msgpack:"wid,omitempty"`
+	Position Position `msgpack:"p,omitempty"`
+}
+
+func (d DesirePing) Type() string {
+	return "ping"
+}

@@ -323,3 +323,15 @@ type EventTurn struct {
 func (e EventTurn) Type() string {
 	return "turn"
 }
+
+// EventPing notifies a client that a player has pinged a location.
+type EventPing struct {
+	From     id.WID   `msgpack:"f,omitempty"`
+	Target   id.WID   `msgpack:"t,omitempty"`
+	Position Position `msgpack:"p,omitempty"`
+}
+
+// Type returns "ping"
+func (e EventPing) Type() string {
+	return "ping"
+}
