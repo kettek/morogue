@@ -43,6 +43,10 @@ func (w *DesireWrapper) Desire() Desire {
 		var d DesireOpen
 		msgpack.Unmarshal(w.Data, &d)
 		return d
+	case (DesirePing{}).Type():
+		var d DesirePing
+		msgpack.Unmarshal(w.Data, &d)
+		return d
 	}
 	return nil
 }

@@ -84,6 +84,10 @@ func (w *EventWrapper) Event() Event {
 		var d EventTurn
 		msgpack.Unmarshal(w.Data, &d)
 		return d
+	case (EventPing{}).Type():
+		var d EventPing
+		msgpack.Unmarshal(w.Data, &d)
+		return d
 	}
 	return nil
 }
