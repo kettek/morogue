@@ -29,7 +29,8 @@ func (kickers *Kickers) SetOffset(x, y int) {
 
 // Kicker is a given kicker instance.
 type Kicker struct {
-	offsetX, offsetY int
+	offsetX, offsetY float64
+	forceX, forceY   float64
 	Position         game.Position
 	Lifetime         int
 	Message          string
@@ -39,8 +40,10 @@ type Kicker struct {
 // Add creates and adds a kicker to the world.
 func (kickers *Kickers) Add(kicker Kicker) {
 	// Lightly randomize x and y offset
-	kicker.offsetX = rand.Intn(5) - 2
-	kicker.offsetY = rand.Intn(5) - 2
+	kicker.offsetX = rand.Float64()*4 - 2
+	kicker.offsetY = -rand.Float64()
+	kicker.forceX = -0.5 + rand.Float64()
+	kicker.forceY = -rand.Float64() - 1
 	kickers.kickers = append(kickers.kickers, &kicker)
 }
 
@@ -49,9 +52,9 @@ func (kickers *Kickers) Update() {
 	i := 0
 	for _, kicker := range kickers.kickers {
 		if kicker.Lifetime > 0 {
-			if kicker.Lifetime%2 == 0 {
-				kicker.offsetY--
-			}
+			kicker.forceY += 0.05
+			kicker.offsetY += kicker.forceY
+			kicker.offsetX += kicker.forceX
 			kicker.Lifetime--
 			kickers.kickers[i] = kicker
 			i++
@@ -78,8 +81,8 @@ func (kickers *Kickers) Draw(ctx ifs.DrawContext) {
 			oclr.A = uint8(float64(kicker.Lifetime) / 10 * 100)
 		}
 
-		x := kicker.Position.X*cw + kickers.offsetX + (cw / 2) + kicker.offsetX
-		y := kicker.Position.Y*ch + kickers.offsetY + kicker.offsetY
+		x := kicker.Position.X*cw + kickers.offsetX + (cw / 2) + int(kicker.offsetX)
+		y := kicker.Position.Y*ch + kickers.offsetY + int(kicker.offsetY)
 
 		ctx.Txt.SetColor(clr)
 		ctx.Txt.SetOutlineColor(oclr)
