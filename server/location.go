@@ -113,23 +113,28 @@ func (l *location) removeCharacter(wid id.WID) error {
 	return ErrCharacterNotInLocation
 }
 
-func (l *location) moveCharacter(wid id.WID, dir game.MoveDirection) error {
+func (l *location) moveCharacter(wid id.WID, dir game.MoveDirection) (events []game.Event, err error) {
 	ch := l.Character(wid)
 	if ch == nil {
-		return ErrCharacterNotInLocation
+		return nil, ErrCharacterNotInLocation
 	}
 	x, y := dir.Position()
 	x += ch.X
 	y += ch.Y
 
 	if cell, err := l.Cells.At(x, y); err != nil {
-		return err
+		return nil, err
 	} else if cell.Blocks == game.MovementAll {
-		return ErrMovementBlocked
+		return nil, ErrMovementBlocked
 	}
 
 	ch.X = x
 	ch.Y = y
+
+	events = append(events, game.EventPosition{
+		WID:      ch.WID,
+		Position: ch.Position,
+	})
 
 	// FIXME: This isn't the right place for this. There should be some sort of "actions" economy that is used to increase hunger.
 	ch.Movable.MoveCounter++
@@ -139,10 +144,21 @@ func (l *location) moveCharacter(wid id.WID, dir game.MoveDirection) error {
 		if energy < 1 {
 			energy = 1
 		}
-		ch.UseEnergy(energy)
+		if ch.UseEnergy(energy) {
+			events = append(events, game.EventHunger{
+				WID:    ch.WID,
+				Hunger: ch.Hungerable.Hunger,
+			})
+			if ch.TakeHeal(ch.HealthRegen) {
+				events = append(events, game.EventHealth{
+					Target: ch.WID,
+					Health: ch.Hurtable.Health,
+				})
+			}
+		}
 	}
 
-	return nil
+	return events, nil
 }
 
 type wfcTile struct {
@@ -345,17 +361,8 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 		}
 		switch d := c.Desire.(type) {
 		case game.DesireMove:
-			if err := l.moveCharacter(c.WID, d.Direction); err == nil {
-				events = append(events, game.EventPosition{
-					WID:      c.WID,
-					Position: c.Position,
-				})
-				if c.MoveCounter == 0 {
-					events = append(events, game.EventHunger{
-						WID:    c.WID,
-						Hunger: c.Hungerable.Hunger,
-					})
-				}
+			if moveEvents, err := l.moveCharacter(c.WID, d.Direction); err == nil {
+				events = append(events, moveEvents...)
 			} else {
 				// Make bump sounds if the character is moving in the same direction as their last desire.
 				if last, ok := c.LastDesire.(game.DesireMove); ok {

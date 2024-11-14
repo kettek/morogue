@@ -5,12 +5,13 @@ import (
 )
 
 type Hurtable struct {
-	Health    int `msgpack:"h,omitempty"`
-	MaxHealth int `msgpack:"H,omitempty"`
-	Downs     int `msgpack:"d,omitempty"`
-	MaxDowns  int `msgpack:"D,omitempty"`
-	MinArmor  int `msgpack:"a,omitempty"`
-	MaxArmor  int `msgpack:"A,omitempty"`
+	Health      int `msgpack:"h,omitempty"`
+	MaxHealth   int `msgpack:"H,omitempty"`
+	HealthRegen int `msgpack:"r,omitempty"`
+	Downs       int `msgpack:"d,omitempty"`
+	MaxDowns    int `msgpack:"D,omitempty"`
+	MinArmor    int `msgpack:"a,omitempty"`
+	MaxArmor    int `msgpack:"A,omitempty"`
 }
 
 func (h *Hurtable) CalculateFromObject(o Object) {
@@ -30,6 +31,8 @@ func (h *Hurtable) CalculateFromCharacter(c *Character) {
 
 	h.MaxHealth = health + int(t)
 	h.MaxDowns = 1 + int(c.Funk()/4)
+
+	h.HealthRegen = 1 + int(c.Zooms()+c.Funk()/2+c.Swole()/4)/3
 }
 
 func (h *Hurtable) CalculateArmorFromCharacter(c *Character) {
@@ -62,8 +65,15 @@ func (h Hurtable) ArmorRangeString() string {
 	return fmt.Sprintf("%d〜%d", h.MinArmor, h.MaxArmor)
 }
 
-func (h *Hurtable) TakeHeal(heal int) {
+func (h *Hurtable) TakeHeal(heal int) bool {
+	if h.Health == h.MaxHealth {
+		return false
+	}
 	h.Health += heal
+	if h.Health > h.MaxHealth {
+		h.Health = h.MaxHealth
+	}
+	return true
 }
 
 func (h *Hurtable) TakeDamages(damages []DamageResult) {

@@ -22,5 +22,5 @@ func (h *Hungerable) UseEnergy(amount int) bool {
 	if h.Hunger < 0 {
 		h.Hunger = 0
 	}
-	return h.Hunger == 0
+	return h.Hunger != 0
 }

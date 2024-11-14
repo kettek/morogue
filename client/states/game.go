@@ -43,6 +43,7 @@ type Game struct {
 	pather   clgame.Pather
 	pinger   clgame.Pinger
 	sounds   clgame.Sounds
+	kickers  clgame.Kickers
 	//
 	inventory clgame.Inventory
 	below     clgame.Below
@@ -75,6 +76,7 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 	state.scroller.SetHandler(func(x, y int) {
 		state.grid.SetOffset(x, y)
 		state.sounds.SetOffset(x, y)
+		state.kickers.SetOffset(x, y)
 		state.pather.SetOffset(x, y)
 		state.pinger.SetOffset(x, y)
 	})
@@ -459,6 +461,7 @@ func (state *Game) Update(ctx ifs.RunContext) error {
 	state.below.Update(ctx)
 
 	state.sounds.Update()
+	state.kickers.Update()
 
 	if state.location != nil {
 		if character := state.Character(); character != nil {
@@ -636,7 +639,30 @@ func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 	case game.EventDamages:
 		fmt.Println("TODO: Handle damages", evt)
 	case game.EventHealth:
-		fmt.Println("TODO: Handle health", evt)
+		if o := state.location.ObjectByWID(evt.Target); o != nil {
+			if ch := state.location.Character(evt.Target); ch != nil {
+				diff := evt.Health - ch.Health
+				ch.Health = evt.Health
+				if ch == state.Character() {
+					state.refreshStatbar(ctx)
+				}
+				msg := fmt.Sprintf("%d", diff)
+				clr := color.NRGBA{255, 0, 0, 255}
+				if diff > 0 {
+					msg = "+" + msg
+					clr = color.NRGBA{0, 255, 0, 255}
+				}
+				state.kickers.Add(clgame.Kicker{
+					Message: msg,
+					Position: game.Position{
+						X: ch.X,
+						Y: ch.Y,
+					},
+					Lifetime: 60,
+					Color:    clr,
+				})
+			}
+		}
 	}
 }
 
@@ -752,6 +778,7 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 		ctx.Txt.Restore()
 
 		state.sounds.Draw(ctx)
+		state.kickers.Draw(ctx)
 		state.pinger.Draw(ctx)
 	}
 
