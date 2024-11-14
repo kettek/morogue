@@ -149,7 +149,12 @@ func (l *location) moveCharacter(wid id.WID, dir game.MoveDirection) (events []g
 				WID:    ch.WID,
 				Hunger: ch.Hungerable.Hunger,
 			})
-			if ch.TakeHeal(ch.HealthRegen) {
+			regen := ch.HealthRegen
+			// Might as well have a 1% chance to double heal per Funk point.
+			if rand.Float64() < float64(ch.Attributes.Funk)/100 {
+				regen *= 2
+			}
+			if ch.TakeHeal(regen) {
 				events = append(events, game.EventHealth{
 					Target: ch.WID,
 					Health: ch.Hurtable.Health,

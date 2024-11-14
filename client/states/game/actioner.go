@@ -33,6 +33,8 @@ func (actioner *Actioner) Update(binds Binds) game.Desire {
 		d = game.DownMoveDirection
 	} else if binds.IsActionHeld("move-up") == 0 {
 		d = game.UpMoveDirection
+	} else if binds.IsActionHeld("wait") == 0 {
+		d = game.CenterMoveDirection
 	}
 	if d != 0 {
 		return game.DesireMove{

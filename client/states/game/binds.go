@@ -24,6 +24,7 @@ func (b *Binds) Init() {
 	b.heldActions = make(map[Action]int)
 
 	// FIXME: Read this in from a binds json.
+	b.SetActionKeys("wait", []ebiten.Key{ebiten.KeyKP5, ebiten.KeyPeriod})
 	b.SetActionKeys("move-left", []ebiten.Key{ebiten.KeyArrowLeft, ebiten.KeyA, ebiten.KeyH})
 	b.SetActionKeys("move-right", []ebiten.Key{ebiten.KeyArrowRight, ebiten.KeyD, ebiten.KeyL})
 	b.SetActionKeys("move-up", []ebiten.Key{ebiten.KeyArrowUp, ebiten.KeyW, ebiten.KeyK})
