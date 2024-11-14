@@ -38,6 +38,12 @@ var IconDefense *ebiten.Image
 var IconHealth *ebiten.Image
 var IconHunger *ebiten.Image
 
+var PingLook *ebiten.Image
+var PingTarget *ebiten.Image
+var PingDanger *ebiten.Image
+var PingBasic *ebiten.Image
+var PingDefend *ebiten.Image
+
 func Setup() {
 	f, err := Assets.Open("images/icon.png")
 	if err != nil {
@@ -135,6 +141,41 @@ func Setup() {
 	}
 	defer f.Close()
 	IconHunger, _, _ = ebitenutil.NewImageFromReader(f)
+
+	f, err = Assets.Open("images/ping-look.png")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	PingLook, _, _ = ebitenutil.NewImageFromReader(f)
+
+	f, err = Assets.Open("images/ping-target.png")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	PingTarget, _, _ = ebitenutil.NewImageFromReader(f)
+
+	f, err = Assets.Open("images/ping-danger.png")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	PingDanger, _, _ = ebitenutil.NewImageFromReader(f)
+
+	f, err = Assets.Open("images/ping-basic.png")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	PingBasic, _, _ = ebitenutil.NewImageFromReader(f)
+
+	f, err = Assets.Open("images/ping-defend.png")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	PingDefend, _, _ = ebitenutil.NewImageFromReader(f)
 
 	//
 	b, err := Assets.ReadFile("fonts/x12y16pxMaruMonica.ttf")

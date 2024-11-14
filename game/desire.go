@@ -112,6 +112,7 @@ func (d DesireOpen) Type() string {
 type DesirePing struct {
 	WID      id.WID   `msgpack:"wid,omitempty"`
 	Position Position `msgpack:"p,omitempty"`
+	Kind     string   `msgpack:"k,omitempty"`
 }
 
 func (d DesirePing) Type() string {

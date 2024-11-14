@@ -41,6 +41,7 @@ type Game struct {
 	grid     clgame.Grid
 	actioner clgame.Actioner
 	pather   clgame.Pather
+	pinger   clgame.Pinger
 	sounds   clgame.Sounds
 	//
 	inventory clgame.Inventory
@@ -75,6 +76,7 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 		state.grid.SetOffset(x, y)
 		state.sounds.SetOffset(x, y)
 		state.pather.SetOffset(x, y)
+		state.pinger.SetOffset(x, y)
 	})
 	state.grid.SetColor(color.NRGBA{255, 255, 255, 30})
 	state.grid.SetHeldHandler(func(x, y int) {
@@ -88,6 +90,16 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 		path.AllowDiagonals(true)
 		state.pather.Steps = path.Compute(state.Character().X, state.Character().Y, x, y)
 	})
+	state.pinger.Init(nil, ifs.RunContext{})
+	state.pinger.PingLocation = func(x, y int, kind string) {
+		state.sendDesire(state.characterWID, game.DesirePing{
+			Position: game.Position{
+				X: x,
+				Y: y,
+			},
+			Kind: kind,
+		})
+	}
 
 	state.inventory.Data = data
 	state.inventory.DropItem = func(wid id.WID) {
@@ -355,6 +367,7 @@ func (state *Game) ensureObjects(objects game.Objects) {
 func (state *Game) Update(ctx ifs.RunContext) error {
 	state.ui.Update()
 	state.grid.Update(ctx)
+	state.pinger.Update(ctx)
 	select {
 	case msg := <-state.messageChan:
 		switch m := msg.(type) {
@@ -618,6 +631,8 @@ func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 		}
 	case game.EventTurn:
 		fmt.Println("turn", evt.Turn)
+	case game.EventPing:
+		state.pinger.Add(evt.Position, evt.Kind)
 	case game.EventDamages:
 		fmt.Println("TODO: Handle damages", evt)
 	case game.EventHealth:
@@ -737,6 +752,7 @@ func (state *Game) Draw(ctx ifs.DrawContext) {
 		ctx.Txt.Restore()
 
 		state.sounds.Draw(ctx)
+		state.pinger.Draw(ctx)
 	}
 
 	state.ui.Draw(ctx.Screen)

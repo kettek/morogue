@@ -531,6 +531,13 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 					Message: "There is nothing there to open.",
 				})
 			}
+		case game.DesirePing:
+			events = append(events, game.EventPing{
+				From:     c.WID,
+				Position: d.Position,
+				Target:   d.WID,
+				Kind:     d.Kind,
+			})
 		}
 		c.LastDesire = c.Desire
 		c.Desire = nil

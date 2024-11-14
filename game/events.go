@@ -333,6 +333,7 @@ type EventPing struct {
 	From     id.WID   `msgpack:"f,omitempty"`
 	Target   id.WID   `msgpack:"t,omitempty"`
 	Position Position `msgpack:"p,omitempty"`
+	Kind     string   `msgpack:"k,omitempty"`
 }
 
 // Type returns "ping"
