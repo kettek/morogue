@@ -10,6 +10,7 @@ import (
 // ArmorType is the type the armor is considered as.
 type ArmorType uint8
 
+// Our armor types.
 const (
 	ArmorTypeNone ArmorType = iota
 	ArmorTypeLight

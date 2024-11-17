@@ -27,6 +27,7 @@ type Object interface {
 	SetContainerWID(id.WID)
 }
 
+// CreateObjectFromArchetype creates an Object interface from an Archetype interface.
 func CreateObjectFromArchetype(a Archetype) Object {
 	switch a := a.(type) {
 	case CharacterArchetype:
@@ -76,20 +77,25 @@ func CreateObjectFromArchetype(a Archetype) Object {
 	return nil
 }
 
+// RawMessage is used to wrap JSON to be later unmarshalled.
 type RawMessage []byte
 
+// MarshalMsgpack marshals the RawMessage to msgpack.
 func (m RawMessage) MarshalMsgpack() ([]byte, error) {
 	return msgpack.Marshal((msgpack.RawMessage)(m))
 }
 
+// UnmarshalMsgpack unmarshals the RawMessage from msgpack.
 func (m *RawMessage) UnmarshalMsgpack(b []byte) error {
 	return msgpack.Unmarshal(b, (*msgpack.RawMessage)(m))
 }
 
+// MarshalJSON marshals the RawMessage to JSON.
 func (m RawMessage) MarshalJSON() ([]byte, error) {
 	return json.Marshal((json.RawMessage)(m))
 }
 
+// UnmarshalJSON unmarshals the RawMessage from JSON.
 func (m *RawMessage) UnmarshalJSON(b []byte) error {
 	return json.Unmarshal(b, (*json.RawMessage)(m))
 }

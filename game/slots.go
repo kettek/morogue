@@ -8,6 +8,7 @@ import (
 // Slot is a slot used for equipment.
 type Slot string
 
+// Our Slots.
 const (
 	SlotNone     Slot = ""
 	SlotHead     Slot = "head"
@@ -124,6 +125,7 @@ func (s SlotMap) Unapply(slots Slots) error {
 	return nil
 }
 
+// Our slot errors.
 var (
 	ErrMissingSlot  = errors.New("missing slot")
 	ErrMissingSlots = errors.New("missing slots")

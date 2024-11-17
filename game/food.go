@@ -11,10 +11,12 @@ type FoodArchetype struct {
 	Calories    int    `msgpack:"c,omitempty"`
 }
 
+// Type returns "food".
 func (a FoodArchetype) Type() string {
 	return "food"
 }
 
+// GetID returns the ID of the archetype.
 func (a FoodArchetype) GetID() id.UUID {
 	return a.ID
 }

@@ -19,6 +19,7 @@ type archetypeWrapper struct {
 	ID string `json:"id"`
 }
 
+// DecodeArchetype decodes an Archetype wrapped by an archetypeWrapper.
 func DecodeArchetype(bytes []byte, rootPath string) (Archetype, error) {
 	var w archetypeWrapper
 	err := json.Unmarshal(bytes, &w)

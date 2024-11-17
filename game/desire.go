@@ -56,6 +56,7 @@ type DesireMove struct {
 	Direction MoveDirection `msgpack:"d,omitempty"`
 }
 
+// Type returns "move".
 func (d DesireMove) Type() string {
 	return "move"
 }
@@ -66,6 +67,7 @@ type DesireApply struct {
 	Apply bool   `msgpack:"a,omitempty"` // Whether to apply or unapply.
 }
 
+// Type returns "apply".
 func (d DesireApply) Type() string {
 	return "apply"
 }
@@ -75,6 +77,7 @@ type DesirePickup struct {
 	WID id.WID `msgpack:"wid,omitempty"`
 }
 
+// Type returns "pickup".
 func (d DesirePickup) Type() string {
 	return "pickup"
 }
@@ -84,6 +87,7 @@ type DesireDrop struct {
 	WID id.WID `msgpack:"wid,omitempty"`
 }
 
+// Type returns "drop".
 func (d DesireDrop) Type() string {
 	return "drop"
 }
@@ -94,6 +98,7 @@ type DesireBash struct {
 	Direction MoveDirection `msgpack:"d,omitempty"`
 }
 
+// Type returns "bash".
 func (d DesireBash) Type() string {
 	return "bash"
 }
@@ -104,6 +109,7 @@ type DesireOpen struct {
 	Open bool   `msgpack:"o,omitempty"` // Whether to open or close.
 }
 
+// Type returns "open".
 func (d DesireOpen) Type() string {
 	return "open"
 }
@@ -115,6 +121,7 @@ type DesirePing struct {
 	Kind     string   `msgpack:"k,omitempty"`
 }
 
+// Type returns "ping".
 func (d DesirePing) Type() string {
 	return "ping"
 }

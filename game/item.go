@@ -9,10 +9,12 @@ type ItemArchetype struct {
 	Image string `msgpack:"i,omitempty"`
 }
 
+// Type returns "item".
 func (a ItemArchetype) Type() string {
 	return "item"
 }
 
+// GetID returns the ID of the archetype.
 func (a ItemArchetype) GetID() id.UUID {
 	return a.ID
 }

@@ -1,9 +1,11 @@
 package game
 
+// Damager is an embed that contains logic for doing damage to objects.
 type Damager struct {
 	Damages []Damage
 }
 
+// RollDamages rolls the the damager's damages.
 func (d *Damager) RollDamages() (results []DamageResult) {
 	for _, damage := range d.Damages {
 		dmg := damage.Roll()
@@ -14,6 +16,7 @@ func (d *Damager) RollDamages() (results []DamageResult) {
 	return
 }
 
+// CalculateFromCharacter calculates the damages from a character.
 func (d *Damager) CalculateFromCharacter(c *Character) {
 	d.Damages = []Damage{}
 	var mainHand, offHand *Weapon

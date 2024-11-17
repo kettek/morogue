@@ -12,10 +12,12 @@ type TileArchetype struct {
 	// TODO: Other tile properties.
 }
 
+// Type returns "tile".
 func (a TileArchetype) Type() string {
 	return "tile"
 }
 
+// GetID returns the ID of the tile.
 func (a TileArchetype) GetID() id.UUID {
 	return a.ID
 }

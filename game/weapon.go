@@ -10,6 +10,7 @@ import (
 // WeaponType is the type the weapon is considered as.
 type WeaponType uint8
 
+// Our weapon types.
 const (
 	WeaponTypeNone WeaponType = iota
 	WeaponTypeMelee

@@ -1,7 +1,9 @@
 package game
 
+// MoveDirection is a direction that an object can move.
 type MoveDirection uint8
 
+// Position returns the x and y direction of the MoveDirection.
 func (d MoveDirection) Position() (int, int) {
 	switch d {
 	case LeftMoveDirection:
@@ -24,6 +26,7 @@ func (d MoveDirection) Position() (int, int) {
 	return 0, 0
 }
 
+// Our movement directions.
 const (
 	UpMoveDirection        MoveDirection = 8
 	LeftMoveDirection      MoveDirection = 4

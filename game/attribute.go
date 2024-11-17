@@ -16,6 +16,7 @@ const (
 	AttributeFunk
 )
 
+// Our attribute descriptions.
 const (
 	AttributeSwoleDescription  = "Swole determines damage and health"
 	AttributeZoomsDescription  = "Zooms determines speed and dodge"
@@ -23,6 +24,7 @@ const (
 	AttributeFunkDescription   = "Funk determines luck and area of effect bonuses"
 )
 
+// Attributes contain our attributes.
 type Attributes struct {
 	Swole  AttributeLevel `msgpack:"s,omitempty"`
 	Zooms  AttributeLevel `msgpack:"z,omitempty"`
@@ -35,6 +37,7 @@ type Attributes struct {
 // the next level.
 type AttributeLevel float64
 
+// Our attribute colors.
 var (
 	ColorSwole         = color.NRGBA{128, 32, 32, 255}
 	ColorSwoleVibrant  = color.NRGBA{200, 100, 100, 255}
