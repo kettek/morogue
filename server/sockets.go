@@ -19,7 +19,8 @@ type socketServer struct {
 	checkChan     chan struct{}
 }
 
-func NewSocketServer(newClientChan chan client, checkChan chan struct{}) *socketServer {
+// NewSocketServer returns a new socketServer, providing functionality for serving web assets, archetypes, images, and the game websocket server.
+func NewSocketServer(newClientChan chan client, checkChan chan struct{}) http.Handler {
 	p := &socketServer{
 		logf:          log.Printf,
 		newClientChan: newClientChan,
@@ -35,6 +36,7 @@ func NewSocketServer(newClientChan chan client, checkChan chan struct{}) *socket
 	return p
 }
 
+// ServeHTTP does what you think it dfoes.
 func (s *socketServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.serveMux.ServeHTTP(w, r)
 }

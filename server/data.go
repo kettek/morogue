@@ -14,9 +14,11 @@ import (
 	"github.com/kettek/morogue/id"
 )
 
+// Places is a slice of our generate-able places.
 type Places []gen.Place
 
-func (p Places) ById(uid id.UUID) (gen.Place, error) {
+// ByID returns a place by its UUID.
+func (p Places) ByID(uid id.UUID) (gen.Place, error) {
 	for _, place := range p {
 		if place.ID == uid {
 			return place, nil
@@ -25,9 +27,11 @@ func (p Places) ById(uid id.UUID) (gen.Place, error) {
 	return gen.Place{}, errors.New("no such place")
 }
 
+// Fixtures is a slice of our generate-able fixtures.
 type Fixtures []gen.Fixture
 
-func (f Fixtures) ById(uid id.UUID) (gen.Fixture, error) {
+// ByID returns a fixture by its UUID.
+func (f Fixtures) ByID(uid id.UUID) (gen.Fixture, error) {
 	for _, fixture := range f {
 		if fixture.ID == uid {
 			return fixture, nil
@@ -36,6 +40,7 @@ func (f Fixtures) ById(uid id.UUID) (gen.Fixture, error) {
 	return gen.Fixture{}, errors.New("no such fixture")
 }
 
+// Data contains our archetypes, places, and fixtures.
 type Data struct {
 	Archetypes []game.Archetype
 	Places     Places
@@ -51,6 +56,7 @@ func (d *Data) hasArchetype(uuid id.UUID) bool {
 	return false
 }
 
+// Archetype returns an archetype by its UUID.
 func (d *Data) Archetype(uuid id.UUID) game.Archetype {
 	for _, a := range d.Archetypes {
 		if a.GetID() == uuid {
@@ -60,6 +66,7 @@ func (d *Data) Archetype(uuid id.UUID) game.Archetype {
 	return nil
 }
 
+// Tile returns a TileArchetype by its UUID.
 func (d *Data) Tile(uuid id.UUID) (game.TileArchetype, error) {
 	for _, t := range d.TileArchetypes() {
 		if t.ID == uuid {
@@ -69,6 +76,7 @@ func (d *Data) Tile(uuid id.UUID) (game.TileArchetype, error) {
 	return game.TileArchetype{}, errors.New("no such tile")
 }
 
+// TileArchetypes returns a slice of all TileArchetypes.
 func (d *Data) TileArchetypes() []game.TileArchetype {
 	var archetypes []game.TileArchetype
 	for _, a := range d.Archetypes {
@@ -79,6 +87,7 @@ func (d *Data) TileArchetypes() []game.TileArchetype {
 	return archetypes
 }
 
+// CharacterArchetypes returns a slice of all CharacterArchetypes.
 func (d *Data) CharacterArchetypes() []game.CharacterArchetype {
 	var archetypes []game.CharacterArchetype
 	for _, a := range d.Archetypes {
@@ -89,6 +98,7 @@ func (d *Data) CharacterArchetypes() []game.CharacterArchetype {
 	return archetypes
 }
 
+// ItemArchetypes returns a slice of all ItemArchetypes.
 func (d *Data) ItemArchetypes() []game.ItemArchetype {
 	var archetypes []game.ItemArchetype
 	for _, a := range d.Archetypes {
@@ -99,6 +109,7 @@ func (d *Data) ItemArchetypes() []game.ItemArchetype {
 	return archetypes
 }
 
+// WeaponArchetypes returns a slice of all WeaponArchetypes.
 func (d *Data) WeaponArchetypes() []game.WeaponArchetype {
 	var archetypes []game.WeaponArchetype
 	for _, a := range d.Archetypes {
@@ -109,6 +120,7 @@ func (d *Data) WeaponArchetypes() []game.WeaponArchetype {
 	return archetypes
 }
 
+// ArmorArchetypes returns a slice of all ArmorArchetypes.
 func (d *Data) ArmorArchetypes() []game.ArmorArchetype {
 	var archetypes []game.ArmorArchetype
 	for _, a := range d.Archetypes {
@@ -119,6 +131,7 @@ func (d *Data) ArmorArchetypes() []game.ArmorArchetype {
 	return archetypes
 }
 
+// FoodArchetypes returns a slice of all FoodArchetypes.
 func (d *Data) FoodArchetypes() []game.FoodArchetype {
 	var archetypes []game.FoodArchetype
 	for _, a := range d.Archetypes {
@@ -129,6 +142,7 @@ func (d *Data) FoodArchetypes() []game.FoodArchetype {
 	return archetypes
 }
 
+// LoadArchetypes loads all archetypes from the archetypes directory.
 func (d *Data) LoadArchetypes() error {
 	var iterate func(string, string) error
 
@@ -166,6 +180,7 @@ func (d *Data) LoadArchetypes() error {
 	return nil
 }
 
+// LoadPlaces loads all places from the places directory.
 func (d *Data) LoadPlaces() error {
 	var iterate func(string, string) error
 
@@ -204,6 +219,7 @@ func (d *Data) LoadPlaces() error {
 	return nil
 }
 
+// LoadFixtures loads all fixtures from the fixtures directory.
 func (d *Data) LoadFixtures() error {
 	var iterate func(string, string) error
 

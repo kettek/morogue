@@ -59,6 +59,7 @@ func (a *Account) DeleteCharacter(name string) error {
 	return ErrCharacterDoesNotExist
 }
 
+// Our account-related errors.
 var (
 	ErrNotLoggedIn           = errors.New("not logged in")
 	ErrBadPassword           = errors.New("bad password")

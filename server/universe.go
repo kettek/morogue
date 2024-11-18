@@ -28,6 +28,7 @@ type universe struct {
 	data *Data
 }
 
+// NewUniverse returns a new full "game server", a channel for receiving new clients on, and a channel for receiving client messages on.
 func NewUniverse(accounts Accounts, data *Data) (universe, chan client, chan struct{}) {
 	u := universe{
 		accounts:               accounts,
@@ -474,6 +475,7 @@ func (u *universe) getWorld(uuid id.UUID) (*world, error) {
 	return nil, ErrWorldDoesNotExist
 }
 
+// Our Universe errors.
 var (
 	ErrWrongState               = errors.New("message sent in wrong state")
 	ErrTooSoon                  = errors.New("message sent too soon, please wait and try again")

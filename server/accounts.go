@@ -22,7 +22,8 @@ type accounts struct {
 	db *bolt.DB
 }
 
-func NewAccounts(path string) (*accounts, error) {
+// NewAccounts creates a new accounts database with the given path.
+func NewAccounts(path string) (Accounts, error) {
 	db, err := bolt.Open(path, 0666, nil)
 	if err != nil {
 		return nil, err
@@ -112,6 +113,7 @@ func (a *accounts) SaveAccount(account Account) error {
 	return err
 }
 
+// Buckets returns the bolt buckets of the accounts.
 func (a *accounts) Buckets() (buckets []string) {
 	a.db.View(func(tx *bolt.Tx) error {
 		tx.ForEach(func(name []byte, b *bolt.Bucket) error {
@@ -123,6 +125,7 @@ func (a *accounts) Buckets() (buckets []string) {
 	return
 }
 
+// ListBucket returns the a list of buckets.
 func (a *accounts) ListBucket(bucket string) (list []string) {
 	a.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))
@@ -135,6 +138,7 @@ func (a *accounts) ListBucket(bucket string) (list []string) {
 	return
 }
 
+// DumpBytes dumps some bytes.
 func (a *accounts) DumpBytes(bucket, data string) (d []byte) {
 	a.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))
@@ -144,6 +148,7 @@ func (a *accounts) DumpBytes(bucket, data string) (d []byte) {
 	return
 }
 
+// Accounts-related errors.
 var (
 	ErrNoUser     = errors.New("no such user")
 	ErrUserExists = errors.New("user exists")

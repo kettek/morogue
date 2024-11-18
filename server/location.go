@@ -76,7 +76,7 @@ func (l *location) addCharacter(character *game.Character) error {
 	l.playerCharacters = append(l.playerCharacters, character)
 
 	// Increase the turn latch.
-	l.turnActionLatch += 1
+	l.turnActionLatch++
 
 	return nil
 }
@@ -105,7 +105,7 @@ func (l *location) removeCharacter(wid id.WID) error {
 			}
 
 			// Decreate the turn latch.
-			l.turnActionLatch -= 1
+			l.turnActionLatch--
 
 			return nil
 		}
@@ -172,7 +172,7 @@ type wfcTile struct {
 }
 
 func (l *location) generate(pid id.UUID, data *Data, wids *id.WIDGenerator) error {
-	place, err := data.Places.ById(pid)
+	place, err := data.Places.ByID(pid)
 	if err != nil {
 		return err
 	}
@@ -257,7 +257,7 @@ func (l *location) generate(pid id.UUID, data *Data, wids *id.WIDGenerator) erro
 			for tries := 0; tries < 10; tries++ {
 				// TODO: Make this weighted.
 				target := f.Targets[rand.Intn(len(f.Targets))]
-				fixture, err := data.Fixtures.ById(target.ID)
+				fixture, err := data.Fixtures.ByID(target.ID)
 				if err != nil {
 					return err
 				}
@@ -624,12 +624,14 @@ type locationConfig struct {
 	Depth int
 }
 
+// Character location errors.
 var (
 	ErrCharacterNotInLocation         = errors.New("character is not in location")
 	ErrCharacterAlreadyInLocation     = errors.New("character is already in location")
 	ErrCharacterCannotPlaceInLocation = errors.New("character cannot be placed in location")
 )
 
+// Movement errors.
 var (
 	ErrMovementBlocked = errors.New("movement blocked")
 )
