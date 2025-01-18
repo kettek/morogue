@@ -1,6 +1,8 @@
 package locale
 
 import (
+	"fmt"
+
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 )
@@ -37,7 +39,9 @@ func Get(id string) Localizer {
 			return locale
 		}
 	}
-	return Localizer{}
+	// Finally, just fall back to en-US.
+	fmt.Printf("%s locale unsupported, falling back to en-US\n", id)
+	return locales[0]
 }
 
 // T translates, yo.
