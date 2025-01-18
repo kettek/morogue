@@ -22,13 +22,13 @@ const (
 func (a ArmorType) String() string {
 	switch a {
 	case ArmorTypeNone:
-		return "petty"
+		return lc.T("petty")
 	case ArmorTypeLight:
-		return "light"
+		return lc.T("light")
 	case ArmorTypeMedium:
-		return "medium"
+		return lc.T("medium")
 	case ArmorTypeHeavy:
-		return "heavy"
+		return lc.T("heavy")
 	default:
 		return ""
 	}

@@ -286,6 +286,7 @@ func (e *EventDrop) UnmarshalMsgpack(b []byte) error {
 // EventNotice notifies the client of a generic notice.
 type EventNotice struct {
 	Message string
+	Args    []any
 }
 
 // Type returns "notice"

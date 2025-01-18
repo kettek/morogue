@@ -32,6 +32,6 @@ func (o *Openable) Close() error {
 
 // Our openable errors.
 var (
-	ErrAlreadyOpen   = errors.New("it is already open")
-	ErrAlreadyClosed = errors.New("it is already closed")
+	ErrAlreadyOpen   = errors.New(lc.T("it is already open"))
+	ErrAlreadyClosed = errors.New(lc.T("it is already closed"))
 )

@@ -127,7 +127,7 @@ func (s SlotMap) Unapply(slots Slots) error {
 
 // Our slot errors.
 var (
-	ErrMissingSlot  = errors.New("missing slot")
-	ErrMissingSlots = errors.New("missing slots")
-	ErrUsedSlots    = errors.New("used slots")
+	ErrMissingSlot  = errors.New(lc.T("missing slot"))
+	ErrMissingSlots = errors.New(lc.T("missing slots"))
+	ErrUsedSlots    = errors.New(lc.T("used slots"))
 )

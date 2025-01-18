@@ -23,13 +23,13 @@ const (
 func (a WeaponType) String() string {
 	switch a {
 	case WeaponTypeRange:
-		return "range"
+		return lc.T("range")
 	case WeaponTypeThrown:
-		return "thrown"
+		return lc.T("thrown")
 	case WeaponTypeMelee:
-		return "melee"
+		return lc.T("melee")
 	case WeaponTypeUnarmed:
-		return "unarmed"
+		return lc.T("unarmed")
 	default:
 		return ""
 	}

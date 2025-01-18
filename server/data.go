@@ -37,7 +37,7 @@ func (f Fixtures) ByID(uid id.UUID) (gen.Fixture, error) {
 			return fixture, nil
 		}
 	}
-	return gen.Fixture{}, errors.New("no such fixture")
+	return gen.Fixture{}, ErrNoSuchFixture
 }
 
 // Data contains our archetypes, places, and fixtures.
@@ -73,7 +73,7 @@ func (d *Data) Tile(uuid id.UUID) (game.TileArchetype, error) {
 			return t, nil
 		}
 	}
-	return game.TileArchetype{}, errors.New("no such tile")
+	return game.TileArchetype{}, ErrNoSuchTile
 }
 
 // TileArchetypes returns a slice of all TileArchetypes.
@@ -257,3 +257,9 @@ func (d *Data) LoadFixtures() error {
 
 	return nil
 }
+
+// Error types, yo.
+var (
+	ErrNoSuchFixture = errors.New(lc.T("no such fixture"))
+	ErrNoSuchTile    = errors.New(lc.T("no such tile"))
+)

@@ -150,6 +150,6 @@ func (a *accounts) DumpBytes(bucket, data string) (d []byte) {
 
 // Accounts-related errors.
 var (
-	ErrNoUser     = errors.New("no such user")
-	ErrUserExists = errors.New("user exists")
+	ErrNoUser     = errors.New(lc.T("no such user"))
+	ErrUserExists = errors.New(lc.T("user exists"))
 )

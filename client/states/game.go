@@ -546,7 +546,8 @@ func (state *Game) handleEvent(e game.Event, ctx ifs.RunContext) {
 	case game.EventSound:
 		state.sounds.Add(evt.Message, evt.Position, evt.FromPosition)
 	case game.EventNotice:
-		fmt.Println(evt.Message)
+		fmt.Println(state.lc.T(evt.Message, evt.Args))
+		fmt.Println(evt.Message, evt.Args, state.lc.T(evt.Message, evt.Args))
 	case game.EventApply:
 		if o := state.location.ObjectByWID(evt.WID); o != nil {
 			if applier := state.location.ObjectByWID(evt.Applier); applier != nil {

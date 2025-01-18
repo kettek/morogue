@@ -61,9 +61,9 @@ func (a *Account) DeleteCharacter(name string) error {
 
 // Our account-related errors.
 var (
-	ErrNotLoggedIn           = errors.New("not logged in")
-	ErrBadPassword           = errors.New("bad password")
-	ErrCharacterExists       = errors.New("character exists")
-	ErrCharacterDoesNotExist = errors.New("character does not exist")
-	ErrNoSuchArchetype       = errors.New("no such archetype")
+	ErrNotLoggedIn           = errors.New(lc.T("not logged in"))
+	ErrBadPassword           = errors.New(lc.T("bad password"))
+	ErrCharacterExists       = errors.New(lc.T("character exists"))
+	ErrCharacterDoesNotExist = errors.New(lc.T("character does not exist"))
+	ErrNoSuchArchetype       = errors.New(lc.T("no such archetype"))
 )

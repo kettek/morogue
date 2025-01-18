@@ -78,7 +78,7 @@ func (c *Character) InInventory(wid id.WID) bool {
 func (c *Character) Apply(o Object, force bool) Event {
 	if !c.InInventory(o.GetWID()) {
 		return EventNotice{
-			Message: "You don't have that item.",
+			Message: lc.T("You don't have that item."),
 		}
 	}
 	switch o := o.(type) {
@@ -100,7 +100,8 @@ func (c *Character) applyWeapon(w *Weapon, force bool) Event {
 		for _, trait := range c.Archetype.(CharacterArchetype).Traits {
 			if !trait.CanApply(w) {
 				return EventNotice{
-					Message: fmt.Sprintf("You can't use %s.", w.Archetype.(WeaponArchetype).Title),
+					Message: lc.T("You can't use %s."),
+					Args:    []any{w.Archetype.(WeaponArchetype).Title},
 				}
 			}
 		}
@@ -131,7 +132,8 @@ func (c *Character) applyArmor(a *Armor, force bool) Event {
 		for _, trait := range c.Archetype.(CharacterArchetype).Traits {
 			if !trait.CanApply(a) {
 				return EventNotice{
-					Message: fmt.Sprintf("You can't use %s.", a.Archetype.(ArmorArchetype).Title),
+					Message: lc.T("You can't use %s."),
+					Args:    []any{a.Archetype.(ArmorArchetype).Title},
 				}
 			}
 		}
@@ -168,7 +170,7 @@ func (c *Character) applyFood(f *Food) Event {
 		if next <= 0 {
 			// Cannot eat, too full.
 			return EventNotice{
-				Message: "You're too full to eat that.",
+				Message: lc.T("You're too full to eat that."),
 			}
 		}
 	}
@@ -194,7 +196,7 @@ func (c *Character) applyFood(f *Food) Event {
 func (c *Character) Unapply(o Object, force bool) Event {
 	if !c.InInventory(o.GetWID()) {
 		return EventNotice{
-			Message: "You don't have that item.",
+			Message: lc.T("You don't have that item."),
 		}
 	}
 	switch o := o.(type) {
@@ -274,7 +276,7 @@ func (c *Character) Pickup(o Object) Event {
 func (c *Character) Drop(o Object) Event {
 	if !c.InInventory(o.GetWID()) {
 		return EventNotice{
-			Message: "You don't have that item.",
+			Message: lc.T("You don't have that item."),
 		}
 	}
 

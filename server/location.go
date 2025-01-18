@@ -380,13 +380,13 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 							events = append(events, game.EventSound{
 								FromPosition: c.Position,
 								Position:     game.Position{X: x, Y: y},
-								Message:      "*bump*",
+								Message:      lc.T("*bump*"),
 							})
 						} else if err == game.ErrOutOfBoundCell {
 							events = append(events, game.EventSound{
 								FromPosition: c.Position,
 								Position:     game.Position{X: x, Y: y},
-								Message:      "*pmub*",
+								Message:      lc.T("*pmub*"),
 							})
 						}
 					}
@@ -419,7 +419,7 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 							events = append(events, game.EventSound{
 								FromPosition: c.GetPosition(),
 								Position:     c.GetPosition(),
-								Message:      "*burp*",
+								Message:      lc.T("*burp*"),
 							})
 							// Destroy the item.
 							events = append(events, l.DestroyObject(t))
@@ -428,13 +428,13 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 							events = append(events, game.EventSound{
 								FromPosition: c.GetPosition(),
 								Position:     c.GetPosition(),
-								Message:      "*munch*",
+								Message:      lc.T("*munch*"),
 							})
 						}
 					}
 				} else {
 					c.Events = append(c.Events, game.EventNotice{
-						Message: "You can't apply that.",
+						Message: lc.T("You can't apply that."),
 					})
 				}
 			}
@@ -442,19 +442,19 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 			if t := l.ObjectByWID(d.WID); t != nil {
 				if t.GetContainerWID() > 0 {
 					c.Events = append(c.Events, game.EventNotice{
-						Message: "You can't pick that up.",
+						Message: lc.T("You can't pick that up."),
 					})
 				} else {
 					if t.GetPosition() != c.GetPosition() {
 						c.Events = append(c.Events, game.EventNotice{
-							Message: "You can't reach that.",
+							Message: lc.T("You can't reach that."),
 						})
 					} else {
 						events = append(events, c.Pickup(t))
 						events = append(events, game.EventSound{
 							FromPosition: c.Position,
 							Position:     c.Position,
-							Message:      "*snarf*",
+							Message:      lc.T("*snarf*"),
 						})
 					}
 				}
@@ -471,7 +471,7 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 						events = append(events, game.EventSound{
 							FromPosition: c.Position,
 							Position:     c.Position,
-							Message:      "*whump*",
+							Message:      lc.T("*whump*"),
 						})
 					}
 				}
@@ -490,12 +490,12 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 					events = append(events, game.EventSound{
 						FromPosition: c.Position,
 						Position:     t.GetPosition(),
-						Message:      "*thud*",
+						Message:      lc.T("*thud*"),
 					})
 				}
 			} else {
 				c.Events = append(c.Events, game.EventNotice{
-					Message: "You kick at the air.",
+					Message: lc.T("You kick at the air."),
 				})
 			}
 		case game.DesireOpen:
@@ -507,40 +507,40 @@ func (l *location) processCharacter(c *game.Character) (events []game.Event) {
 							events = append(events, game.EventSound{
 								FromPosition: c.Position,
 								Position:     t.GetPosition(),
-								Message:      "*click*",
+								Message:      lc.T("*click*"),
 							})
 							c.Events = append(c.Events, game.EventNotice{
-								Message: "You close the door.",
+								Message: lc.T("You close the door."),
 							})
 						} else if errors.Is(err, game.ErrAlreadyClosed) {
 							c.Events = append(c.Events, game.EventNotice{
-								Message: "It's already closed.",
+								Message: lc.T("It's already closed."),
 							})
 						}
 					} else if !openable.IsOpened() {
 						if isLockable && lockable.IsLocked() {
 							c.Events = append(c.Events, game.EventNotice{
-								Message: "It's locked.",
+								Message: lc.T("It's locked."),
 							})
 						} else if err := openable.Open(); err == nil {
 							c.Events = append(c.Events, game.EventNotice{
-								Message: "You open the door.",
+								Message: lc.T("You open the door."),
 							})
 							events = append(events, game.EventSound{
 								FromPosition: c.Position,
 								Position:     t.GetPosition(),
-								Message:      "*creak*",
+								Message:      lc.T("*creak*"),
 							})
 						} else if errors.Is(err, game.ErrAlreadyOpen) {
 							c.Events = append(c.Events, game.EventNotice{
-								Message: "It's already open.",
+								Message: lc.T("It's already open."),
 							})
 						}
 					}
 				}
 			} else {
 				c.Events = append(c.Events, game.EventNotice{
-					Message: "There is nothing there to open.",
+					Message: lc.T("There is nothing there to open."),
 				})
 			}
 		case game.DesirePing:

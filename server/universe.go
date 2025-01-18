@@ -97,7 +97,7 @@ func (u *universe) checkClients() {
 
 func (u *universe) checkName(name string) error {
 	if name == "" {
-		return errors.New("name cannot be empty")
+		return ErrNameCannotBeEmpty
 	}
 	// TODO: Probably handle pottymouth names, if even possible.
 	return nil
@@ -483,5 +483,6 @@ var (
 	ErrAlreadyJoined            = errors.New("character is already joined")
 	ErrUserLoggedIn             = errors.New("user is logged in")
 	ErrWorldDoesNotExist        = errors.New("world does not exist")
+	ErrNameCannotBeEmpty        = errors.New(lc.T("name cannot be empty"))
 	errRemoveClientFromUniverse = errors.New("this is not an error lol")
 )
