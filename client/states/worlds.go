@@ -10,6 +10,7 @@ import (
 	"github.com/kettek/morogue/client/ifs"
 	"github.com/kettek/morogue/game"
 	"github.com/kettek/morogue/id"
+	"github.com/kettek/morogue/locale"
 	"github.com/kettek/morogue/net"
 )
 
@@ -42,6 +43,7 @@ type Worlds struct {
 	createControls *widget.Container
 	//
 	worlds []game.WorldInfo
+	lc     locale.Localizer
 }
 
 // NewWorlds creates a new Worlds instance.
@@ -60,6 +62,7 @@ func NewWorlds(connection net.Connection, msgCh chan net.Message, data *Data) *W
 				),
 			),
 		},
+		lc: locale.Get("en-us"),
 	}
 	return state
 }
@@ -87,7 +90,7 @@ func (state *Worlds) Begin(ctx ifs.RunContext) error {
 			widget.WidgetOpts.CursorHovered("interactive"),
 		),
 		widget.ButtonOpts.Image(ctx.UI.ButtonImage),
-		widget.ButtonOpts.Text("back", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
+		widget.ButtonOpts.Text(state.lc.T("back"), ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
 		widget.ButtonOpts.TextPadding(ctx.UI.ButtonPadding),
 		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 			state.connection.Write(net.UnjoinCharacterMessage{})
@@ -171,7 +174,7 @@ func (state *Worlds) Begin(ctx ifs.RunContext) error {
 		widget.TextInputOpts.CaretOpts(
 			widget.CaretOpts.Size(ctx.UI.BodyCopyFace, 2),
 		),
-		widget.TextInputOpts.Placeholder("password"),
+		widget.TextInputOpts.Placeholder(state.lc.T("password")),
 		widget.TextInputOpts.ChangedHandler(func(args *widget.TextInputChangedEventArgs) {
 			state.password = args.InputText
 		}),
@@ -187,7 +190,7 @@ func (state *Worlds) Begin(ctx ifs.RunContext) error {
 			widget.WidgetOpts.CursorHovered("interactive"),
 		),
 		widget.ButtonOpts.Image(ctx.UI.ButtonImage),
-		widget.ButtonOpts.Text("join", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
+		widget.ButtonOpts.Text(state.lc.T("join"), ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
 		widget.ButtonOpts.TextPadding(ctx.UI.ButtonPadding),
 		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 			state.connection.Write(net.JoinWorldMessage{
@@ -242,7 +245,7 @@ func (state *Worlds) Begin(ctx ifs.RunContext) error {
 		widget.TextInputOpts.CaretOpts(
 			widget.CaretOpts.Size(ctx.UI.BodyCopyFace, 2),
 		),
-		widget.TextInputOpts.Placeholder("world name"),
+		widget.TextInputOpts.Placeholder(state.lc.T("world name")),
 		widget.TextInputOpts.ChangedHandler(func(args *widget.TextInputChangedEventArgs) {
 			state.worldName = args.InputText
 		}),
@@ -269,7 +272,7 @@ func (state *Worlds) Begin(ctx ifs.RunContext) error {
 			widget.WidgetOpts.CursorHovered("interactive"),
 		),
 		widget.ButtonOpts.Image(ctx.UI.ButtonImage),
-		widget.ButtonOpts.Text("create", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
+		widget.ButtonOpts.Text(state.lc.T("create"), ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
 		widget.ButtonOpts.TextPadding(ctx.UI.ButtonPadding),
 		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 			state.connection.Write(net.CreateWorldMessage{

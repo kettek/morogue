@@ -15,6 +15,7 @@ import (
 	"github.com/kettek/morogue/client/ifs"
 	"github.com/kettek/morogue/game"
 	"github.com/kettek/morogue/id"
+	"github.com/kettek/morogue/locale"
 	"github.com/kettek/morogue/net"
 	"golang.org/x/exp/slices"
 )
@@ -62,6 +63,7 @@ type Create struct {
 	brainsImage    *ebiten.Image
 	funkImage      *ebiten.Image
 	archetypeImage *ebiten.Image
+	lc             locale.Localizer
 }
 
 type archetype struct {
@@ -85,6 +87,7 @@ func NewCreate(connection net.Connection, msgCh chan net.Message) *Create {
 			),
 		},
 		tooltips: make(map[string]*widget.Container),
+		lc:       locale.Get("en-us"),
 	}
 	return state
 }
@@ -170,7 +173,7 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 			widget.WidgetOpts.CursorHovered("interactive"),
 		),
 		widget.ButtonOpts.Image(ctx.UI.ButtonImage),
-		widget.ButtonOpts.Text("join", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
+		widget.ButtonOpts.Text(state.lc.T("join"), ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
 		widget.ButtonOpts.TextPadding(ctx.UI.ButtonPadding),
 		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 			state.doJoin()
@@ -187,7 +190,7 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 			widget.WidgetOpts.CursorHovered("interactive"),
 		),
 		widget.ButtonOpts.Image(ctx.UI.ButtonImage),
-		widget.ButtonOpts.Text("delete", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
+		widget.ButtonOpts.Text(state.lc.T("delete"), ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
 		widget.ButtonOpts.TextPadding(ctx.UI.ButtonPadding),
 		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 			state.doDelete()
@@ -210,7 +213,7 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 	)
 
 	deleteText := widget.NewText(
-		widget.TextOpts.Text("Confirm deletion", ctx.UI.BodyCopyFace, color.White),
+		widget.TextOpts.Text(state.lc.T("Confirm deletion"), ctx.UI.BodyCopyFace, color.White),
 		widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
 		widget.TextOpts.WidgetOpts(
 			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
@@ -226,7 +229,7 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 				Stretch: true,
 			}),
 		),
-		widget.ButtonOpts.Text("delete", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
+		widget.ButtonOpts.Text(state.lc.T("delete"), ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
 		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 			state.connection.Write(net.DeleteCharacterMessage{
 				Name: state.selectedCharacter,
@@ -315,7 +318,7 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 			widget.TextInputOpts.CaretOpts(
 				widget.CaretOpts.Size(ctx.UI.BodyCopyFace, 2),
 			),
-			widget.TextInputOpts.Placeholder("character name"),
+			widget.TextInputOpts.Placeholder(state.lc.T("character name")),
 			widget.TextInputOpts.SubmitHandler(func(args *widget.TextInputChangedEventArgs) {
 				state.doCreate()
 			}),
@@ -335,7 +338,7 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 				widget.WidgetOpts.CursorHovered("interactive"),
 			),
 			widget.ButtonOpts.Image(ctx.UI.ButtonImage),
-			widget.ButtonOpts.Text("create", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
+			widget.ButtonOpts.Text(state.lc.T("create"), ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
 			widget.ButtonOpts.TextPadding(ctx.UI.ButtonPadding),
 			widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 				state.doCreate()
@@ -355,7 +358,7 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 			widget.WidgetOpts.CursorHovered("interactive"),
 		),
 		widget.ButtonOpts.Image(ctx.UI.ButtonImage),
-		widget.ButtonOpts.Text("logout", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
+		widget.ButtonOpts.Text(state.lc.T("logout"), ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
 		widget.ButtonOpts.TextPadding(ctx.UI.ButtonPadding),
 		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 			state.connection.Write(net.LogoutMessage{})
@@ -364,7 +367,7 @@ func (state *Create) Begin(ctx ifs.RunContext) error {
 	)
 
 	state.resultText = widget.NewText(
-		widget.TextOpts.Text("Create a new hero or select a previous one.", ctx.UI.BodyCopyFace, color.White),
+		widget.TextOpts.Text(state.lc.T("Create a new hero or select a previous one."), ctx.UI.BodyCopyFace, color.White),
 		widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
 		widget.TextOpts.WidgetOpts(
 			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
@@ -550,28 +553,28 @@ func (state *Create) refreshArchetypes(ctx ifs.RunContext) {
 				switch p {
 				case "Archetype":
 					c = color.NRGBA{255, 255, 255, 255}
-					tooltip = "Archetype is a collection of attributes and traits"
+					tooltip = state.lc.T("Archetype is a collection of attributes and traits")
 					img = state.archetypeImage
 				case "Swole":
 					c = game.ColorSwoleVibrant
-					tooltip = game.AttributeSwoleDescription
+					tooltip = state.lc.T(game.AttributeSwoleDescription)
 					img = state.swoleImage
 				case "Zooms":
 					c = game.ColorZoomsVibrant
-					tooltip = game.AttributeZoomsDescription
+					tooltip = state.lc.T(game.AttributeZoomsDescription)
 					img = state.zoomsImage
 				case "Brains":
 					c = game.ColorBrainsVibrant
-					tooltip = game.AttributeBrainsDescription
+					tooltip = state.lc.T(game.AttributeBrainsDescription)
 					img = state.brainsImage
 				case "Funk":
 					c = game.ColorFunkVibrant
-					tooltip = game.AttributeFunkDescription
+					tooltip = state.lc.T(game.AttributeFunkDescription)
 					img = state.funkImage
 				case "Traits":
 					c = color.NRGBA{200, 200, 200, 255}
 					img = state.traitsImage
-					tooltip = "Traits are unique modifiers to an archetype"
+					tooltip = state.lc.T("Traits are unique modifiers to an archetype")
 					width = 200
 				}
 
@@ -853,11 +856,11 @@ func (state *Create) doCreate() {
 	id := state.selectedArchetype
 
 	if name == "" {
-		state.resultText.Label = "name must not be empty"
+		state.resultText.Label = state.lc.T("name must not be empty")
 		return
 	}
 	if id.IsNil() {
-		state.resultText.Label = "archetype must be selected"
+		state.resultText.Label = state.lc.T("archetype must be selected")
 		return
 	}
 

@@ -10,6 +10,9 @@ import (
 	"github.com/kettek/morogue/client/ifs"
 	"github.com/kettek/morogue/config"
 	"github.com/kettek/morogue/net"
+
+	// Just for "L"
+	"github.com/kettek/morogue/locale"
 )
 
 // Login is the first state when connecting to a server. It provides
@@ -27,6 +30,7 @@ type Login struct {
 	confirmInput                            *widget.TextInput
 	resultText                              *widget.Text
 	loginButton, registerButton, backButton *widget.Button
+	lc                                      locale.Localizer
 }
 
 // NewLogin creates a new Login instance.
@@ -42,6 +46,7 @@ func NewLogin(connection net.Connection, msgCh chan net.Message) *Login {
 				)),
 			),
 		},
+		lc: locale.Get("en-us"),
 	}
 	return state
 }
@@ -78,7 +83,7 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 		widget.TextInputOpts.CaretOpts(
 			widget.CaretOpts.Size(ctx.UI.BodyCopyFace, 2),
 		),
-		widget.TextInputOpts.Placeholder("username"),
+		widget.TextInputOpts.Placeholder(state.lc.T("username")),
 		widget.TextInputOpts.ChangedHandler(func(args *widget.TextInputChangedEventArgs) {
 			state.checkInputs()
 			ctx.Cfg.LastUsername = args.InputText
@@ -103,7 +108,7 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 			widget.CaretOpts.Size(ctx.UI.BodyCopyFace, 2),
 		),
 		widget.TextInputOpts.Secure(true),
-		widget.TextInputOpts.Placeholder("password"),
+		widget.TextInputOpts.Placeholder(state.lc.T("password")),
 		widget.TextInputOpts.ChangedHandler(func(args *widget.TextInputChangedEventArgs) {
 			state.checkInputs()
 			ctx.Cfg.LastPassword = args.InputText
@@ -154,7 +159,7 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 			widget.CaretOpts.Size(ctx.UI.BodyCopyFace, 2),
 		),
 		widget.TextInputOpts.Secure(true),
-		widget.TextInputOpts.Placeholder("confirm"),
+		widget.TextInputOpts.Placeholder(state.lc.T("confirm")),
 		widget.TextInputOpts.ChangedHandler(func(args *widget.TextInputChangedEventArgs) {
 			state.checkInputs()
 		}),
@@ -169,7 +174,7 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 			widget.WidgetOpts.CursorHovered("interactive"),
 		),
 		widget.ButtonOpts.Image(ctx.UI.ButtonImage),
-		widget.ButtonOpts.Text("login", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
+		widget.ButtonOpts.Text(state.lc.T("login"), ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
 		widget.ButtonOpts.TextPadding(ctx.UI.ButtonPadding),
 		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 			state.doLogin()
@@ -185,7 +190,7 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 			widget.WidgetOpts.CursorHovered("interactive"),
 		),
 		widget.ButtonOpts.Image(ctx.UI.ButtonImage),
-		widget.ButtonOpts.Text("register", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
+		widget.ButtonOpts.Text(state.lc.T("register"), ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
 		widget.ButtonOpts.TextPadding(ctx.UI.ButtonPadding),
 		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 			state.doRegister()
@@ -201,7 +206,7 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 			widget.WidgetOpts.CursorHovered("interactive"),
 		),
 		widget.ButtonOpts.Image(ctx.UI.ButtonImage),
-		widget.ButtonOpts.Text("back", ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
+		widget.ButtonOpts.Text(state.lc.T("back"), ctx.UI.HeadlineFace, ctx.UI.ButtonTextColor),
 		widget.ButtonOpts.TextPadding(ctx.UI.ButtonPadding),
 		widget.ButtonOpts.ClickedHandler(func(args *widget.ButtonClickedEventArgs) {
 			state.showLogin()
@@ -209,7 +214,7 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 	)
 
 	state.resultText = widget.NewText(
-		widget.TextOpts.Text("login. you will be prompted to register if username does not exist.", ctx.UI.BodyCopyFace, color.White),
+		widget.TextOpts.Text(state.lc.T("login. you will be prompted to register if username does not exist."), ctx.UI.BodyCopyFace, color.White),
 		widget.TextOpts.Position(widget.TextPositionCenter, widget.TextPositionCenter),
 		widget.TextOpts.WidgetOpts(
 			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
@@ -231,11 +236,11 @@ func (state *Login) Begin(ctx ifs.RunContext) error {
 
 func (state *Login) checkInputs() {
 	if state.usernameInput.GetText() == "" {
-		state.resultText.Label = "username must not be empty"
+		state.resultText.Label = state.lc.T("username must not be empty")
 		return
 	}
 	if state.passwordInput.GetText() == "" {
-		state.resultText.Label = "password must not be empty"
+		state.resultText.Label = state.lc.T("password must not be empty")
 		return
 	}
 	hasConfirm := false
@@ -246,7 +251,7 @@ func (state *Login) checkInputs() {
 		}
 	}
 	if hasConfirm && state.passwordInput.GetText() != state.confirmInput.GetText() {
-		state.resultText.Label = "passwords must match"
+		state.resultText.Label = state.lc.T("passwords must match")
 		return
 	}
 	state.resultText.Label = ""
@@ -256,7 +261,7 @@ func (state *Login) doLogin() {
 	if state.usernameInput.GetText() == "" || state.passwordInput.GetText() == "" {
 		return
 	}
-	state.resultText.Label = "logging in..."
+	state.resultText.Label = state.lc.T("logging in...")
 	state.connection.Write(net.LoginMessage{
 		User:     state.usernameInput.GetText(),
 		Password: state.passwordInput.GetText(),
@@ -267,7 +272,7 @@ func (state *Login) doRegister() {
 	if state.usernameInput.GetText() == "" || state.passwordInput.GetText() == "" || state.passwordInput.GetText() != state.confirmInput.GetText() {
 		return
 	}
-	state.resultText.Label = "registering..."
+	state.resultText.Label = state.lc.T("registering...")
 	state.connection.Write(net.RegisterMessage{
 		User:     state.usernameInput.GetText(),
 		Password: state.passwordInput.GetText(),
@@ -297,7 +302,7 @@ func (state *Login) showRegister() {
 }
 
 func (state *Login) Return(interface{}) error {
-	state.resultText.Label = "...and so you return."
+	state.resultText.Label = state.lc.T("...and so you return.")
 	state.showLogin()
 
 	return nil
@@ -317,18 +322,18 @@ func (state *Login) Update(ctx ifs.RunContext) error {
 		switch m := msg.(type) {
 		case net.LoginMessage:
 			if m.ResultCode == 200 {
-				state.resultText.Label = "logged in!"
+				state.resultText.Label = state.lc.T("logged in!")
 				ctx.Sm.Push(NewCreate(state.connection, state.messageChan))
 				return nil
 			} else if m.ResultCode == 404 {
 				state.showRegister()
-				state.resultText.Label = "Confirm your password to register."
+				state.resultText.Label = state.lc.T("Confirm your password to register.")
 			} else {
 				state.resultText.Label = m.Result
 			}
 		case net.RegisterMessage:
 			if m.ResultCode == 200 {
-				state.resultText.Label = "logged in!"
+				state.resultText.Label = state.lc.T("logged in!")
 				ctx.Sm.Push(NewCreate(state.connection, state.messageChan))
 				return nil
 			} else {

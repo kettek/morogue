@@ -12,6 +12,7 @@ import (
 	clgame "github.com/kettek/morogue/client/states/game"
 	"github.com/kettek/morogue/game"
 	"github.com/kettek/morogue/id"
+	"github.com/kettek/morogue/locale"
 	"github.com/kettek/morogue/net"
 	"github.com/tinne26/etxt"
 	"github.com/vmihailenco/msgpack/v5"
@@ -49,6 +50,7 @@ type Game struct {
 	below     clgame.Below
 	hotbar    clgame.Hotbar
 	statbar   clgame.Statbar
+	lc        locale.Localizer
 }
 
 // NewGame creates a new Game instance.
@@ -63,6 +65,7 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 			),
 		},
 		locations: make(map[id.UUID]*game.Location),
+		lc:        locale.Get("en-us"),
 	}
 
 	/*state.innerContainer = widget.NewContainer(

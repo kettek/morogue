@@ -1,0 +1,222 @@
+{
+    "language": "en-US",
+    "messages": [
+        {
+            "id": "join",
+            "message": "join",
+            "translation": "join",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "delete",
+            "message": "delete",
+            "translation": "delete",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Confirm deletion",
+            "message": "Confirm deletion",
+            "translation": "Confirm deletion",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "character name",
+            "message": "character name",
+            "translation": "character name",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "create",
+            "message": "create",
+            "translation": "create",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "logout",
+            "message": "logout",
+            "translation": "logout",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Create a new hero or select a previous one.",
+            "message": "Create a new hero or select a previous one.",
+            "translation": "Create a new hero or select a previous one.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Archetype is a collection of attributes and traits",
+            "message": "Archetype is a collection of attributes and traits",
+            "translation": "Archetype is a collection of attributes and traits",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Swole determines damage and health",
+            "message": "Swole determines damage and health",
+            "translation": "Swole determines damage and health",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Zooms determines speed and dodge",
+            "message": "Zooms determines speed and dodge",
+            "translation": "Zooms determines speed and dodge",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Brains determines spell damage and ability to by-pass traps",
+            "message": "Brains determines spell damage and ability to by-pass traps",
+            "translation": "Brains determines spell damage and ability to by-pass traps",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Funk determines luck and area of effect bonuses",
+            "message": "Funk determines luck and area of effect bonuses",
+            "translation": "Funk determines luck and area of effect bonuses",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Traits are unique modifiers to an archetype",
+            "message": "Traits are unique modifiers to an archetype",
+            "translation": "Traits are unique modifiers to an archetype",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "name must not be empty",
+            "message": "name must not be empty",
+            "translation": "name must not be empty",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "archetype must be selected",
+            "message": "archetype must be selected",
+            "translation": "archetype must be selected",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "username",
+            "message": "username",
+            "translation": "username",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "password",
+            "message": "password",
+            "translation": "password",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "confirm",
+            "message": "confirm",
+            "translation": "confirm",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "login",
+            "message": "login",
+            "translation": "login",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "register",
+            "message": "register",
+            "translation": "register",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "back",
+            "message": "back",
+            "translation": "back",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "login. you will be prompted to register if username does not exist.",
+            "message": "login. you will be prompted to register if username does not exist.",
+            "translation": "login. you will be prompted to register if username does not exist.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "username must not be empty",
+            "message": "username must not be empty",
+            "translation": "username must not be empty",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "password must not be empty",
+            "message": "password must not be empty",
+            "translation": "password must not be empty",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "passwords must match",
+            "message": "passwords must match",
+            "translation": "passwords must match",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "logging in...",
+            "message": "logging in...",
+            "translation": "logging in...",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "registering...",
+            "message": "registering...",
+            "translation": "registering...",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "...and so you return.",
+            "message": "...and so you return.",
+            "translation": "...and so you return.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "logged in!",
+            "message": "logged in!",
+            "translation": "logged in!",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Confirm your password to register.",
+            "message": "Confirm your password to register.",
+            "translation": "Confirm your password to register.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "world name",
+            "message": "world name",
+            "translation": "world name",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        }
+    ]
+}
