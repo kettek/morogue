@@ -65,7 +65,7 @@ func NewGame(connection net.Connection, msgCh chan net.Message, data *Data) *Gam
 			),
 		},
 		locations: make(map[id.UUID]*game.Location),
-		lc:        locale.Get("en-us"),
+		lc:        locale.Get(locale.Locale()),
 	}
 
 	/*state.innerContainer = widget.NewContainer(

@@ -46,7 +46,7 @@ func NewLogin(connection net.Connection, msgCh chan net.Message) *Login {
 				)),
 			),
 		},
-		lc: locale.Get("en-us"),
+		lc: locale.Get(locale.Locale()),
 	}
 	return state
 }

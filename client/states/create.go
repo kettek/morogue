@@ -87,7 +87,7 @@ func NewCreate(connection net.Connection, msgCh chan net.Message) *Create {
 			),
 		},
 		tooltips: make(map[string]*widget.Container),
-		lc:       locale.Get("en-us"),
+		lc:       locale.Get(locale.Locale()),
 	}
 	return state
 }

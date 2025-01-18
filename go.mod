@@ -21,6 +21,7 @@ require (
 )
 
 require (
+	github.com/cubiest/jibberjabber v1.0.1 // indirect
 	github.com/ebitengine/gomobile v0.0.0-20240329170434-1771503ff0a8 // indirect
 	github.com/ebitengine/hideconsole v1.0.0 // indirect
 	github.com/ebitengine/purego v0.7.1 // indirect

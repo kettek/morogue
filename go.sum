@@ -1,6 +1,8 @@
 github.com/DATA-DOG/go-sqlmock v1.3.3/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
 github.com/carlmjohnson/versioninfo v0.22.5 h1:O00sjOLUAFxYQjlN/bzYTuZiS0y6fWDQjMRvwtKgwwc=
 github.com/carlmjohnson/versioninfo v0.22.5/go.mod h1:QT9mph3wcVfISUKd0i9sZfVrPviHuSF+cUtLjm2WSf8=
+github.com/cubiest/jibberjabber v1.0.1 h1:JxKC9EZcdw8azEbyWaNj62ppPMkbFJBf2ayPY1vBeDI=
+github.com/cubiest/jibberjabber v1.0.1/go.mod h1:Ovt9ZAmzAgwQ8cWgvZ1se9oaGYzjHrlAXKM3NOzlQOs=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/ebitengine/gomobile v0.0.0-20240329170434-1771503ff0a8 h1:5e8X7WEdOWrjrKvgaWF6PRnDvJicfrkEnwAkWtMN74g=
