@@ -24,6 +24,10 @@ var locales = []Localizer{
 		ID:      "ja-JP",
 		printer: message.NewPrinter(language.MustParse("ja-JP")),
 	},
+	{
+		ID:      "tr-TR",
+		printer: message.NewPrinter(language.MustParse("tr-TR")),
+	},
 }
 
 // Get returns the Localizer for the given ID.
