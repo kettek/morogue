@@ -248,37 +248,37 @@
         {
             "id": "not logged in",
             "message": "not logged in",
-            "translation": ""
+            "translation": "Giriş yapılmamış"
         },
         {
             "id": "bad password",
             "message": "bad password",
-            "translation": ""
+            "translation": "Kötü şifre"
         },
         {
             "id": "character exists",
             "message": "character exists",
-            "translation": ""
+            "translation": "Karakter zaten var"
         },
         {
             "id": "character does not exist",
             "message": "character does not exist",
-            "translation": ""
+            "translation": "Karakyter bulunmuyor"
         },
         {
             "id": "no such archetype",
             "message": "no such archetype",
-            "translation": ""
+            "translation": "Öyle bir archetype yok"
         },
         {
             "id": "no such user",
             "message": "no such user",
-            "translation": ""
+            "translation": "Öyle bir kullanıcı yok"
         },
         {
             "id": "user exists",
             "message": "user exists",
-            "translation": ""
+            "translation": "Kullanıcı zaten bulunuyor"
         },
         {
             "id": "no such fixture",
@@ -303,7 +303,7 @@
         {
             "id": "*burp*",
             "message": "*burp*",
-            "translation": ""
+            "translation": "*geğirik*"
         },
         {
             "id": "*munch*",
@@ -313,17 +313,17 @@
         {
             "id": "You can't apply that.",
             "message": "You can't apply that.",
-            "translation": ""
+            "translation": "Onu uygulayamazsın"
         },
         {
             "id": "You can't pick that up.",
             "message": "You can't pick that up.",
-            "translation": ""
+            "translation": "Onu alamazsın"
         },
         {
             "id": "You can't reach that.",
             "message": "You can't reach that.",
-            "translation": ""
+            "translation": "Ona ulaşamazsın"
         },
         {
             "id": "*snarf*",
@@ -343,7 +343,7 @@
         {
             "id": "You kick at the air.",
             "message": "You kick at the air.",
-            "translation": "Havaya vutdfu"
+            "translation": "Havaya vurdun"
         },
         {
             "id": "*click*",
