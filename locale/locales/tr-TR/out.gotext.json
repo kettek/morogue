@@ -1,0 +1,394 @@
+{
+    "language": "tr-TR",
+    "messages": [
+        {
+            "id": "join",
+            "message": "join",
+            "translation": "Katıl"
+        },
+        {
+            "id": "delete",
+            "message": "delete",
+            "translation": "Sil"
+        },
+        {
+            "id": "Confirm deletion",
+            "message": "Confirm deletion",
+            "translation": "Silme işlemini onayla"
+        },
+        {
+            "id": "character name",
+            "message": "character name",
+            "translation": "Karakter adı"
+        },
+        {
+            "id": "create",
+            "message": "create",
+            "translation": "Oluştur"
+        },
+        {
+            "id": "logout",
+            "message": "logout",
+            "translation": "Çıkış yap"
+        },
+        {
+            "id": "Create a new hero or select a previous one.",
+            "message": "Create a new hero or select a previous one.",
+            "translation": "Yeni bir karakter oluştur veya bir öncekini seç"
+        },
+        {
+            "id": "Archetype is a collection of attributes and traits",
+            "message": "Archetype is a collection of attributes and traits",
+            "translation": "Arketip, niteliklerin ve özelliklerin bir koleksiyonudur"
+        },
+        {
+            "id": "Swole determines damage and health",
+            "message": "Swole determines damage and health",
+            "translation": "Swole hasarı ve canı belirler"
+        },
+        {
+            "id": "Zooms determines speed and dodge",
+            "message": "Zooms determines speed and dodge",
+            "translation": "Zooms hızı ve kaçmayı belirler"
+        },
+        {
+            "id": "Brains determines spell damage and ability to by-pass traps",
+            "message": "Brains determines spell damage and ability to by-pass traps",
+            "translation": "Brains büyü hasarını ve tuzakları aşma yeteneğini belirler"
+        },
+        {
+            "id": "Funk determines luck and area of effect bonuses",
+            "message": "Funk determines luck and area of effect bonuses",
+            "translation": ""
+        },
+        {
+            "id": "Traits are unique modifiers to an archetype",
+            "message": "Traits are unique modifiers to an archetype",
+            "translation": "Özellikler bir archetype'ın benzersiz değiştiricileridir"
+        },
+        {
+            "id": "name must not be empty",
+            "message": "name must not be empty",
+            "translation": "İsim boş olamaz"
+        },
+        {
+            "id": "archetype must be selected",
+            "message": "archetype must be selected",
+            "translation": "Archetype mutlaka seçilmeli"
+        },
+        {
+            "id": "username",
+            "message": "username",
+            "translation": "Kullanıcı adı"
+        },
+        {
+            "id": "password",
+            "message": "password",
+            "translation": "Şifre"
+        },
+        {
+            "id": "confirm",
+            "message": "confirm",
+            "translation": "Kabul et"
+        },
+        {
+            "id": "login",
+            "message": "login",
+            "translation": "Giriş yap"
+        },
+        {
+            "id": "register",
+            "message": "register",
+            "translation": "Kayıt ol"
+        },
+        {
+            "id": "back",
+            "message": "back",
+            "translation": "Geri"
+        },
+        {
+            "id": "login. you will be prompted to register if username does not exist.",
+            "message": "login. you will be prompted to register if username does not exist.",
+            "translation": "Giriş yap. kullanıcı adın bulunmazsa kayıt olmaya yönlendirilirsin."
+        },
+        {
+            "id": "username must not be empty",
+            "message": "username must not be empty",
+            "translation": "Kullanıcı adı boş olamaz"
+        },
+        {
+            "id": "password must not be empty",
+            "message": "password must not be empty",
+            "translation": "Şifre boş olamaz"
+        },
+        {
+            "id": "passwords must match",
+            "message": "passwords must match",
+            "translation": "Şifreler mutlaka eşleşmeli"
+        },
+        {
+            "id": "logging in...",
+            "message": "logging in...",
+            "translation": "Giriş yapılıyor..."
+        },
+        {
+            "id": "registering...",
+            "message": "registering...",
+            "translation": "Kayıt yapılıyor..."
+        },
+        {
+            "id": "...and so you return.",
+            "message": "...and so you return.",
+            "translation": "...ve böyle geri dönersin."
+        },
+        {
+            "id": "logged in!",
+            "message": "logged in!",
+            "translation": "Giriş yapıldı!"
+        },
+        {
+            "id": "Confirm your password to register.",
+            "message": "Confirm your password to register.",
+            "translation": "Kayıt olmak için şifreni doğrula"
+        },
+        {
+            "id": "world name",
+            "message": "world name",
+            "translation": "Dünya adı"
+        },
+        {
+            "id": "petty",
+            "message": "petty",
+            "translation": "petty"
+        },
+        {
+            "id": "light",
+            "message": "light",
+            "translation": "hafif"
+        },
+        {
+            "id": "medium",
+            "message": "medium",
+            "translation": "orta"
+        },
+        {
+            "id": "heavy",
+            "message": "heavy",
+            "translation": "ağır"
+        },
+        {
+            "id": "You don't have that item.",
+            "message": "You don't have that item.",
+            "translation": "O eşyaya sahip değilsin."
+        },
+        {
+            "id": "You can't use {Arg_1}.",
+            "message": "You can't use {Arg_1}.",
+            "translation": "",
+            "placeholders": [
+                {
+                    "id": "Arg_1",
+                    "string": "%[1]s",
+                    "type": "",
+                    "underlyingType": "string",
+                    "argNum": 1
+                }
+            ]
+        },
+        {
+            "id": "You're too full to eat that.",
+            "message": "You're too full to eat that.",
+            "translation": ""
+        },
+        {
+            "id": "it is already open",
+            "message": "it is already open",
+            "translation": ""
+        },
+        {
+            "id": "it is already closed",
+            "message": "it is already closed",
+            "translation": ""
+        },
+        {
+            "id": "missing slot",
+            "message": "missing slot",
+            "translation": ""
+        },
+        {
+            "id": "missing slots",
+            "message": "missing slots",
+            "translation": ""
+        },
+        {
+            "id": "used slots",
+            "message": "used slots",
+            "translation": ""
+        },
+        {
+            "id": "range",
+            "message": "range",
+            "translation": ""
+        },
+        {
+            "id": "thrown",
+            "message": "thrown",
+            "translation": ""
+        },
+        {
+            "id": "melee",
+            "message": "melee",
+            "translation": ""
+        },
+        {
+            "id": "unarmed",
+            "message": "unarmed",
+            "translation": ""
+        },
+        {
+            "id": "not logged in",
+            "message": "not logged in",
+            "translation": ""
+        },
+        {
+            "id": "bad password",
+            "message": "bad password",
+            "translation": ""
+        },
+        {
+            "id": "character exists",
+            "message": "character exists",
+            "translation": ""
+        },
+        {
+            "id": "character does not exist",
+            "message": "character does not exist",
+            "translation": ""
+        },
+        {
+            "id": "no such archetype",
+            "message": "no such archetype",
+            "translation": ""
+        },
+        {
+            "id": "no such user",
+            "message": "no such user",
+            "translation": ""
+        },
+        {
+            "id": "user exists",
+            "message": "user exists",
+            "translation": ""
+        },
+        {
+            "id": "no such fixture",
+            "message": "no such fixture",
+            "translation": ""
+        },
+        {
+            "id": "no such tile",
+            "message": "no such tile",
+            "translation": ""
+        },
+        {
+            "id": "*bump*",
+            "message": "*bump*",
+            "translation": ""
+        },
+        {
+            "id": "*pmub*",
+            "message": "*pmub*",
+            "translation": ""
+        },
+        {
+            "id": "*burp*",
+            "message": "*burp*",
+            "translation": ""
+        },
+        {
+            "id": "*munch*",
+            "message": "*munch*",
+            "translation": ""
+        },
+        {
+            "id": "You can't apply that.",
+            "message": "You can't apply that.",
+            "translation": ""
+        },
+        {
+            "id": "You can't pick that up.",
+            "message": "You can't pick that up.",
+            "translation": ""
+        },
+        {
+            "id": "You can't reach that.",
+            "message": "You can't reach that.",
+            "translation": ""
+        },
+        {
+            "id": "*snarf*",
+            "message": "*snarf*",
+            "translation": ""
+        },
+        {
+            "id": "*whump*",
+            "message": "*whump*",
+            "translation": ""
+        },
+        {
+            "id": "*thud*",
+            "message": "*thud*",
+            "translation": ""
+        },
+        {
+            "id": "You kick at the air.",
+            "message": "You kick at the air.",
+            "translation": "Havaya vutdfu"
+        },
+        {
+            "id": "*click*",
+            "message": "*click*",
+            "translation": "*tık*"
+        },
+        {
+            "id": "You close the door.",
+            "message": "You close the door.",
+            "translation": "Kapıyı kapattın"
+        },
+        {
+            "id": "It's already closed.",
+            "message": "It's already closed.",
+            "translation": "Zaten kapalı"
+        },
+        {
+            "id": "It's locked.",
+            "message": "It's locked.",
+            "translation": "Kilitli."
+        },
+        {
+            "id": "You open the door.",
+            "message": "You open the door.",
+            "translation": "Kapıyı açtın."
+        },
+        {
+            "id": "*creak*",
+            "message": "*creak*",
+            "translation": "*gıcırtı*"
+        },
+        {
+            "id": "It's already open.",
+            "message": "It's already open.",
+            "translation": "Zaten açık"
+        },
+        {
+            "id": "There is nothing there to open.",
+            "message": "There is nothing there to open.",
+            "translation": "Açacak hiçbirşey yok"
+        },
+        {
+            "id": "name cannot be empty",
+            "message": "name cannot be empty",
+            "translation": "İsim boş olamaz"
+        }
+    ]
+}

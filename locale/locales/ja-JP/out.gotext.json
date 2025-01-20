@@ -1,0 +1,394 @@
+{
+    "language": "ja-JP",
+    "messages": [
+        {
+            "id": "join",
+            "message": "join",
+            "translation": ""
+        },
+        {
+            "id": "delete",
+            "message": "delete",
+            "translation": ""
+        },
+        {
+            "id": "Confirm deletion",
+            "message": "Confirm deletion",
+            "translation": ""
+        },
+        {
+            "id": "character name",
+            "message": "character name",
+            "translation": ""
+        },
+        {
+            "id": "create",
+            "message": "create",
+            "translation": ""
+        },
+        {
+            "id": "logout",
+            "message": "logout",
+            "translation": ""
+        },
+        {
+            "id": "Create a new hero or select a previous one.",
+            "message": "Create a new hero or select a previous one.",
+            "translation": ""
+        },
+        {
+            "id": "Archetype is a collection of attributes and traits",
+            "message": "Archetype is a collection of attributes and traits",
+            "translation": ""
+        },
+        {
+            "id": "Swole determines damage and health",
+            "message": "Swole determines damage and health",
+            "translation": ""
+        },
+        {
+            "id": "Zooms determines speed and dodge",
+            "message": "Zooms determines speed and dodge",
+            "translation": ""
+        },
+        {
+            "id": "Brains determines spell damage and ability to by-pass traps",
+            "message": "Brains determines spell damage and ability to by-pass traps",
+            "translation": ""
+        },
+        {
+            "id": "Funk determines luck and area of effect bonuses",
+            "message": "Funk determines luck and area of effect bonuses",
+            "translation": ""
+        },
+        {
+            "id": "Traits are unique modifiers to an archetype",
+            "message": "Traits are unique modifiers to an archetype",
+            "translation": ""
+        },
+        {
+            "id": "name must not be empty",
+            "message": "name must not be empty",
+            "translation": ""
+        },
+        {
+            "id": "archetype must be selected",
+            "message": "archetype must be selected",
+            "translation": ""
+        },
+        {
+            "id": "username",
+            "message": "username",
+            "translation": ""
+        },
+        {
+            "id": "password",
+            "message": "password",
+            "translation": ""
+        },
+        {
+            "id": "confirm",
+            "message": "confirm",
+            "translation": ""
+        },
+        {
+            "id": "login",
+            "message": "login",
+            "translation": ""
+        },
+        {
+            "id": "register",
+            "message": "register",
+            "translation": ""
+        },
+        {
+            "id": "back",
+            "message": "back",
+            "translation": ""
+        },
+        {
+            "id": "login. you will be prompted to register if username does not exist.",
+            "message": "login. you will be prompted to register if username does not exist.",
+            "translation": ""
+        },
+        {
+            "id": "username must not be empty",
+            "message": "username must not be empty",
+            "translation": ""
+        },
+        {
+            "id": "password must not be empty",
+            "message": "password must not be empty",
+            "translation": ""
+        },
+        {
+            "id": "passwords must match",
+            "message": "passwords must match",
+            "translation": ""
+        },
+        {
+            "id": "logging in...",
+            "message": "logging in...",
+            "translation": ""
+        },
+        {
+            "id": "registering...",
+            "message": "registering...",
+            "translation": ""
+        },
+        {
+            "id": "...and so you return.",
+            "message": "...and so you return.",
+            "translation": ""
+        },
+        {
+            "id": "logged in!",
+            "message": "logged in!",
+            "translation": ""
+        },
+        {
+            "id": "Confirm your password to register.",
+            "message": "Confirm your password to register.",
+            "translation": ""
+        },
+        {
+            "id": "world name",
+            "message": "world name",
+            "translation": ""
+        },
+        {
+            "id": "petty",
+            "message": "petty",
+            "translation": ""
+        },
+        {
+            "id": "light",
+            "message": "light",
+            "translation": ""
+        },
+        {
+            "id": "medium",
+            "message": "medium",
+            "translation": ""
+        },
+        {
+            "id": "heavy",
+            "message": "heavy",
+            "translation": ""
+        },
+        {
+            "id": "You don't have that item.",
+            "message": "You don't have that item.",
+            "translation": ""
+        },
+        {
+            "id": "You can't use {Arg_1}.",
+            "message": "You can't use {Arg_1}.",
+            "translation": "",
+            "placeholders": [
+                {
+                    "id": "Arg_1",
+                    "string": "%[1]s",
+                    "type": "",
+                    "underlyingType": "string",
+                    "argNum": 1
+                }
+            ]
+        },
+        {
+            "id": "You're too full to eat that.",
+            "message": "You're too full to eat that.",
+            "translation": ""
+        },
+        {
+            "id": "it is already open",
+            "message": "it is already open",
+            "translation": ""
+        },
+        {
+            "id": "it is already closed",
+            "message": "it is already closed",
+            "translation": ""
+        },
+        {
+            "id": "missing slot",
+            "message": "missing slot",
+            "translation": ""
+        },
+        {
+            "id": "missing slots",
+            "message": "missing slots",
+            "translation": ""
+        },
+        {
+            "id": "used slots",
+            "message": "used slots",
+            "translation": ""
+        },
+        {
+            "id": "range",
+            "message": "range",
+            "translation": ""
+        },
+        {
+            "id": "thrown",
+            "message": "thrown",
+            "translation": ""
+        },
+        {
+            "id": "melee",
+            "message": "melee",
+            "translation": ""
+        },
+        {
+            "id": "unarmed",
+            "message": "unarmed",
+            "translation": ""
+        },
+        {
+            "id": "not logged in",
+            "message": "not logged in",
+            "translation": ""
+        },
+        {
+            "id": "bad password",
+            "message": "bad password",
+            "translation": ""
+        },
+        {
+            "id": "character exists",
+            "message": "character exists",
+            "translation": ""
+        },
+        {
+            "id": "character does not exist",
+            "message": "character does not exist",
+            "translation": ""
+        },
+        {
+            "id": "no such archetype",
+            "message": "no such archetype",
+            "translation": ""
+        },
+        {
+            "id": "no such user",
+            "message": "no such user",
+            "translation": ""
+        },
+        {
+            "id": "user exists",
+            "message": "user exists",
+            "translation": ""
+        },
+        {
+            "id": "no such fixture",
+            "message": "no such fixture",
+            "translation": ""
+        },
+        {
+            "id": "no such tile",
+            "message": "no such tile",
+            "translation": ""
+        },
+        {
+            "id": "*bump*",
+            "message": "*bump*",
+            "translation": ""
+        },
+        {
+            "id": "*pmub*",
+            "message": "*pmub*",
+            "translation": ""
+        },
+        {
+            "id": "*burp*",
+            "message": "*burp*",
+            "translation": ""
+        },
+        {
+            "id": "*munch*",
+            "message": "*munch*",
+            "translation": ""
+        },
+        {
+            "id": "You can't apply that.",
+            "message": "You can't apply that.",
+            "translation": ""
+        },
+        {
+            "id": "You can't pick that up.",
+            "message": "You can't pick that up.",
+            "translation": ""
+        },
+        {
+            "id": "You can't reach that.",
+            "message": "You can't reach that.",
+            "translation": ""
+        },
+        {
+            "id": "*snarf*",
+            "message": "*snarf*",
+            "translation": ""
+        },
+        {
+            "id": "*whump*",
+            "message": "*whump*",
+            "translation": ""
+        },
+        {
+            "id": "*thud*",
+            "message": "*thud*",
+            "translation": ""
+        },
+        {
+            "id": "You kick at the air.",
+            "message": "You kick at the air.",
+            "translation": ""
+        },
+        {
+            "id": "*click*",
+            "message": "*click*",
+            "translation": ""
+        },
+        {
+            "id": "You close the door.",
+            "message": "You close the door.",
+            "translation": ""
+        },
+        {
+            "id": "It's already closed.",
+            "message": "It's already closed.",
+            "translation": ""
+        },
+        {
+            "id": "It's locked.",
+            "message": "It's locked.",
+            "translation": ""
+        },
+        {
+            "id": "You open the door.",
+            "message": "You open the door.",
+            "translation": ""
+        },
+        {
+            "id": "*creak*",
+            "message": "*creak*",
+            "translation": ""
+        },
+        {
+            "id": "It's already open.",
+            "message": "It's already open.",
+            "translation": ""
+        },
+        {
+            "id": "There is nothing there to open.",
+            "message": "There is nothing there to open.",
+            "translation": ""
+        },
+        {
+            "id": "name cannot be empty",
+            "message": "name cannot be empty",
+            "translation": ""
+        }
+    ]
+}
