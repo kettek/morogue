@@ -17,14 +17,17 @@ func NewConnection(c *websocket.Conn) *Connection {
 	return &Connection{c}
 }
 
-func (conn *Connection) Connect() chan error {
+func (conn *Connection) Connect(server string) chan error {
+	if server == "" {
+		server = "localhost:8080"
+	}
 	ch := make(chan error)
 
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 		defer cancel()
 
-		c, _, err := websocket.Dial(ctx, "ws://localhost:8080/sockit", &websocket.DialOptions{
+		c, _, err := websocket.Dial(ctx, "ws://"+server+"/sockit", &websocket.DialOptions{
 			Subprotocols: []string{"morogue"},
 		})
 		if err != nil {
