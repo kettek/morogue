@@ -29,8 +29,15 @@ type Connect struct {
 }
 
 func (state *Connect) Begin(ctx ifs.RunContext) error {
+	return state.Connect(ctx)
+}
+
+func (state *Connect) Connect(ctx ifs.RunContext) error {
+	if state.mode == modeConnecting {
+		return nil
+	}
 	state.mode = modeConnecting
-	state.connectionChan = state.connection.Connect()
+	state.connectionChan = state.connection.Connect(ctx.Cfg.LastServer)
 	return nil
 }
 
@@ -52,6 +59,7 @@ func (state *Connect) Update(ctx ifs.RunContext) error {
 		if err != nil {
 			state.mode = modeFailed
 			state.result = err.Error()
+			ctx.Sm.Push(NewServer(&state.mode, &state.connection, &state.connectionChan))
 			return nil
 		}
 		state.mode = modeSuccess
@@ -68,6 +76,7 @@ func (state *Connect) Update(ctx ifs.RunContext) error {
 			state.mode = modeFailed
 		}
 		state.result = err.Error()
+		ctx.Sm.Push(NewServer(&state.mode, &state.connection, &state.connectionChan))
 	default:
 		//
 	}
