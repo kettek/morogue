@@ -1,0 +1,546 @@
+{
+    "language": "en-US",
+    "messages": [
+        {
+            "id": "join",
+            "message": "join",
+            "translation": "join",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "delete",
+            "message": "delete",
+            "translation": "delete",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Confirm deletion",
+            "message": "Confirm deletion",
+            "translation": "Confirm deletion",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "character name",
+            "message": "character name",
+            "translation": "character name",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "create",
+            "message": "create",
+            "translation": "create",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "logout",
+            "message": "logout",
+            "translation": "logout",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Create a new hero or select a previous one.",
+            "message": "Create a new hero or select a previous one.",
+            "translation": "Create a new hero or select a previous one.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Archetype is a collection of attributes and traits",
+            "message": "Archetype is a collection of attributes and traits",
+            "translation": "Archetype is a collection of attributes and traits",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Swole determines damage and health",
+            "message": "Swole determines damage and health",
+            "translation": "Swole determines damage and health",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Zooms determines speed and dodge",
+            "message": "Zooms determines speed and dodge",
+            "translation": "Zooms determines speed and dodge",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Brains determines spell damage and ability to by-pass traps",
+            "message": "Brains determines spell damage and ability to by-pass traps",
+            "translation": "Brains determines spell damage and ability to by-pass traps",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Funk determines luck and area of effect bonuses",
+            "message": "Funk determines luck and area of effect bonuses",
+            "translation": "Funk determines luck and area of effect bonuses",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Traits are unique modifiers to an archetype",
+            "message": "Traits are unique modifiers to an archetype",
+            "translation": "Traits are unique modifiers to an archetype",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "name must not be empty",
+            "message": "name must not be empty",
+            "translation": "name must not be empty",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "archetype must be selected",
+            "message": "archetype must be selected",
+            "translation": "archetype must be selected",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "username",
+            "message": "username",
+            "translation": "username",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "password",
+            "message": "password",
+            "translation": "password",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "confirm",
+            "message": "confirm",
+            "translation": "confirm",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "login",
+            "message": "login",
+            "translation": "login",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "register",
+            "message": "register",
+            "translation": "register",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "back",
+            "message": "back",
+            "translation": "back",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "login. you will be prompted to register if username does not exist.",
+            "message": "login. you will be prompted to register if username does not exist.",
+            "translation": "login. you will be prompted to register if username does not exist.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "username must not be empty",
+            "message": "username must not be empty",
+            "translation": "username must not be empty",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "password must not be empty",
+            "message": "password must not be empty",
+            "translation": "password must not be empty",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "passwords must match",
+            "message": "passwords must match",
+            "translation": "passwords must match",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "logging in...",
+            "message": "logging in...",
+            "translation": "logging in...",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "registering...",
+            "message": "registering...",
+            "translation": "registering...",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "...and so you return.",
+            "message": "...and so you return.",
+            "translation": "...and so you return.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "logged in!",
+            "message": "logged in!",
+            "translation": "logged in!",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Confirm your password to register.",
+            "message": "Confirm your password to register.",
+            "translation": "Confirm your password to register.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "world name",
+            "message": "world name",
+            "translation": "world name",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "petty",
+            "message": "petty",
+            "translation": "petty",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "light",
+            "message": "light",
+            "translation": "light",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "medium",
+            "message": "medium",
+            "translation": "medium",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "heavy",
+            "message": "heavy",
+            "translation": "heavy",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "You don't have that item.",
+            "message": "You don't have that item.",
+            "translation": "You don't have that item.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "You can't use {Arg_1}.",
+            "message": "You can't use {Arg_1}.",
+            "translation": "You can't use {Arg_1}.",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "Arg_1",
+                    "string": "%[1]s",
+                    "type": "",
+                    "underlyingType": "string",
+                    "argNum": 1
+                }
+            ],
+            "fuzzy": true
+        },
+        {
+            "id": "You're too full to eat that.",
+            "message": "You're too full to eat that.",
+            "translation": "You're too full to eat that.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "it is already open",
+            "message": "it is already open",
+            "translation": "it is already open",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "it is already closed",
+            "message": "it is already closed",
+            "translation": "it is already closed",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "missing slot",
+            "message": "missing slot",
+            "translation": "missing slot",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "missing slots",
+            "message": "missing slots",
+            "translation": "missing slots",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "used slots",
+            "message": "used slots",
+            "translation": "used slots",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "range",
+            "message": "range",
+            "translation": "range",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "thrown",
+            "message": "thrown",
+            "translation": "thrown",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "melee",
+            "message": "melee",
+            "translation": "melee",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "unarmed",
+            "message": "unarmed",
+            "translation": "unarmed",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "not logged in",
+            "message": "not logged in",
+            "translation": "not logged in",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "bad password",
+            "message": "bad password",
+            "translation": "bad password",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "character exists",
+            "message": "character exists",
+            "translation": "character exists",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "character does not exist",
+            "message": "character does not exist",
+            "translation": "character does not exist",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "no such archetype",
+            "message": "no such archetype",
+            "translation": "no such archetype",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "no such user",
+            "message": "no such user",
+            "translation": "no such user",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "user exists",
+            "message": "user exists",
+            "translation": "user exists",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "no such fixture",
+            "message": "no such fixture",
+            "translation": "no such fixture",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "no such tile",
+            "message": "no such tile",
+            "translation": "no such tile",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "*bump*",
+            "message": "*bump*",
+            "translation": "*bump*",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "*pmub*",
+            "message": "*pmub*",
+            "translation": "*pmub*",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "*burp*",
+            "message": "*burp*",
+            "translation": "*burp*",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "*munch*",
+            "message": "*munch*",
+            "translation": "*munch*",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "You can't apply that.",
+            "message": "You can't apply that.",
+            "translation": "You can't apply that.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "You can't pick that up.",
+            "message": "You can't pick that up.",
+            "translation": "You can't pick that up.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "You can't reach that.",
+            "message": "You can't reach that.",
+            "translation": "You can't reach that.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "*snarf*",
+            "message": "*snarf*",
+            "translation": "*snarf*",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "*whump*",
+            "message": "*whump*",
+            "translation": "*whump*",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "*thud*",
+            "message": "*thud*",
+            "translation": "*thud*",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "You kick at the air.",
+            "message": "You kick at the air.",
+            "translation": "You kick at the air.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "*click*",
+            "message": "*click*",
+            "translation": "*click*",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "You close the door.",
+            "message": "You close the door.",
+            "translation": "You close the door.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "It's already closed.",
+            "message": "It's already closed.",
+            "translation": "It's already closed.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "It's locked.",
+            "message": "It's locked.",
+            "translation": "It's locked.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "You open the door.",
+            "message": "You open the door.",
+            "translation": "You open the door.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "*creak*",
+            "message": "*creak*",
+            "translation": "*creak*",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "It's already open.",
+            "message": "It's already open.",
+            "translation": "It's already open.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "There is nothing there to open.",
+            "message": "There is nothing there to open.",
+            "translation": "There is nothing there to open.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "name cannot be empty",
+            "message": "name cannot be empty",
+            "translation": "name cannot be empty",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        }
+    ]
+}
