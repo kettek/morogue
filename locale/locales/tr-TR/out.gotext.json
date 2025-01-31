@@ -59,7 +59,7 @@
         {
             "id": "Funk determines luck and area of effect bonuses",
             "message": "Funk determines luck and area of effect bonuses",
-            "translation": ""
+            "translation": "Funk, şans ve etki alanı bonuslarını belirler."
         },
         {
             "id": "Traits are unique modifiers to an archetype",
@@ -159,7 +159,7 @@
         {
             "id": "petty",
             "message": "petty",
-            "translation": "petty"
+            "translation": "miskat"
         },
         {
             "id": "light",
@@ -184,7 +184,7 @@
         {
             "id": "You can't use {Arg_1}.",
             "message": "You can't use {Arg_1}.",
-            "translation": "",
+            "translation": "{Arg_1} kullanamazsın",
             "placeholders": [
                 {
                     "id": "Arg_1",
@@ -198,52 +198,52 @@
         {
             "id": "You're too full to eat that.",
             "message": "You're too full to eat that.",
-            "translation": ""
+            "translation": "Onu yemek için çok toksun."
         },
         {
             "id": "it is already open",
             "message": "it is already open",
-            "translation": ""
+            "translation": "Zaten açık"
         },
         {
             "id": "it is already closed",
             "message": "it is already closed",
-            "translation": ""
+            "translation": "Zaten kapalı"
         },
         {
             "id": "missing slot",
             "message": "missing slot",
-            "translation": ""
+            "translation": "Kayıp slot"
         },
         {
             "id": "missing slots",
             "message": "missing slots",
-            "translation": ""
+            "translation": "Kayıp slotlar"
         },
         {
             "id": "used slots",
             "message": "used slots",
-            "translation": ""
+            "translation": "Kullanılmış slotlar"
         },
         {
             "id": "range",
             "message": "range",
-            "translation": ""
+            "translation": "aralık"
         },
         {
             "id": "thrown",
             "message": "thrown",
-            "translation": ""
+            "translation": "fırlatılmış"
         },
         {
             "id": "melee",
             "message": "melee",
-            "translation": ""
+            "translation": "yakın dövüş silahı"
         },
         {
             "id": "unarmed",
             "message": "unarmed",
-            "translation": ""
+            "translation": "silahsız"
         },
         {
             "id": "not logged in",
@@ -283,22 +283,22 @@
         {
             "id": "no such fixture",
             "message": "no such fixture",
-            "translation": ""
+            "translation": "böyle bir fikstür yok"
         },
         {
             "id": "no such tile",
             "message": "no such tile",
-            "translation": ""
+            "translation": "böyle bir tile yok"
         },
         {
             "id": "*bump*",
             "message": "*bump*",
-            "translation": ""
+            "translation": "*küt*"
         },
         {
             "id": "*pmub*",
             "message": "*pmub*",
-            "translation": ""
+            "translation": "*pmub*"
         },
         {
             "id": "*burp*",
@@ -308,7 +308,7 @@
         {
             "id": "*munch*",
             "message": "*munch*",
-            "translation": ""
+            "translation": "*sesli çiğneme*"
         },
         {
             "id": "You can't apply that.",
@@ -328,17 +328,17 @@
         {
             "id": "*snarf*",
             "message": "*snarf*",
-            "translation": ""
+            "translation": "*hüp*"
         },
         {
             "id": "*whump*",
             "message": "*whump*",
-            "translation": ""
+            "translation": "*şaplak*"
         },
         {
             "id": "*thud*",
             "message": "*thud*",
-            "translation": ""
+            "translation": "*güm*"
         },
         {
             "id": "You kick at the air.",
