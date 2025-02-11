@@ -263,7 +263,7 @@
         {
             "id": "character does not exist",
             "message": "character does not exist",
-            "translation": "Karakyter bulunmuyor"
+            "translation": "Karakter bulunmuyor"
         },
         {
             "id": "no such archetype",
