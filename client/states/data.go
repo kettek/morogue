@@ -17,14 +17,16 @@ import (
 )
 
 type Data struct {
+	serverSource    string
 	archetypes      map[id.UUID]game.Archetype
 	archetypeImages map[id.UUID]*ebiten.Image
 	tiles           map[id.UUID]game.TileArchetype
 	tileImages      map[id.UUID]*ebiten.Image
 }
 
-func NewData() *Data {
+func NewData(serverSource string) *Data {
 	return &Data{
+		serverSource:    serverSource,
 		archetypes:      make(map[id.UUID]game.Archetype),
 		archetypeImages: make(map[id.UUID]*ebiten.Image),
 	}
@@ -94,7 +96,7 @@ func (d *Data) EnsureImage(archetype game.Archetype, zoom float64) (*ebiten.Imag
 func (d *Data) LoadImage(src string, scale float64) (*ebiten.Image, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*5)
 	defer cancel()
-	req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost:8080/"+src, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", d.serverSource+"/"+src, nil)
 	if err != nil {
 		log.Println(err)
 		return nil, err
