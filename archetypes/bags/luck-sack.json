@@ -1,0 +1,10 @@
+{
+  "id": "morogue:bag:lucksack",
+  "title": "Lucksack",
+  "image": "lucksack.png",
+  "description": "A tiny bag composed entirely from four-leaf clovers, somehow.",
+  "capacity": 1,
+  "limit": 7777,
+  "traits": ["lucky"],
+  "slots": ["bag"]
+}
