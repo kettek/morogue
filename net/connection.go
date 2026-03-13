@@ -10,11 +10,19 @@ import (
 )
 
 type Connection struct {
-	c *websocket.Conn
+	c      *websocket.Conn
+	server string
 }
 
 func NewConnection(c *websocket.Conn) *Connection {
-	return &Connection{c}
+	return &Connection{
+		c:      c,
+		server: "undef",
+	}
+}
+
+func (conn *Connection) String() string {
+	return conn.server
 }
 
 func (conn *Connection) Connect(server string) chan error {
@@ -22,6 +30,8 @@ func (conn *Connection) Connect(server string) chan error {
 		server = "localhost:8080"
 	}
 	ch := make(chan error)
+
+	conn.server = server
 
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
@@ -52,6 +62,7 @@ func (conn *Connection) Close() {
 	}
 	conn.c.Close(websocket.StatusNormalClosure, "")
 	conn.c = nil
+	conn.server = ""
 }
 
 func (conn *Connection) Loop() (chan Message, chan error) {

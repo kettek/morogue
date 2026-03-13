@@ -74,7 +74,7 @@ type archetype struct {
 // NewCreate creates a new Create instance.
 func NewCreate(connection net.Connection, msgCh chan net.Message) *Create {
 	state := &Create{
-		data:        NewData(),
+		data:        NewData("http://" + connection.String()),
 		connection:  connection,
 		messageChan: msgCh,
 		ui: &ebitenui.UI{
