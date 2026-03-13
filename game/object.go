@@ -73,6 +73,17 @@ func CreateObjectFromArchetype(a Archetype) Object {
 				CurrentCalories: a.Calories,
 			},
 		}
+	case BagArchetype:
+		return &Bag{
+			Objectable: Objectable{
+				ArchetypeID: a.GetID(),
+				Archetype:   a,
+			},
+			Containerable: Containerable{
+				Capacity: a.Capacity,
+				Limit:    a.Limit,
+			},
+		}
 	}
 	return nil
 }

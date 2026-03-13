@@ -47,3 +47,9 @@ type Edible interface {
 	Eat() int
 	Throw()
 }
+
+// Containerable is the interface for objecst that can contain other objects.
+type Containerable interface {
+	Pickup(o game.Object) bool
+	Drop(o game.Object) bool
+}

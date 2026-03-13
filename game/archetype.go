@@ -90,6 +90,13 @@ func DecodeArchetype(bytes []byte, rootPath string) (Archetype, error) {
 		}
 		a.Image = path.Join(rootPath, a.Image)
 		return a, nil
+	case id.KeyBag:
+		var a BagArchetype
+		if err = json.Unmarshal(bytes, &a); err != nil {
+			return nil, err
+		}
+		a.Image = path.Join(rootPath, a.Image)
+		return a, nil
 	default:
 		return nil, fmt.Errorf("invalid archetype type: %s", key)
 	}

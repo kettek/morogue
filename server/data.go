@@ -142,6 +142,17 @@ func (d *Data) FoodArchetypes() []game.FoodArchetype {
 	return archetypes
 }
 
+// BagArchetypes returns a slice of all BagArchetypes.
+func (d *Data) BagArchetypes() []game.BagArchetype {
+	var archetypes []game.BagArchetype
+	for _, a := range d.Archetypes {
+		if b, ok := a.(game.BagArchetype); ok {
+			archetypes = append(archetypes, b)
+		}
+	}
+	return archetypes
+}
+
 // LoadArchetypes loads all archetypes from the archetypes directory.
 func (d *Data) LoadArchetypes() error {
 	var iterate func(string, string) error
