@@ -1,0 +1,9 @@
+{
+  "id": "morogue:bag:a-classic-sack",
+  "title": "A Classic Sack",
+  "image": "a-classic-sack.png",
+  "description": "The icon, perhaps even classic, sack.",
+  "capacity": 5,
+  "limit": 600,
+  "slots": ["bag"]
+}

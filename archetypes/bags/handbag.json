@@ -1,0 +1,10 @@
+{
+  "id": "morogue:bag:handbag",
+  "title": "Handbag",
+  "image": "handbag.png",
+  "description": "A HANDBAG?!?",
+  "capacity": 3,
+  "limit": 200,
+  "traits": ["charismatic"],
+  "slots": ["bag"]
+}
